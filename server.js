@@ -17,9 +17,9 @@ const COOKIE_SECURE = process.env.COOKIE_SECURE === 'true' || NODE_ENV === 'prod
 const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret';
 const TOKEN_EXPIRY = '2h'; // token validity
 
-const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY || '6Lcr-BktAAAAAIReEFxxEXvHpvD5EhwyZCvXELSA';
-const RECAPTCHA_API_KEY = process.env.RECAPTCHA_API_KEY || '';
-const RECAPTCHA_PROJECT_ID = process.env.RECAPTCHA_PROJECT_ID || process.env.GCLOUD_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || '';
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY || '6LeYBRotAAAAAKfB0iPqbv2bGbBWE_UrS1f1Jb9H';
+const RECAPTCHA_API_KEY = process.env.RECAPTCHA_API_KEY || 'AIzaSyD8xuAMJaPiamW-fYkhNhLpyr8FrK6hVwI';
+const RECAPTCHA_PROJECT_ID = process.env.RECAPTCHA_PROJECT_ID || 'smartbiz-a9987';
 const RECAPTCHA_MIN_SCORE = parseFloat(process.env.RECAPTCHA_MIN_SCORE || '0.5');
 
 function isRecaptchaConfigured() {
