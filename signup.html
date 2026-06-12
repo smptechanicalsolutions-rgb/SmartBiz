@@ -546,6 +546,8 @@
         }
     </style>
     <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lf75xotAAAAAOtywURIVODHe-SLjE-3s22_gvhK"></script>
+    <!-- reCAPTCHA v2 (checkbox) for Netlify compatibility; if you use Netlify env, set the V2 site key there -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
     <a href="home.html" class="auth-back-button" aria-label="Go back" onclick="if (history.length > 1) { history.back(); return false; }">
@@ -618,6 +620,10 @@
                         <strong>Protected by Google reCAPTCHA Enterprise</strong>
                         <div style="font-size:0.9rem; color:#55617d; margin-top:4px;">Secure registration with fraud prevention and bot protection.</div>
                     </div>
+                </div>
+                <!-- Optional reCAPTCHA v2 checkbox (Netlify-friendly) -->
+                <div style="margin-top:12px;">
+                    <div class="g-recaptcha" data-sitekey="6Lf75xotAAAAAOtywURIVODHe-SLjE-3s22_gvhK"></div>
                 </div>
             </form>
 
