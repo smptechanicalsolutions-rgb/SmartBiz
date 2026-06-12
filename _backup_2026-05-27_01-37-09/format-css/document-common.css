@@ -1,0 +1,275 @@
+/**
+ * Shared document layout: A4 container, centered watermark, alignment.
+ * Load after format-specific CSS.
+ */
+
+/* Back control — screen only, top-left on format/document pages */
+.sb-document-back {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10000;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0a4b78;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.sb-document-back:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.sb-document-back:active {
+  background: #f1f5f9;
+}
+
+.sb-document-back__icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+#invoice,
+#invoice.proforma3,
+.invoice {
+  position: relative !important;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 1122px;
+}
+
+/* Flex invoices: stretch page so watermark overlay matches full A4, not content height only */
+#invoice > .invoice-page-spacer {
+  flex: 1 1 auto;
+  min-height: 1px;
+  width: 100%;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Consistent table number alignment */
+#invoice .invoice-table th,
+#invoice .invoice-table td,
+#invoice .proforma3-items th,
+#invoice .proforma3-items td {
+  vertical-align: top;
+}
+
+#invoice .invoice-table th:last-child,
+#invoice .invoice-table td:last-child,
+#invoice .proforma3-items .col-amt,
+#invoice .proforma3-items .col-rate,
+#invoice .proforma3-items .col-qty {
+  text-align: right;
+}
+
+#invoice > *:not(.watermark):not(.proforma3-watermark):not(#proformaWatermark):not(.invoice-page-spacer) {
+  position: relative;
+  z-index: 2;
+}
+
+/* Watermark layer — hidden by default, full invoice area when active */
+#invoice > .watermark,
+#invoice > .proforma3-watermark,
+#proformaWatermark {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: none !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  background: transparent !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+/* Visible watermark overlay */
+#invoice > .watermark.watermark-visible,
+#invoice > .watermark[data-watermark-active="true"],
+#invoice > .proforma3-watermark.watermark-visible,
+#invoice > .proforma3-watermark[data-watermark-active="true"],
+#proformaWatermark.watermark-visible,
+#proformaWatermark[data-watermark-active="true"] {
+  display: block !important;
+}
+
+/* Watermark text — position synced by js/watermark.js to invoice center */
+#invoice > .watermark .wm,
+#invoice > .proforma3-watermark .wm,
+#proformaWatermark .wm,
+#pWatermarkText {
+  padding: 0 !important;
+  font-size: 88px !important;
+  font-weight: 700 !important;
+  color: rgba(15, 23, 42, 0.16) !important;
+  letter-spacing: 0.14em;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap;
+  text-transform: uppercase;
+  user-select: none;
+  z-index: 1 !important;
+}
+
+/* Action buttons — shared on all format preview pages */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 18px 0;
+  flex-wrap: wrap;
+}
+
+.action-buttons .pdf-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 10px 25px;
+  background: #0a4b78;
+  color: #ffffff !important;
+  border: none !important;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 120px;
+  line-height: 1.2;
+  box-shadow: none;
+  text-decoration: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.action-buttons .pdf-btn:hover {
+  filter: brightness(1.08);
+}
+
+.action-buttons .pdf-btn:active {
+  filter: brightness(0.95);
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .action-buttons .pdf-btn {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 576px) {
+  .action-buttons {
+    gap: 8px;
+    margin: 10px 0;
+  }
+
+  .action-buttons .pdf-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    min-width: 100px;
+  }
+}
+
+@media print {
+  .action-buttons {
+    display: none !important;
+  }
+}
+
+/* Footer — bottom-right on every document */
+#invoice .invoice-footer {
+  position: relative;
+  z-index: 2;
+  text-align: right;
+  padding: 10px 4px 2px;
+  margin-top: 8px;
+  font-size: 10px;
+  color: #6c757d;
+  line-height: 1.35;
+}
+
+#invoice .invoice-footer .powered-by {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+#invoice .invoice-footer .digitally-signed {
+  font-style: italic;
+  font-size: 9px;
+}
+
+#invoice.proforma3 .invoice-footer {
+  margin-top: 12px;
+  padding-right: 8px;
+  padding-bottom: 4px;
+}
+
+/* Stamp slot — keep stamp centered and inside the signature area (formats 9–12) */
+#invoice .proforma3-sign-box .sig-stamp-slot {
+  min-height: 128px;
+  overflow: hidden;
+}
+
+#invoice .proforma3-sign-box #invoiceStampImage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  max-width: 88%;
+  max-height: 88%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+@media print {
+  .sb-document-back {
+    display: none !important;
+  }
+
+  #invoice > .watermark[data-watermark-active="true"],
+  #invoice > .proforma3-watermark[data-watermark-active="true"],
+  #proformaWatermark[data-watermark-active="true"] {
+    display: block !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #invoice > .watermark .wm,
+  #invoice > .proforma3-watermark .wm,
+  #proformaWatermark .wm,
+  #pWatermarkText {
+    font-size: 76px !important;
+    color: rgba(15, 23, 42, 0.16) !important;
+  }
+
+  #invoice .invoice-footer {
+    color: #555 !important;
+  }
+}

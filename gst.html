@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Professional GST Invoice</title>
+    <style>
+      :root {
+        --brand: #1e293b;
+        --bg: #f1f5f9;
+        --text: #334155;
+      }
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: var(--bg);
+        margin: 0;
+        display: flex;
+        color: var(--text);
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 300px;
+        background: white;
+        height: 100vh;
+        padding: 25px;
+        position: fixed;
+        border-right: 1px solid #e2e8f0;
+        z-index: 10;
+      }
+      .main-content {
+        margin-left: 300px;
+        flex-grow: 1;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* Invoice */
+      .invoice-box {
+        width: 800px;
+        background: white;
+        padding: 50px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      /* My Details (Locked) */
+      .my-details h2 {
+        margin: 0;
+        color: var(--brand);
+        font-size: 24px;
+        text-transform: uppercase;
+      }
+      .my-details p {
+        margin: 2px 0;
+        font-size: 13px;
+        color: #64748b;
+      }
+
+      /* User Details (Editable) */
+      .user-details {
+        margin-top: 30px;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .editable-field {
+        border: 1px dashed #cbd5e1;
+        padding: 5px;
+        min-height: 20px;
+        outline: none;
+        margin-bottom: 5px;
+        border-radius: 4px;
+      }
+      .editable-field:focus {
+        background: #f8fafc;
+        border-color: #4f46e5;
+      }
+      .editable-field:empty:before {
+        content: attr(placeholder);
+        color: #94a3b8;
+      }
+
+      /* Table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 30px 0;
+      }
+      th {
+        background: #f8fafc;
+        text-align: left;
+        padding: 12px;
+        font-size: 12px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      input {
+        border: 1px solid #e2e8f0;
+        padding: 6px;
+        border-radius: 4px;
+        width: 90%;
+      }
+
+      /* Signature */
+      .sig-canvas-area {
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        cursor: crosshair;
+        border-radius: 4px;
+      }
+      .btn-clear {
+        background: #fee2e2;
+        color: #ef4444;
+        border: none;
+        padding: 4px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        margin-top: 5px;
+      }
+
+      .print-btn {
+        background: #4f46e5;
+        color: white;
+        border: none;
+        padding: 12px;
+        width: 100%;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      @media print {
+        .sidebar,
+        .btn-clear,
+        .no-print,
+        .add-row {
+          display: none !important;
+        }
+        body {
+          background: white;
+        }
+        .main-content {
+          margin: 0;
+          padding: 0;
+        }
+        .invoice-box {
+          box-shadow: none;
+          width: 100%;
+          padding: 0;
+        }
+        .editable-field {
+          border: none;
+        }
+        input {
+          border: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Back to Home Button - Top Left Corner -->
+    <button
+      onclick="window.location.href='index.html'"
+      style="
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: background 0.3s ease;
+      "
+      onmouseover="this.style.background='#0056b3'"
+      onmouseout="this.style.background='#007bff'"
+    >
+      ← Back to Home
+    </button>
+    <div class="sidebar">
+      <h3 style="margin-top: 0">Settings</h3>
+      <label style="font-size: 12px">Currency</label>
+      <select
+        id="currency"
+        onchange="calculate()"
+        style="width: 100%; padding: 8px; margin-bottom: 20px"
+      >
+        <option value="₹">INR (₹)</option>
+        <option value="$">USD ($)</option>
+        <option value="€">EUR (€)</option>
+      </select>
+      <button class="print-btn" onclick="window.print()">Print Invoice</button>
+    </div>
+
+    <div class="main-content">
+      <div class="invoice-box">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+          "
+        >
+          <div class="my-details">
+            <h2>Akib-IT-Solutin</h2>
+            <p>123, Business Park, Industrial Area</p>
+            <p>Mumbai, Maharashtra - 400001</p>
+            <p><strong>GSTIN: 27AAAAA0000A1Z5</strong></p>
+          </div>
+          <div style="text-align: right">
+            <h1 style="margin: 0; color: #cbd5e1; letter-spacing: 2px">
+              INVOICE
+            </h1>
+            <p># <span contenteditable="true" placeholder="001"></span></p>
+            <input
+              type="date"
+              id="dateInput"
+              style="width: auto; border: none; font-weight: bold"
+            />
+          </div>
+        </div>
+
+        <div class="user-details">
+          <div>
+            <p
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                margin-bottom: 5px;
+              "
+            >
+              BILL TO (User Details)
+            </p>
+            <div
+              class="editable-field"
+              contenteditable="true"
+              placeholder="User Name / Company Name"
+            ></div>
+            <div
+              class="editable-field"
+              contenteditable="true"
+              placeholder="User Address"
+            ></div>
+            <div
+              class="editable-field"
+              contenteditable="true"
+              placeholder="User GSTIN (Optional)"
+            ></div>
+          </div>
+          <div style="text-align: right">
+            <p
+              style="
+                font-size: 11px;
+                font-weight: bold;
+                color: #64748b;
+                margin-bottom: 5px;
+              "
+            >
+              TAX TYPE
+            </p>
+            <select id="taxType" onchange="calculate()" style="width: 180px">
+              <option value="intra">Intra-State (CGST + SGST)</option>
+              <option value="inter">Inter-State (IGST)</option>
+            </select>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th width="80">Qty</th>
+              <th width="120">Rate</th>
+              <th width="80">GST %</th>
+              <th width="120" style="text-align: right">Total</th>
+              <th width="30" class="no-print"></th>
+            </tr>
+          </thead>
+          <tbody id="itemBody"></tbody>
+        </table>
+        <button
+          class="add-row no-print"
+          onclick="addRow()"
+          style="
+            cursor: pointer;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 5px 15px;
+            border-radius: 4px;
+          "
+        >
+          + Add Item
+        </button>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 30px">
+          <div style="width: 250px">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+              "
+            >
+              <span>Taxable Value:</span> <span id="subtotal">0.00</span>
+            </div>
+            <div id="taxDetails"></div>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                font-weight: bold;
+                font-size: 18px;
+                border-top: 2px solid #1e293b;
+                padding-top: 10px;
+                margin-top: 10px;
+              "
+            >
+              <span>Grand Total:</span> <span id="grandTotal">0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style="
+            margin-top: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+          "
+        >
+          <div style="font-size: 12px; color: #94a3b8; max-width: 400px">
+            <strong>Terms:</strong><br />
+            Goods once sold will not be taken back. This is a computer generated
+            invoice.
+          </div>
+          <div style="text-align: center">
+            <canvas
+              id="sig-pad"
+              class="sig-canvas-area"
+              width="200"
+              height="80"
+            ></canvas>
+            <div class="no-print">
+              <button class="btn-clear" onclick="clearSig()">
+                Clear Signature
+              </button>
+            </div>
+            <div
+              style="
+                border-top: 1px solid #1e293b;
+                margin-top: 5px;
+                font-weight: bold;
+                font-size: 13px;
+                width: 200px;
+                padding-top: 5px;
+              "
+            >
+              Authorized Signatory
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      window.onload = () => {
+        addRow();
+        document.getElementById("dateInput").valueAsDate = new Date();
+        initSig();
+      };
+
+      function addRow() {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><input type="text" placeholder="Item Name"></td>
+            <td><input type="number" value="1" class="qty" oninput="calculate()"></td>
+            <td><input type="number" placeholder="0.00" class="rate" oninput="calculate()"></td>
+            <td><select class="gst" onchange="calculate()"><option value="18">18%</option><option value="12">12%</option><option value="5">5%</option><option value="0">0%</option></select></td>
+            <td class="row-total" style="text-align:right; font-weight:bold;">0.00</td>
+            <td class="no-print"><button onclick="this.parentElement.parentElement.remove(); calculate()" style="color:#ef4444; border:none; background:none; cursor:pointer;">✕</button></td>
+        `;
+        document.getElementById("itemBody").appendChild(tr);
+      }
+
+      function calculate() {
+        let taxable = 0,
+          gstTotal = 0;
+        const curr = document.getElementById("currency").value;
+        const isIntra = document.getElementById("taxType").value === "intra";
+
+        document.querySelectorAll("#itemBody tr").forEach((row) => {
+          const q = row.querySelector(".qty").value || 0;
+          const r = row.querySelector(".rate").value || 0;
+          const g = row.querySelector(".gst").value;
+          const line = q * r;
+          const tax = (line * g) / 100;
+          row.querySelector(".row-total").innerText = (line + tax).toFixed(2);
+          taxable += line;
+          gstTotal += tax;
+        });
+
+        document.getElementById("subtotal").innerText = taxable.toFixed(2);
+        let taxHtml = "";
+        if (isIntra) {
+          taxHtml += `<div style="display:flex; justify-content:space-between; font-size:14px;"><span>CGST (9%):</span><span>${(
+            gstTotal / 2
+          ).toFixed(2)}</span></div>`;
+          taxHtml += `<div style="display:flex; justify-content:space-between; font-size:14px;"><span>SGST (9%):</span><span>${(
+            gstTotal / 2
+          ).toFixed(2)}</span></div>`;
+        } else {
+          taxHtml += `<div style="display:flex; justify-content:space-between; font-size:14px;"><span>IGST (18%):</span><span>${gstTotal.toFixed(
+            2
+          )}</span></div>`;
+        }
+        document.getElementById("taxDetails").innerHTML = taxHtml;
+        document.getElementById("grandTotal").innerText = `${curr} ${(
+          taxable + gstTotal
+        ).toFixed(2)}`;
+      }
+
+      // Signature Logic
+      let canvas,
+        ctx,
+        drawing = false;
+      function initSig() {
+        canvas = document.getElementById("sig-pad");
+        ctx = canvas.getContext("2d");
+        const getPos = (e) => {
+          const r = canvas.getBoundingClientRect();
+          return {
+            x: (e.clientX || e.touches[0].clientX) - r.left,
+            y: (e.clientY || e.touches[0].clientY) - r.top,
+          };
+        };
+        const start = (e) => {
+          drawing = true;
+          draw(e);
+        };
+        const end = () => {
+          drawing = false;
+          ctx.beginPath();
+        };
+        const draw = (e) => {
+          if (!drawing) return;
+          e.preventDefault();
+          const p = getPos(e);
+          ctx.lineWidth = 2;
+          ctx.lineCap = "round";
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+        };
+        canvas.addEventListener("mousedown", start);
+        canvas.addEventListener("mousemove", draw);
+        window.addEventListener("mouseup", end);
+        canvas.addEventListener("touchstart", start);
+        canvas.addEventListener("touchmove", draw);
+        window.addEventListener("touchend", end);
+      }
+      function clearSig() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      (function syncGstCurrency() {
+        const select = document.getElementById('currency');
+        if (!select) return;
+        try {
+          const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+          if (settings.currency) select.value = settings.currency;
+        } catch (e) { /* ignore */ }
+        select.addEventListener('change', function () {
+          const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+          settings.currency = select.value;
+          localStorage.setItem('appSettings', JSON.stringify(settings));
+          if (window.SmarbizCurrency) SmarbizCurrency.setCurrency(select.value);
+          calculate();
+        });
+      })();
+    </script>
+    <script src="assets/js/currency.js"></script>
+  </body>
+</html>

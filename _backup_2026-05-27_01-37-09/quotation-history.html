@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotation History - SmartBiz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="js/navigation-manager.js"></script><script src="js/auth-service.js"></script>
+    <script src="js/auth-status.js"></script>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f6fa;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Main Container - Uses full viewport height */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #1a252f;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .business-card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .business-card-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Main Layout Container */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Sidebar - Fixed Width */
+        .sidebar {
+            width: 300px; /* Increased width for more space */
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
+            overflow-y: auto; /* Allow sidebar to scroll if needed */
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+        }
+
+        .company-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .company-tagline {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        /* Equal size for all sidebar items */
+        .sidebar-nav-item {
+            padding: 14px 20px;
+            min-height: 50px;
+        }
+
+        /* Different colors for each sidebar item */
+        .sidebar-nav-item:nth-child(1) { /* Home */
+            border-left-color: #e74c3c;
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(2) { /* Dashboard */
+            border-left-color: #3498db;
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(3) { /* Items */
+            border-left-color: #f39c12;
+            background: linear-gradient(90deg, rgba(243, 156, 18, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(4) { /* Menu */
+            border-left-color: #27ae60;
+            background: linear-gradient(90deg, rgba(39, 174, 96, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(5) { /* Invoice */
+            border-left-color: #667eea;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(6) { /* Delivery Challan */
+            border-left-color: #e67e22;
+            background: linear-gradient(90deg, rgba(230, 126, 34, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(7) { /* Quotation */
+            border-left-color: #f093fb;
+            background: linear-gradient(90deg, rgba(240, 147, 251, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(8) { /* Propharma Invoice */
+            border-left-color: #4facfe;
+            background: linear-gradient(90deg, rgba(79, 172, 254, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(9) { /* All Transactions */
+            border-left-color: #fd7e14;
+            background: linear-gradient(90deg, rgba(253, 126, 34, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(10) { /* Business Card */
+            border-left-color: #764ba2;
+            background: linear-gradient(90deg, rgba(118, 75, 162, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(11) { /* Settings */
+            border-left-color: #e74c3c;
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.1) 0%, transparent 100%);
+        }
+
+        /* Hover states for colored sidebar items */
+        .sidebar-nav-item:hover {
+            transform: translateX(3px);
+        }
+
+        .sidebar-nav-item:nth-child(1):hover { /* Home */
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.2) 0%, transparent 100%);
+            border-left-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .sidebar-nav-item:nth-child(2):hover { /* Dashboard */
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.2) 0%, transparent 100%);
+            border-left-color: #3498db;
+            color: #3498db;
+        }
+
+        .sidebar-nav-item:nth-child(3):hover { /* Items */
+            background: linear-gradient(90deg, rgba(243, 156, 18, 0.2) 0%, transparent 100%);
+            border-left-color: #f39c12;
+            color: #f39c12;
+        }
+
+        .sidebar-nav-item:nth-child(4):hover { /* Menu */
+            background: linear-gradient(90deg, rgba(39, 174, 96, 0.2) 0%, transparent 100%);
+            border-left-color: #27ae60;
+            color: #27ae60;
+        }
+
+        .sidebar-nav-item:nth-child(5):hover { /* Invoice */
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            border-left-color: #667eea;
+            color: #667eea;
+        }
+
+        .sidebar-nav-item:nth-child(6):hover { /* Delivery Challan */
+            background: linear-gradient(90deg, rgba(230, 126, 34, 0.2) 0%, transparent 100%);
+            border-left-color: #e67e22;
+            color: #e67e22;
+        }
+
+        .sidebar-nav-item:nth-child(7):hover { /* Quotation */
+            background: linear-gradient(90deg, rgba(240, 147, 251, 0.2) 0%, transparent 100%);
+            border-left-color: #f093fb;
+            color: #f093fb;
+        }
+
+        .sidebar-nav-item:nth-child(8):hover { /* Propharma Invoice */
+            background: linear-gradient(90deg, rgba(79, 172, 254, 0.2) 0%, transparent 100%);
+            border-left-color: #4facfe;
+            color: #4facfe;
+        }
+
+        .sidebar-nav-item:nth-child(9):hover { /* All Transactions */
+            background: linear-gradient(90deg, rgba(253, 126, 34, 0.2) 0%, transparent 100%);
+            border-left-color: #fd7e14;
+            color: #fd7e14;
+        }
+
+        .sidebar-nav-item:nth-child(10):hover { /* Business Card */
+            background: linear-gradient(90deg, rgba(118, 75, 162, 0.2) 0%, transparent 100%);
+            border-left-color: #764ba2;
+            color: #764ba2;
+        }
+
+        .sidebar-nav-item:nth-child(11):hover { /* Settings */
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.2) 0%, transparent 100%);
+            border-left-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        /* Active state - overrides color */
+        .sidebar-nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            border-left-color: #667eea;
+            color: #667eea;
+        }
+
+        /* Main Content - Takes All Remaining Space */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f5f6fa;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            background: white;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e8ecf1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb i {
+            margin: 0 8px;
+            color: #999;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border: 1px solid #e8ecf1;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-button:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .action-button.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .action-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e8ecf1;
+            padding: 8px 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.7rem;
+            min-width: 60px;
+        }
+
+        .nav-item:hover {
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .main-content {
+                padding-bottom: 80px;
+            }
+
+            .bottom-nav {
+                display: flex;
+            }
+
+            .header-right #userEmail {
+                display: none !important;
+            }
+
+            .content-area {
+                padding: 15px;
+            }
+
+            /* Show hamburger menu only on mobile */
+            .header-left .mobile-menu-toggle,
+            .header-left .back-icon {
+                display: block;
+                margin-right: 10px;
+                font-size: 18px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                padding: 8px;
+                border-radius: 4px;
+                background: rgba(255,255,255,0.1);
+            }
+
+            /* Hide app title on mobile */
+            .app-title {
+                display: none;
+            }
+
+            .search-container {
+                display: block;
+                padding: 10px 15px;
+                background: #fff;
+            }
+
+            .search-container input {
+                width: 100%;
+                padding: 8px 12px;
+                border-radius: 20px;
+                border: 1px solid #ccc;
+                font-size: 14px;
+            }
+
+            .status-bar {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .bottom-nav {
+                display: none !important;
+            }
+
+            /* Hide hamburger menu on desktop */
+            .mobile-menu-toggle {
+                display: none !important;
+            }
+
+            .back-icon {
+                display: none;
+            }
+
+            .search-container {
+                display: none;
+            }
+        }
+
+        /* Quotation Specific Styles */
+        .search-section {
+            margin-bottom: 25px;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e8ecf1;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .quotations-list-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .quotation-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e8ecf1;
+            transition: all 0.3s ease;
+        }
+
+        .quotation-item:hover {
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .quotation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .quotation-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .quotation-date {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .quotation-amount {
+            text-align: right;
+        }
+
+        .amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .status.accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .quotation-details {
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .quotation-details p {
+            margin: 5px 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .summary-section {
+            margin-bottom: 25px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e8ecf1;
+        }
+
+        .summary-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto 10px;
+        }
+
+        .summary-content h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .quotation-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .view-btn,
+        .download-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Icons */
+        .notification-icon, .settings-icon, .auto-save-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-icon:hover, .settings-icon:hover, .auto-save-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .login-header-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-header-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+    <link rel="stylesheet" href="css/app-shell.css" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <!-- Back button for mobile -->
+                <i class="fas fa-arrow-left back-icon" onclick="goBack()" title="Back"></i>
+                <!-- Mobile Menu Toggle (hidden on mobile now) -->
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <i class="fas fa-user-edit business-card-icon" onclick="goToPersonalInfo()" title="Personal Information"></i>
+                <h1 class="app-title">Quotation History</h1>
+            </div>
+            <div class="header-right">
+                <span id="userEmail" style="font-size:0.9rem;opacity:0.8;margin-right:10px;"></span>
+                <a id="loginIcon" class="login-header-btn" href="login.html" style="display:inline-block;">Login</a>
+                <i class="fas fa-bell notification-icon"></i>
+                <i class="fas fa-cog settings-icon" onclick="goToSettings()"></i>
+                <i class="fas fa-save auto-save-icon" id="autoSaveIcon" onclick="goToAutoSaveSettings()" title="Auto-Save Settings" style="cursor:pointer;opacity:0.6;"></i>
+            </div>
+        </header>
+
+        <!-- Main Layout Container -->
+        <div class="main-layout">
+            <!-- Search bar shown only on small screens -->
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search quotations..." />
+            </div>
+            
+            <!-- App sidebar (shared: js/app-sidebar.js) -->
+            <aside class="sidebar" id="sidebar" data-active="quotation"></aside>
+
+            <!-- Main Content - Takes All Remaining Space -->
+            <main class="main-content">
+                <div class="content-header">
+                    <div class="breadcrumb">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Quotation History</span>
+                    </div>
+                    <div class="content-actions">
+                        <button class="action-button secondary" onclick="refreshData()">
+                            <i class="fas fa-sync"></i>
+                            Refresh
+                        </button>
+                        <button class="action-button" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-area">
+                    <!-- Search and Filter Section -->
+                    <section class="search-section">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search quotations..." id="searchInput">
+                        </div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" onclick="filterQuotations('all')">All</button>
+                            <button class="filter-btn" onclick="filterQuotations('today')">Today</button>
+                            <button class="filter-btn" onclick="filterQuotations('week')">This Week</button>
+                            <button class="filter-btn" onclick="filterQuotations('month')">This Month</button>
+                        </div>
+                    </section>
+
+                    <!-- Quotations List -->
+                    <section class="quotations-list-section">
+                        <h2 class="section-title">Quotations</h2>
+                        <div class="quotations-list" id="quotationsList">
+                            <!-- Sample quotation data -->
+                            <div class="quotation-item">
+                                <div class="quotation-header">
+                                    <div class="quotation-info">
+                                        <h3>Quote #QT-001</h3>
+                                        <p class="quotation-date">15 Jan 2026</p>
+                                    </div>
+                                    <div class="quotation-amount">
+                                        <span class="amount">₹25,000</span>
+                                        <span class="status pending">Pending</span>
+                                    </div>
+                                </div>
+                                <div class="quotation-details">
+                                    <p><strong>Customer:</strong> ABC Corporation</p>
+                                    <p><strong>Items:</strong> 8 Products</p>
+                                    <p><strong>Valid Until:</strong> 30 Jan 2026</p>
+                                </div>
+                                <div class="quotation-actions">
+                                    <button class="view-btn" onclick="viewQuotation('QT-001')">
+                                        <i class="fas fa-eye"></i>
+                                        View Quote
+                                    </button>
+                                    <button class="download-btn" onclick="downloadQuotation('QT-001')">
+                                        <i class="fas fa-download"></i>
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="quotation-item">
+                                <div class="quotation-header">
+                                    <div class="quotation-info">
+                                        <h3>Quote #QT-002</h3>
+                                        <p class="quotation-date">14 Jan 2026</p>
+                                    </div>
+                                    <div class="quotation-amount">
+                                        <span class="amount">₹18,500</span>
+                                        <span class="status accepted">Accepted</span>
+                                    </div>
+                                </div>
+                                <div class="quotation-details">
+                                    <p><strong>Customer:</strong> XYZ Enterprises</p>
+                                    <p><strong>Items:</strong> 5 Products</p>
+                                    <p><strong>Valid Until:</strong> 28 Jan 2026</p>
+                                </div>
+                                <div class="quotation-actions">
+                                    <button class="view-btn" onclick="viewQuotation('QT-002')">
+                                        <i class="fas fa-eye"></i>
+                                        View Quote
+                                    </button>
+                                    <button class="download-btn" onclick="downloadQuotation('QT-002')">
+                                        <i class="fas fa-download"></i>
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="quotation-item">
+                                <div class="quotation-header">
+                                    <div class="quotation-info">
+                                        <h3>Quote #QT-003</h3>
+                                        <p class="quotation-date">13 Jan 2026</p>
+                                    </div>
+                                    <div class="quotation-amount">
+                                        <span class="amount">₹32,000</span>
+                                        <span class="status expired">Expired</span>
+                                    </div>
+                                </div>
+                                <div class="quotation-details">
+                                    <p><strong>Customer:</strong> Global Solutions</p>
+                                    <p><strong>Items:</strong> 12 Products</p>
+                                    <p><strong>Valid Until:</strong> 20 Jan 2026</p>
+                                </div>
+                                <div class="quotation-actions">
+                                    <button class="view-btn" onclick="viewQuotation('QT-003')">
+                                        <i class="fas fa-eye"></i>
+                                        View Quote
+                                    </button>
+                                    <button class="download-btn" onclick="downloadQuotation('QT-003')">
+                                        <i class="fas fa-download"></i>
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="quotation-item">
+                                <div class="quotation-header">
+                                    <div class="quotation-info">
+                                        <h3>Quote #QT-004</h3>
+                                        <p class="quotation-date">12 Jan 2026</p>
+                                    </div>
+                                    <div class="quotation-amount">
+                                        <span class="amount">₹15,750</span>
+                                        <span class="status pending">Pending</span>
+                                    </div>
+                                </div>
+                                <div class="quotation-details">
+                                    <p><strong>Customer:</strong> Tech Solutions Pvt. Ltd.</p>
+                                    <p><strong>Items:</strong> 6 Products</p>
+                                    <p><strong>Valid Until:</strong> 27 Jan 2026</p>
+                                </div>
+                                <div class="quotation-actions">
+                                    <button class="view-btn" onclick="viewQuotation('QT-004')">
+                                        <i class="fas fa-eye"></i>
+                                        View Quote
+                                    </button>
+                                    <button class="download-btn" onclick="downloadQuotation('QT-004')">
+                                        <i class="fas fa-download"></i>
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="quotation-item">
+                                <div class="quotation-header">
+                                    <div class="quotation-info">
+                                        <h3>Quote #QT-005</h3>
+                                        <p class="quotation-date">11 Jan 2026</p>
+                                    </div>
+                                    <div class="quotation-amount">
+                                        <span class="amount">₹45,200</span>
+                                        <span class="status accepted">Accepted</span>
+                                    </div>
+                                </div>
+                                <div class="quotation-details">
+                                    <p><strong>Customer:</strong> Premium Industries</p>
+                                    <p><strong>Items:</strong> 15 Products</p>
+                                    <p><strong>Valid Until:</strong> 25 Jan 2026</p>
+                                </div>
+                                <div class="quotation-actions">
+                                    <button class="view-btn" onclick="viewQuotation('QT-005')">
+                                        <i class="fas fa-eye"></i>
+                                        View Quote
+                                    </button>
+                                    <button class="download-btn" onclick="downloadQuotation('QT-005')">
+                                        <i class="fas fa-download"></i>
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Summary Section -->
+                    <section class="summary-section">
+                        <h2 class="section-title">Summary</h2>
+                        <div class="summary-cards">
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <i class="fas fa-file-invoice"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <h3>Total Quotes</h3>
+                                    <p class="summary-value">5</p>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <h3>Accepted</h3>
+                                    <p class="summary-value">2</p>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <h3>Pending</h3>
+                                    <p class="summary-value">2</p>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <h3>Expired</h3>
+                                    <p class="summary-value">1</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="navigateTo('home')">
+                <i class="fas fa-home"></i>
+                <span>HOME</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('dashboard')">
+                <i class="fas fa-chart-bar"></i>
+                <span>DASHBOARD</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('products')">
+                <i class="fas fa-box"></i>
+                <span>ITEMS</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('menu')">
+                <i class="fas fa-bars"></i>
+                <span>MENU</span>
+            </div>
+            <div class="nav-item" onclick="getDesktop()">
+                <i class="fab fa-windows"></i>
+                <span>GET DESKTOP</span>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // Mobile Sidebar Toggle (unused when footer nav is active)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Basic back navigation
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            }
+        }
+
+        // Search filter for quotations
+        function filterQuotations(query) {
+            const items = document.querySelectorAll('.quotation-item');
+            items.forEach(item => {
+                const text = item.textContent;
+                item.style.display = searchMatches(text, query) ? '' : 'none';
+            });
+        }
+
+        // wire search input
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchEl = document.getElementById('searchInput');
+            if (searchEl) {
+                searchEl.addEventListener('input', e => filterQuotations(e.target.value));
+            }
+        });
+
+        // Enhanced Navigation Functions
+        function navigateTo(page) {
+            console.log('Navigating to:', page);
+            
+            // Show loading state
+            showLoading();
+            
+            // Actual navigation logic
+            setTimeout(() => {
+                hideLoading();
+                
+                // Navigate to actual pages
+                switch(page) {
+                    case 'home':
+                        window.location.href = 'home.html';
+                        break;
+                    case 'dashboard':
+                        window.location.href = 'dashboard.html';
+                        break;
+                    case 'invoice':
+                        window.location.href = 'invoice-layouts.html';
+                        break;
+                    case 'delivery':
+                        window.location.href = 'delivery-challan-history.html';
+                        break;
+                    case 'quotation':
+                        window.location.href = 'quotation-history.html';
+                        break;
+                    case 'propharma':
+                        // Navigate to dedicated propharma invoice page
+                        window.location.href = 'propharma-invoice.html';
+                        break;
+                    case 'transactions':
+                        window.location.href = 'payment-receipt-history.html';
+                        break;
+                    case 'business-card':
+                        window.location.href = 'company-card-generator.html';
+                        break;
+                    case 'settings':
+                        window.location.href = 'settings.html';
+                        break;
+                    case 'personal-info':
+                        window.location.href = 'personal-info.html';
+                        break;
+                    case 'product':
+                        window.location.href = 'product.html';
+                        break;
+                    case 'products':
+                        window.location.href = 'product.html';
+                        break;
+                    case 'menu':
+                        window.location.href = 'menu.html';
+                        break;
+                    case 'address':
+                        window.location.href = 'formats/address.html';
+                        break;
+                    default:
+                        console.log(`Page ${page} not found`);
+                }
+            }, 300);
+            
+            // For mobile, close sidebar after navigation
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        // Loading Functions
+        function showLoading() {
+            const loadingHtml = '<div class="loading-overlay"><div class="loading-spinner"></div></div>';
+            document.body.insertAdjacentHTML('beforeend', loadingHtml);
+        }
+
+        function hideLoading() {
+            const loadingOverlay = document.querySelector('.loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+        }
+
+        function goToPersonalInfo() {
+            navigateTo('personal-info');
+        }
+
+        function goToSettings() {
+            navigateTo('settings');
+        }
+
+        function refreshData() {
+            console.log('Refreshing data...');
+            // Reload current page
+            setTimeout(() => {
+                window.location.reload();
+            }, 300);
+        }
+
+        function exportData() {
+            console.log('Exporting data...');
+            // Export functionality
+            alert('Export functionality coming soon!');
+        }
+
+        function getDesktop() {
+            alert('Get desktop version functionality coming soon!');
+        }
+
+        function goToAutoSaveSettings() {
+            alert('Auto-save settings functionality coming soon!');
+        }
+
+        // Document Functions
+        function viewQuotation(quotationNumber) {
+            // Open quotation in new tab or modal
+            window.open(`index.html?view=quotation&number=${quotationNumber}`, '_blank');
+        }
+
+        function downloadQuotation(quotationNumber) {
+            // Generate and download quotation PDF
+            alert(`Downloading Quotation ${quotationNumber}...`);
+            // In a real implementation, this would generate a PDF
+            console.log(`Download quotation: ${quotationNumber}`);
+        }
+
+        // Filter Functions
+        function filterQuotations(period) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter logic (placeholder)
+            console.log('Filtering quotations by:', period);
+            // Add actual filtering logic here
+        }
+
+        // Search Function
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const quotationItems = document.querySelectorAll('.quotation-item');
+            
+            quotationItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    <script src="js/app-sidebar.js"></script>
+    <script src="js/test-documents.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.SmarbizTestDocuments) return;
+            SmarbizTestDocuments.initTypedHistoryPage({
+                docTypes: ['Quotation'],
+                listId: 'quotationsList',
+                itemClass: 'quotation',
+                numberPrefix: 'Quotation',
+                emptyLabel: 'quotations'
+            });
+        });
+    </script>
+    <script src="js/simple-login-button.js"></script>
+</body>
+</html>
+
+

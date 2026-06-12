@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>Quotation - Format 7</title>
+    <link rel="stylesheet" href="../format-css/format22.css" />
+    <link rel="stylesheet" href="../format-css/responsive-mobile.css" />
+    <link rel="stylesheet" href="../format-css/document-common.css?v=4" />
+    <script src="../../assets/js/document-actions.js"></script>
+    <script src="../../assets/js/mobile-preview-chrome.js?v=20260602-preview-clean"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../../assets/js/currency.js"></script>
+  </head>
+  <body>
+    <div id="invoice"></div>
+    <script>
+      window.SMARBIZ_FORMAT_CONFIG = {
+        docType: "Quotation",
+        title: "Quotation",
+        numberLabel: "Quotation #",
+        dueLabel: "Valid Until",
+        termsLabel: "Terms & Conditions",
+        totalLabel: "Estimated Total",
+        styleName: "panel"
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="../../assets/js/signature.js"></script>
+    <script src="../../assets/js/stamp.js"></script>
+    <script src="../../assets/js/watermark.js?v=4"></script>
+    <script src="../../assets/js/pdf.js"></script>
+    <script src="../../assets/js/format-renderer.js"></script>
+  </body>
+</html>

@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Layouts - SmartBiz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="js/navigation-manager.js"></script><script src="js/auth-service.js"></script>
+    <script src="js/auth-status.js"></script>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f6fa;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Main Container - Uses full viewport height */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #1a252f;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .business-card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .business-card-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Main Layout Container */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Sidebar - Fixed Width */
+        .sidebar {
+            width: 300px; /* Increased width for more space */
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
+            overflow-y: auto; /* Allow sidebar to scroll if needed */
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+        }
+
+        .company-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .company-tagline {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        .sidebar-nav-item i {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .sidebar-nav-item span {
+            font-weight: 500;
+        }
+
+        /* Equal size for all sidebar items */
+        .sidebar-nav-item {
+            padding: 14px 20px;
+            min-height: 50px;
+        }
+
+        /* Different colors for each sidebar item */
+        .sidebar-nav-item:nth-child(1) { /* Home */
+            border-left-color: #e74c3c;
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(2) { /* Dashboard */
+            border-left-color: #3498db;
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(3) { /* Items */
+            border-left-color: #f39c12;
+            background: linear-gradient(90deg, rgba(243, 156, 18, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(4) { /* Menu */
+            border-left-color: #27ae60;
+            background: linear-gradient(90deg, rgba(39, 174, 96, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(5) { /* Invoice */
+            border-left-color: #667eea;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(6) { /* Delivery Challan */
+            border-left-color: #e67e22;
+            background: linear-gradient(90deg, rgba(230, 126, 34, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(7) { /* Quotation */
+            border-left-color: #f093fb;
+            background: linear-gradient(90deg, rgba(240, 147, 251, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(8) { /* Propharma Invoice */
+            border-left-color: #4facfe;
+            background: linear-gradient(90deg, rgba(79, 172, 254, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(9) { /* All Transactions */
+            border-left-color: #fd7e14;
+            background: linear-gradient(90deg, rgba(253, 126, 34, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(10) { /* Business Card */
+            border-left-color: #764ba2;
+            background: linear-gradient(90deg, rgba(118, 75, 162, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-nav-item:nth-child(11) { /* Settings */
+            border-left-color: #e74c3c;
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.1) 0%, transparent 100%);
+        }
+
+        /* Hover states for colored sidebar items */
+        .sidebar-nav-item:hover {
+            transform: translateX(3px);
+        }
+
+        .sidebar-nav-item:nth-child(1):hover { /* Home */
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.2) 0%, transparent 100%);
+            border-left-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .sidebar-nav-item:nth-child(2):hover { /* Dashboard */
+            background: linear-gradient(90deg, rgba(52, 152, 219, 0.2) 0%, transparent 100%);
+            border-left-color: #3498db;
+            color: #3498db;
+        }
+
+        .sidebar-nav-item:nth-child(3):hover { /* Items */
+            background: linear-gradient(90deg, rgba(243, 156, 18, 0.2) 0%, transparent 100%);
+            border-left-color: #f39c12;
+            color: #f39c12;
+        }
+
+        .sidebar-nav-item:nth-child(4):hover { /* Menu */
+            background: linear-gradient(90deg, rgba(39, 174, 96, 0.2) 0%, transparent 100%);
+            border-left-color: #27ae60;
+            color: #27ae60;
+        }
+
+        .sidebar-nav-item:nth-child(5):hover { /* Invoice */
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%);
+            border-left-color: #667eea;
+            color: #667eea;
+        }
+
+        .sidebar-nav-item:nth-child(6):hover { /* Delivery Challan */
+            background: linear-gradient(90deg, rgba(230, 126, 34, 0.2) 0%, transparent 100%);
+            border-left-color: #e67e22;
+            color: #e67e22;
+        }
+
+        .sidebar-nav-item:nth-child(7):hover { /* Quotation */
+            background: linear-gradient(90deg, rgba(240, 147, 251, 0.2) 0%, transparent 100%);
+            border-left-color: #f093fb;
+            color: #f093fb;
+        }
+
+        .sidebar-nav-item:nth-child(8):hover { /* Propharma Invoice */
+            background: linear-gradient(90deg, rgba(79, 172, 254, 0.2) 0%, transparent 100%);
+            border-left-color: #4facfe;
+            color: #4facfe;
+        }
+
+        .sidebar-nav-item:nth-child(9):hover { /* All Transactions */
+            background: linear-gradient(90deg, rgba(253, 126, 34, 0.2) 0%, transparent 100%);
+            border-left-color: #fd7e14;
+            color: #fd7e14;
+        }
+
+        .sidebar-nav-item:nth-child(10):hover { /* Business Card */
+            background: linear-gradient(90deg, rgba(118, 75, 162, 0.2) 0%, transparent 100%);
+            border-left-color: #764ba2;
+            color: #764ba2;
+        }
+
+        .sidebar-nav-item:nth-child(11):hover { /* Settings */
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.2) 0%, transparent 100%);
+            border-left-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        /* Main Content - Takes All Remaining Space */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f5f6fa;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            background: white;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e8ecf1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb i {
+            margin: 0 8px;
+            color: #999;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border: 1px solid #e8ecf1;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-button:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .action-button.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .action-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e8ecf1;
+            padding: 8px 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.7rem;
+            min-width: 60px;
+        }
+
+        .nav-item:hover {
+            color: #667eea;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .main-content {
+                padding-bottom: 80px;
+            }
+
+            .bottom-nav {
+                display: flex;
+            }
+
+            .header-right #userEmail {
+                display: none !important;
+            }
+
+            .content-area {
+                padding: 15px;
+            }
+
+            /* Show hamburger menu only on mobile */
+            .header-left .mobile-menu-toggle,
+            .header-left .back-icon {
+                display: block;
+                margin-right: 10px;
+                font-size: 18px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                padding: 8px;
+                border-radius: 4px;
+                background: rgba(255,255,255,0.1);
+            }
+
+            /* Hide app title on mobile */
+            .app-title {
+                display: none;
+            }
+
+            .search-container {
+                display: block;
+                padding: 10px 15px;
+                background: #fff;
+            }
+
+            .search-container input {
+                width: 100%;
+                padding: 8px 12px;
+                border-radius: 20px;
+                border: 1px solid #ccc;
+                font-size: 14px;
+            }
+
+            .status-bar {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .bottom-nav {
+                display: none !important;
+            }
+
+            /* Hide hamburger menu on desktop */
+            .mobile-menu-toggle {
+                display: none !important;
+            }
+
+            .back-icon {
+                display: none;
+            }
+
+            .search-container {
+                display: none;
+            }
+        }
+
+        /* Invoice Layouts Specific Styles */
+        .invoice-layouts-section {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .section-header h2 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header h2 i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .layouts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .layout-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .layout-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .layout-card:hover::before {
+            left: 100%;
+        }
+
+        .layout-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .layout-preview {
+            width: 100%;
+            height: 430px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .format-preview-frame {
+            width: 860px;
+            height: 1260px;
+            border: 0;
+            transform: scale(0.33);
+            transform-origin: top left;
+            pointer-events: none;
+            background: #fff;
+        }
+
+        .format-preview-stage {
+            width: 284px;
+            height: 416px;
+            margin: 0 auto;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .invoice-preview {
+            width: 100%;
+            height: 100%;
+            background: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.7rem;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .invoice-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .invoice-title {
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .invoice-number {
+            font-size: 0.65rem;
+            opacity: 0.9;
+        }
+
+        .invoice-body {
+            padding: 10px 15px;
+            background: white;
+        }
+
+        .invoice-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            padding: 3px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .invoice-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .invoice-value {
+            text-align: right;
+            color: #333;
+        }
+
+        .invoice-items {
+            margin: 8px 0;
+        }
+
+        .invoice-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            padding: 2px 0;
+            font-size: 0.65rem;
+        }
+
+        .invoice-total {
+            background: #f8f9fa;
+            padding: 6px 15px;
+            border-top: 2px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+        }
+
+        .invoice-footer {
+            background: #2c3e50;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.6rem;
+            text-align: center;
+        }
+
+        .modern-invoice .invoice-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .modern-invoice .invoice-total {
+            background: #e8f5e8;
+            border-top: 2px solid #28a745;
+        }
+
+        .detailed-invoice .invoice-header {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        }
+
+        .detailed-invoice .invoice-total {
+            background: #fff5f5;
+            border-top: 2px solid #dc3545;
+        }
+
+        .layout-preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(102, 126, 234, 0.9);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .layout-preview:hover .layout-preview-overlay {
+            opacity: 1;
+        }
+
+        .preview-text {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .preview-icon {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .layout-info {
+            text-align: center;
+        }
+
+        .layout-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .layout-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .layout-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-tag {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .content-actions {
+            display: none;
+        }
+
+        .real-preview {
+            background: #fff;
+            color: #172033;
+            border: 1px solid #d9e2ec;
+            border-radius: 6px;
+            min-height: 250px;
+            padding: 12px;
+            box-shadow: inset 0 0 0 4px #f8fafc;
+        }
+
+        .real-preview.preview-classic {
+            box-shadow: none;
+            border: 2px solid #222;
+            font-family: Arial, sans-serif;
+        }
+
+        .real-preview.preview-modern {
+            border: 0;
+            box-shadow: inset 0 0 0 1px #ffd7bd;
+        }
+
+        .real-preview.preview-detailed {
+            border: 1px solid #2b2b2b;
+            box-shadow: none;
+            padding: 9px;
+        }
+
+        .real-preview.preview-detailed .preview-party-grid {
+            gap: 0;
+            margin: 0;
+        }
+
+        .real-preview.preview-detailed .preview-party {
+            border-color: #2b2b2b;
+            background: #fff;
+        }
+
+        .real-preview.preview-panel {
+            padding: 0;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 1px #d7dee7;
+        }
+
+        .preview-accent-bar {
+            height: 6px;
+            margin: -12px -12px 12px;
+            background: linear-gradient(90deg, #0f766e, #2563eb);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .preview-panel-head {
+            display: grid;
+            grid-template-columns: 42% 1fr;
+            border-bottom: 1px solid #d9e2ec;
+        }
+
+        .preview-panel-title {
+            background: #172554;
+            color: #fff;
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .preview-panel-company {
+            padding: 12px;
+            text-align: right;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .preview-title-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .preview-company {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .preview-doc-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-align: right;
+            text-transform: uppercase;
+        }
+
+        .preview-lines {
+            font-size: 9px;
+            color: #52606d;
+            line-height: 1.35;
+        }
+
+        .preview-party-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .preview-party {
+            background: #f8fafc;
+            border: 1px solid #d9e2ec;
+            padding: 8px;
+            font-size: 9px;
+            line-height: 1.3;
+        }
+
+        .preview-party strong {
+            display: block;
+            color: #0f766e;
+            font-size: 9px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            table-layout: fixed;
+        }
+
+        .preview-table th {
+            background: #0f172a;
+            color: #fff;
+            padding: 5px;
+            text-align: left;
+        }
+
+        .preview-table td {
+            border: 1px solid #d9e2ec;
+            padding: 5px;
+        }
+
+        .preview-total {
+            margin-left: auto;
+            margin-top: 10px;
+            width: 45%;
+            background: #0f766e;
+            color: #fff;
+            padding: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .preview-sign {
+            margin-left: auto;
+            margin-top: 18px;
+            width: 92px;
+            border-top: 1px solid #172033;
+            font-size: 8px;
+            text-align: center;
+            padding-top: 4px;
+        }
+
+        .preview-body-pad {
+            padding: 12px;
+        }
+
+        .preview-modern-head {
+            margin: -12px -12px 12px;
+            padding: 14px 12px;
+            background: linear-gradient(135deg, #ff8c42, #ffb37a);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .preview-modern-head .preview-lines {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .preview-modern-head .preview-doc-title {
+            color: #fff;
+        }
+
+        .preview-classic-rule {
+            border-top: 2px solid #222;
+            margin: 10px 0;
+        }
+
+        .preview-detail-title {
+            margin: -9px -9px 0;
+            padding: 6px;
+            border-bottom: 1px solid #2b2b2b;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .preview-tax-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            border: 1px solid #2b2b2b;
+            border-top: 0;
+            font-size: 8px;
+        }
+
+        .preview-tax-grid span {
+            padding: 4px;
+            border-right: 1px solid #2b2b2b;
+        }
+
+        .preview-tax-grid span:last-child {
+            border-right: 0;
+        }
+
+        .select-layout-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .select-layout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .layouts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Icons */
+        .notification-icon, .settings-icon, .auto-save-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-icon:hover, .settings-icon:hover, .auto-save-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .login-header-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-header-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+    <link rel="stylesheet" href="css/app-shell.css" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <!-- Back button for mobile -->
+                <i class="fas fa-arrow-left back-icon" onclick="goBack()" title="Back"></i>
+                <!-- Mobile Menu Toggle (hidden on mobile now) -->
+                <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <i class="fas fa-user-edit business-card-icon" onclick="goToPersonalInfo()" title="Personal Information"></i>
+                <h1 class="app-title">Invoice Layouts</h1>
+            </div>
+            <div class="header-right">
+                <span id="userEmail" style="font-size:0.9rem;opacity:0.8;margin-right:10px;"></span>
+                <a id="loginIcon" class="login-header-btn" href="login.html" style="display:inline-block;">Login</a>
+                <i class="fas fa-bell notification-icon"></i>
+                <i class="fas fa-cog settings-icon" onclick="goToSettings()"></i>
+                <i class="fas fa-save auto-save-icon" id="autoSaveIcon" onclick="goToAutoSaveSettings()" title="Auto-Save Settings" style="cursor:pointer;opacity:0.6;"></i>
+            </div>
+        </header>
+
+        <!-- Main Layout Container -->
+        <div class="main-layout">
+            <!-- Search bar shown only on small screens -->
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search invoice layouts..." />
+            </div>
+            
+            <!-- App sidebar (shared: js/app-sidebar.js) -->
+            <aside class="sidebar" id="sidebar" data-active="invoice"></aside>
+
+            <!-- Main Content - Takes All Remaining Space -->
+            <main class="main-content">
+                <div class="content-header">
+                    <div class="breadcrumb">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Invoice Layouts</span>
+                    </div>
+                    <div class="content-actions">
+                        <button class="action-button secondary" onclick="refreshData()">
+                            <i class="fas fa-sync"></i>
+                            Refresh
+                        </button>
+                        <button class="action-button" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-area">
+                    <!-- Invoice Layouts Section -->
+                    <section class="invoice-layouts-section">
+                        <div class="section-header">
+                            <h2>
+                                <i class="fas fa-file-invoice"></i>
+                                Choose Invoice Layout
+                            </h2>
+                            <button class="back-btn" onclick="navigateTo('home')">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Home
+                            </button>
+                        </div>
+
+                        <div class="layouts-grid">
+                            <!-- Layout 1: Standard Invoice -->
+                            <div class="layout-card" onclick="selectLayout('standard')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview">
+                                        <div class="invoice-header">
+                                            <div class="invoice-title">TAX INVOICE</div>
+                                            <div class="invoice-number">#INV-2024-001</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">From:</span>
+                                                <span class="invoice-value">Your Company Ltd.</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">To:</span>
+                                                <span class="invoice-value">Client Name</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Date:</span>
+                                                <span class="invoice-value">01/01/2024</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Web Design Service</span>
+                                                    <span>?5,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Hosting (1 year)</span>
+                                                    <span>?2,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Domain Registration</span>
+                                                    <span>?800</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Total Amount:</span>
+                                            <span>?7,800</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            GST INVOICE | Terms: Net 30 Days
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Standard Invoice</h3>
+                                    <p class="layout-description">Classic professional invoice layout with all essential fields</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">GST Compliant</span>
+                                        <span class="feature-tag">Professional</span>
+                                        <span class="feature-tag">Most Popular</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Layout 2: Modern Invoice -->
+                            <div class="layout-card" onclick="selectLayout('modern')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview modern-invoice">
+                                        <div class="invoice-header">
+                                            <div class="invoice-title">MODERN INVOICE</div>
+                                            <div class="invoice-number">#INV-2024-002</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Company:</span>
+                                                <span class="invoice-value">Tech Solutions Pvt. Ltd.</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Customer:</span>
+                                                <span class="invoice-value">ABC Corporation</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Due Date:</span>
+                                                <span class="invoice-value">15/01/2024</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Software Development</span>
+                                                    <span>?25,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>UI/UX Design</span>
+                                                    <span>?8,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Testing & QA</span>
+                                                    <span>?5,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Project Management</span>
+                                                    <span>?3,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Total Amount:</span>
+                                            <span>?41,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            MODERN DESIGN | Thank you for your business!
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Modern Invoice</h3>
+                                    <p class="layout-description">Clean and contemporary design with enhanced visual appeal</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Clean Design</span>
+                                        <span class="feature-tag">Enhanced</span>
+                                        <span class="feature-tag">Trendy</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Layout 3: Detailed Invoice -->
+                            <div class="layout-card" onclick="selectLayout('detailed')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview detailed-invoice">
+                                        <div class="invoice-header">
+                                            <div class="invoice-title">DETAILED INVOICE</div>
+                                            <div class="invoice-number">#BILL-2024-003</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Business:</span>
+                                                <span class="invoice-value">Global Services Inc.</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Client:</span>
+                                                <span class="invoice-value">Premium Enterprises</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">P.O. Number:</span>
+                                                <span class="invoice-value">PO-2024-123</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Terms:</span>
+                                                <span class="invoice-value">Net 30 Days</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Consulting Services (40 hrs)</span>
+                                                    <span>?40,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Travel Expenses</span>
+                                                    <span>?5,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Materials & Supplies</span>
+                                                    <span>?2,500</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Subcontractor Fees</span>
+                                                    <span>?15,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Administrative Fees</span>
+                                                    <span>?1,500</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Total Amount:</span>
+                                            <span>?64,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            DETAILED BREAKDOWN | Payment Terms Applied
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Detailed Invoice</h3>
+                                    <p class="layout-description">Comprehensive layout with detailed breakdown and terms</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Comprehensive</span>
+                                        <span class="feature-tag">Itemized</span>
+                                        <span class="feature-tag">Professional</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Layout 4: Minimal Invoice -->
+                            <div class="layout-card" onclick="selectLayout('minimal')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview">
+                                        <div class="invoice-header" style="background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">
+                                            <div class="invoice-title">INVOICE</div>
+                                            <div class="invoice-number">#2024-004</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Bill From:</span>
+                                                <span class="invoice-value">ABC Company</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Bill To:</span>
+                                                <span class="invoice-value">Customer</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Service</span>
+                                                    <span>₹5,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Product</span>
+                                                    <span>₹3,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Total:</span>
+                                            <span>₹8,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            Minimal | Clean
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Minimal Invoice</h3>
+                                    <p class="layout-description">Clean and minimal design with essential information only</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Minimalist</span>
+                                        <span class="feature-tag">Simple</span>
+                                        <span class="feature-tag">Light</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Layout 5: Executive Invoice -->
+                            <div class="layout-card" onclick="selectLayout('executive')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview">
+                                        <div class="invoice-header" style="background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);">
+                                            <div class="invoice-title">EXECUTIVE INVOICE</div>
+                                            <div class="invoice-number">#EXE-2024-005</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Billed By:</span>
+                                                <span class="invoice-value">Premium Services</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Client:</span>
+                                                <span class="invoice-value">Corporate Client</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Invoice Date:</span>
+                                                <span class="invoice-value">01/01/2024</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Executive Consulting</span>
+                                                    <span>₹50,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Strategy Review</span>
+                                                    <span>₹20,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Grand Total:</span>
+                                            <span>₹70,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            EXECUTIVE | Professional Services
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Executive Invoice</h3>
+                                    <p class="layout-description">Professional layout for high-value business transactions</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Corporate</span>
+                                        <span class="feature-tag">Premium</span>
+                                        <span class="feature-tag">Formal</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Layout 6: Compact Invoice -->
+                            <div class="layout-card" onclick="selectLayout('compact')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview">
+                                        <div class="invoice-header" style="background: linear-gradient(135deg, #16a085 0%, #138d75 100%);">
+                                            <div class="invoice-title">COMPACT BILL</div>
+                                            <div class="invoice-number">#C-2024-006</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">From:</span>
+                                                <span class="invoice-value">Business</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">To:</span>
+                                                <span class="invoice-value">Customer</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Item 1</span>
+                                                    <span>₹2,500</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Item 2</span>
+                                                    <span>₹1,500</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Item 3</span>
+                                                    <span>₹1,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Bill Total:</span>
+                                            <span>₹5,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            COMPACT | Quick Reference
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Compact Invoice</h3>
+                                    <p class="layout-description">Space-efficient invoice for quick reference</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Compact</span>
+                                        <span class="feature-tag">Quick</span>
+                                        <span class="feature-tag">Efficient</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Layout 7: Creative Invoice -->
+                            <div class="layout-card" onclick="selectLayout('creative')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview">
+                                        <div class="invoice-header" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                                            <div class="invoice-title">CREATIVE DESIGN</div>
+                                            <div class="invoice-number">#ART-2024-007</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Studio:</span>
+                                                <span class="invoice-value">Creative Works</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Client:</span>
+                                                <span class="invoice-value">Brand Studio</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Logo Design</span>
+                                                    <span>₹15,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Branding Package</span>
+                                                    <span>₹25,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Creative Direction</span>
+                                                    <span>₹10,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Total Due:</span>
+                                            <span>₹50,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            CREATIVE | Design Services
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Creative Invoice</h3>
+                                    <p class="layout-description">Vibrant design for creative agencies and studios</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Creative</span>
+                                        <span class="feature-tag">Vibrant</span>
+                                        <span class="feature-tag">Modern</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Layout 8: Luxury Invoice -->
+                            <div class="layout-card" onclick="selectLayout('luxury')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview">
+                                        <div class="invoice-header" style="background: linear-gradient(135deg, #8e44ad 0%, #6c3483 100%);">
+                                            <div class="invoice-title">LUXURY INVOICE</div>
+                                            <div class="invoice-number">#LUX-2024-008</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Provided By:</span>
+                                                <span class="invoice-value">Luxury Enterprises</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Invoiced To:</span>
+                                                <span class="invoice-value">Valued Client</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Reference:</span>
+                                                <span class="invoice-value">Premium Account</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Premium Service</span>
+                                                    <span>₹100,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Luxury Package</span>
+                                                    <span>₹75,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Total Amount Due:</span>
+                                            <span>₹175,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            LUXURY CLASS | Premium Services
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Luxury Invoice</h3>
+                                    <p class="layout-description">Premium elegant design for high-end services</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Luxury</span>
+                                        <span class="feature-tag">Elegant</span>
+                                        <span class="feature-tag">Premium</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Layout 9: Tech Invoice -->
+                            <div class="layout-card" onclick="selectLayout('tech')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview modern-invoice">
+                                        <div class="invoice-header" style="background: linear-gradient(135deg, #2980b9 0%, #1f618d 100%);">
+                                            <div class="invoice-title">TECH INVOICE</div>
+                                            <div class="invoice-number">#TECH-2024-009</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Provider:</span>
+                                                <span class="invoice-value">Tech Solutions</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Customer:</span>
+                                                <span class="invoice-value">Tech Startup</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Cloud Services (Monthly)</span>
+                                                    <span>₹10,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>API Integration</span>
+                                                    <span>₹8,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Support & Maintenance</span>
+                                                    <span>₹5,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Total Invoice:</span>
+                                            <span>₹23,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            TECH | Cloud & Digital Services
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Tech Invoice</h3>
+                                    <p class="layout-description">Modern design for technology and digital services</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Tech</span>
+                                        <span class="feature-tag">Modern</span>
+                                        <span class="feature-tag">Digital</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="invoice-layouts-section">
+                        <div class="section-header">
+                            <h2>
+                                <i class="fas fa-truck"></i>
+                                Delivery Challan Layouts
+                            </h2>
+                        </div>
+
+                        <div class="layouts-grid">
+                            <!-- Delivery Challan Layout 1 -->
+                            <div class="layout-card" onclick="selectLayout('delivery-standard')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview">
+                                        <div class="invoice-header">
+                                            <div class="invoice-title">DELIVERY CHALLAN</div>
+                                            <div class="invoice-number">#DC-2024-001</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Dispatch:</span>
+                                                <span class="invoice-value">Your Company Ltd.</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Deliver To:</span>
+                                                <span class="invoice-value">Customer Name</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Date:</span>
+                                                <span class="invoice-value">01/01/2024</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Product Item 1</span>
+                                                    <span>Qty: 5</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Product Item 2</span>
+                                                    <span>Qty: 3</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Product Item 3</span>
+                                                    <span>Qty: 10</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            DISPATCH DOCUMENT | No GST
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Standard Delivery</h3>
+                                    <p class="layout-description">Simple delivery challan without GST charges</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Simple</span>
+                                        <span class="feature-tag">No Tax</span>
+                                        <span class="feature-tag">Professional</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Quotation Layouts Section -->
+                    <section class="invoice-layouts-section">
+                        <div class="section-header">
+                            <h2>
+                                <i class="fas fa-quote-left"></i>
+                                Quotation Layouts
+                            </h2>
+                        </div>
+
+                        <div class="layouts-grid">
+                            <!-- Quotation Layout 1 -->
+                            <div class="layout-card" onclick="selectLayout('quotation-standard')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview">
+                                        <div class="invoice-header">
+                                            <div class="invoice-title">QUOTATION</div>
+                                            <div class="invoice-number">#QT-2024-001</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">From:</span>
+                                                <span class="invoice-value">Your Company Ltd.</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">To:</span>
+                                                <span class="invoice-value">Prospect Name</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Date:</span>
+                                                <span class="invoice-value">01/01/2024</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Service Package A</span>
+                                                    <span>₹15,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Service Package B</span>
+                                                    <span>₹8,000</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Support & Maintenance</span>
+                                                    <span>₹3,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Estimated Total:</span>
+                                            <span>₹26,000</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            QUOTATION | Valid for 30 Days
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Standard Quotation</h3>
+                                    <p class="layout-description">Professional quotation layout for price estimates</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Estimate</span>
+                                        <span class="feature-tag">Professional</span>
+                                        <span class="feature-tag">Clean Design</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Propharma Layouts Section -->
+                    <section class="invoice-layouts-section">
+                        <div class="section-header">
+                            <h2>
+                                <i class="fas fa-prescription-bottle"></i>
+                                Propharma Invoice Layouts
+                            </h2>
+                        </div>
+
+                        <div class="layouts-grid">
+                            <!-- Propharma Layout 1 -->
+                            <div class="layout-card" onclick="selectLayout('propharma-standard')">
+                                <div class="layout-preview">
+                                    <div class="invoice-preview modern-invoice">
+                                        <div class="invoice-header">
+                                            <div class="invoice-title">PROPHARMA INVOICE</div>
+                                            <div class="invoice-number">#PROP-2024-001</div>
+                                        </div>
+                                        <div class="invoice-body">
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Supplier:</span>
+                                                <span class="invoice-value">Pharma Corp Pvt. Ltd.</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Customer:</span>
+                                                <span class="invoice-value">Medical Store Name</span>
+                                            </div>
+                                            <div class="invoice-row">
+                                                <span class="invoice-label">Date:</span>
+                                                <span class="invoice-value">01/01/2024</span>
+                                            </div>
+                                            <div class="invoice-items">
+                                                <div class="invoice-item">
+                                                    <span>Medicine A (100 tabs)</span>
+                                                    <span>₹1,200</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Medicine B (50ml)</span>
+                                                    <span>₹800</span>
+                                                </div>
+                                                <div class="invoice-item">
+                                                    <span>Medicine C (30 caps)</span>
+                                                    <span>₹1,500</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span>Total Amount:</span>
+                                            <span>₹3,500</span>
+                                        </div>
+                                        <div class="invoice-footer">
+                                            PROPHARMA INVOICE | GST Applicable
+                                        </div>
+                                    </div>
+                                    <div class="layout-preview-overlay">
+                                        <i class="fas fa-eye preview-icon"></i>
+                                        <div class="preview-text">Click to use this layout</div>
+                                    </div>
+                                </div>
+                                <div class="layout-info">
+                                    <h3 class="layout-title">Standard Propharma</h3>
+                                    <p class="layout-description">Specialized pharmaceutical invoice with medicine details</p>
+                                    <div class="layout-features">
+                                        <span class="feature-tag">Pharma</span>
+                                        <span class="feature-tag">GST Ready</span>
+                                        <span class="feature-tag">Professional</span>
+                                    </div>
+                                    <button class="select-layout-btn">
+                                        <i class="fas fa-check"></i>
+                                        Select Layout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="navigateTo('home')">
+                <i class="fas fa-home"></i>
+                <span>HOME</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('dashboard')">
+                <i class="fas fa-chart-bar"></i>
+                <span>DASHBOARD</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('products')">
+                <i class="fas fa-box"></i>
+                <span>ITEMS</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('menu')">
+                <i class="fas fa-bars"></i>
+                <span>MENU</span>
+            </div>
+            <div class="nav-item" onclick="getDesktop()">
+                <i class="fab fa-windows"></i>
+                <span>GET DESKTOP</span>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // Mobile Sidebar Toggle (unused when footer nav is active)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Basic back navigation
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            }
+        }
+
+        // Enhanced Navigation Functions
+        function navigateTo(page) {
+            console.log('Navigating to:', page);
+            
+            // Show loading state
+            showLoading();
+            
+            // Actual navigation logic
+            setTimeout(() => {
+                hideLoading();
+                
+                // Navigate to actual pages
+                switch(page) {
+                    case 'home':
+                        window.location.href = 'home.html';
+                        break;
+                    case 'dashboard':
+                        window.location.href = 'dashboard.html';
+                        break;
+                    case 'invoice':
+                        window.location.href = 'invoice-layouts.html?type=invoice';
+                        break;
+                    case 'delivery':
+                        window.location.href = 'invoice-layouts.html?type=delivery-challan';
+                        break;
+                    case 'quotation':
+                        window.location.href = 'invoice-layouts.html?type=quotation';
+                        break;
+                    case 'propharma':
+                        window.location.href = 'invoice-layouts.html?type=proforma';
+                        break;
+                    case 'transactions':
+                        window.location.href = 'payment-receipt-history.html';
+                        break;
+                    case 'business-card':
+                        window.location.href = 'company-card-generator.html';
+                        break;
+                    case 'settings':
+                        window.location.href = 'settings.html';
+                        break;
+                    case 'personal-info':
+                        window.location.href = 'personal-info.html';
+                        break;
+                    case 'product':
+                        window.location.href = 'product.html';
+                        break;
+                    case 'products':
+                        window.location.href = 'product.html';
+                        break;
+                    case 'menu':
+                        window.location.href = 'menu.html';
+                        break;
+                    case 'address':
+                        window.location.href = 'formats/address.html';
+                        break;
+                    default:
+                        console.log(`Page ${page} not found`);
+                }
+            }, 300);
+            
+            // For mobile, close sidebar after navigation
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        // Loading Functions
+        function showLoading() {
+            const loadingHtml = '<div class="loading-overlay"><div class="loading-spinner"></div></div>';
+            document.body.insertAdjacentHTML('beforeend', loadingHtml);
+        }
+
+        function hideLoading() {
+            const loadingOverlay = document.querySelector('.loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+        }
+
+        function goToPersonalInfo() {
+            navigateTo('personal-info');
+        }
+
+        function goToSettings() {
+            navigateTo('settings');
+        }
+
+        function refreshData() {
+            console.log('Refreshing data...');
+            // Reload current page
+            setTimeout(() => {
+                window.location.reload();
+            }, 300);
+        }
+
+        function exportData() {
+            console.log('Exporting data...');
+            // Export functionality
+            alert('Export functionality coming soon!');
+        }
+
+        function getDesktop() {
+            alert('Get desktop version functionality coming soon!');
+        }
+
+        function goToAutoSaveSettings() {
+            alert('Auto-save settings functionality coming soon!');
+        }
+
+        const DOCUMENTS = {
+            invoice: {
+                title: 'Invoice Layouts',
+                icon: 'fa-file-invoice',
+                type: 'invoice',
+                crumb: 'Invoice',
+                formats: [
+                    { key: 'invoice-1', format: 'format1.html', title: 'Invoice 1', desc: 'Classic GST invoice with complete buyer, seller, tax, shipping, payment and signature sections.', tags: ['GST Ready', 'Classic', 'Full Info'], style: 'classic' },
+                    { key: 'invoice-2', format: 'format2.html', title: 'Invoice 2', desc: 'Balanced business layout with a stronger header and clean item details.', tags: ['Professional', 'Readable', 'Popular'], style: 'classic' },
+                    { key: 'invoice-3', format: 'format10.html', title: 'Invoice 3', desc: 'Detailed table-first layout for businesses that need HSN, GST and full breakup visibility.', tags: ['Detailed', 'Tax Breakup', 'New'], style: 'detailed' },
+                    { key: 'invoice-4', format: 'format13.html', title: 'Invoice 4 - Clean Accent', desc: 'Simple modern invoice with accent header, full tax totals, amount words and authorization.', tags: ['Clean', 'Modern', 'Full Info'], style: 'accent' },
+                    { key: 'invoice-5', format: 'format14.html', title: 'Invoice 5 - Modern Panel', desc: 'Popular panel layout with strong title block, meta strip, parties, totals and signature.', tags: ['Popular', 'Panel', 'Attractive'], style: 'panel' }
+                ]
+            },
+            'delivery-challan': {
+                title: 'Delivery Challan Layouts',
+                icon: 'fa-truck',
+                type: 'delivery-challan',
+                crumb: 'Delivery Challan',
+                formats: [
+                    { key: 'delivery-1', format: 'format3.html', title: 'Delivery Challan 1', desc: 'Standard delivery document with dispatch, receiver, quantity and authorization details.', tags: ['Dispatch', 'Simple', 'No Tax'], style: 'classic' },
+                    { key: 'delivery-2', format: 'format4.html', title: 'Delivery Challan 2', desc: 'Alternative challan layout for clean product movement documentation.', tags: ['Delivery', 'Clean', 'Stock'], style: 'classic' },
+                    { key: 'delivery-3', format: 'format11.html', title: 'Delivery Challan 3', desc: 'Detailed new delivery layout for itemized shipment records.', tags: ['Detailed', 'New', 'Shipment'], style: 'detailed' },
+                    { key: 'delivery-4', format: 'format15.html', title: 'Delivery Challan 4 - Clean Accent', desc: 'Modern challan design with company, delivery party, item quantity and signature sections.', tags: ['Clean', 'Modern', 'Full Info'], style: 'accent' },
+                    { key: 'delivery-5', format: 'format16.html', title: 'Delivery Challan 5 - Modern Panel', desc: 'Panel style challan for polished dispatch documentation.', tags: ['Popular', 'Panel', 'Attractive'], style: 'panel' }
+                ]
+            },
+            quotation: {
+                title: 'Quotation Layouts',
+                icon: 'fa-quote-left',
+                type: 'quotation',
+                crumb: 'Quotation',
+                formats: [
+                    { key: 'quotation-1', format: 'format5.html', title: 'Quotation 1', desc: 'Standard quotation with client, valid-until date, items, amount and terms.', tags: ['Estimate', 'Simple', 'Terms'], style: 'classic' },
+                    { key: 'quotation-2', format: 'format6.html', title: 'Quotation 2', desc: 'Professional estimate layout with clear service and total presentation.', tags: ['Professional', 'Readable', 'Sales'], style: 'classic' },
+                    { key: 'quotation-3', format: 'format12.html', title: 'Quotation 3', desc: 'New detailed quotation layout for itemized proposals.', tags: ['Detailed', 'New', 'Proposal'], style: 'detailed' },
+                    { key: 'quotation-4', format: 'format17.html', title: 'Quotation 4 - Clean Accent', desc: 'Modern quotation with full parties, line items, estimated total and terms.', tags: ['Clean', 'Modern', 'Full Info'], style: 'accent' },
+                    { key: 'quotation-5', format: 'format18.html', title: 'Quotation 5 - Modern Panel', desc: 'Popular panel quote design for polished client estimates.', tags: ['Popular', 'Panel', 'Attractive'], style: 'panel' }
+                ]
+            },
+            proforma: {
+                title: 'Proforma Layouts',
+                icon: 'fa-file-contract',
+                type: 'proforma',
+                crumb: 'Proforma',
+                formats: [
+                    { key: 'proforma-1', format: 'format7.html', title: 'Proforma 1', desc: 'Standard proforma invoice with seller, buyer, items, tax and payment details.', tags: ['Proforma', 'Simple', 'Payment'], style: 'classic' },
+                    { key: 'proforma-2', format: 'format8.html', title: 'Proforma 2', desc: 'Professional proforma layout for advance payment or pre-sale documentation.', tags: ['Professional', 'Advance', 'Readable'], style: 'classic' },
+                    { key: 'proforma-3', format: 'format9.html', title: 'Proforma 3', desc: 'Detailed proforma with structured tax and totals breakdown.', tags: ['Detailed', 'Tax Breakup', 'Full Info'], style: 'detailed' },
+                    { key: 'proforma-4', format: 'format19.html', title: 'Proforma 4 - Clean Accent', desc: 'Simple attractive proforma with all important business, customer and payment sections.', tags: ['Clean', 'Modern', 'Full Info'], style: 'accent' },
+                    { key: 'proforma-5', format: 'format20.html', title: 'Proforma 5 - Modern Panel', desc: 'Popular panel design for polished proforma invoices.', tags: ['Popular', 'Panel', 'Attractive'], style: 'panel' }
+                ]
+            }
+        };
+
+        function normalizeDocType(value) {
+            const v = (value || 'invoice').toLowerCase();
+            if (v.includes('delivery')) return 'delivery-challan';
+            if (v.includes('quotation')) return 'quotation';
+            if (v.includes('proforma') || v.includes('propharma')) return 'proforma';
+            return 'invoice';
+        }
+
+        function currentDoc() {
+            const params = new URLSearchParams(window.location.search);
+            return DOCUMENTS[normalizeDocType(params.get('type'))] || DOCUMENTS.invoice;
+        }
+
+        function allLayouts() {
+            return Object.keys(DOCUMENTS).reduce((list, key) => list.concat(DOCUMENTS[key].formats.map(function (layout) {
+                return Object.assign({ type: DOCUMENTS[key].type }, layout);
+            })), []);
+        }
+
+        function findLayoutByFormat(format) {
+            return allLayouts().find(function (layout) { return layout.format === format; });
+        }
+
+        function selectLayout(format) {
+            const selected = findLayoutByFormat(format);
+            if (!selected) return;
+            localStorage.setItem('selectedInvoiceFormat', selected.format);
+            localStorage.setItem('selectedDocumentType', selected.type);
+            window.location.href = `index.html?format=${encodeURIComponent(selected.format)}&type=${encodeURIComponent(selected.type)}`;
+        }
+
+        function sampleDataForPreview(doc) {
+            const isDelivery = doc.type === 'delivery-challan';
+            const isQuotation = doc.type === 'quotation';
+            const isProforma = doc.type === 'proforma';
+            return {
+                companyName: 'Shree Traders',
+                companyGST: '27ABCDE1234F1Z5',
+                companyAddress: 'Pune, Maharashtra',
+                companyMobile: '9876543210',
+                companyEmail: 'sales@shreetraders.example',
+                clientName: 'ABC Enterprises',
+                clientGST: '27PQRSX9876K1Z2',
+                clientAddress: 'Mumbai, Maharashtra',
+                clientMobile: '9123456780',
+                invoiceNo: isDelivery ? 'DC-001' : isQuotation ? 'QT-001' : isProforma ? 'PRO-001' : 'INV-001',
+                invoiceDate: '2026-05-26',
+                dueDate: '2026-05-30',
+                poNumber: 'PO-1024',
+                poDate: '2026-05-25',
+                items: [
+                    { name: 'Product A', desc: 'Premium item', qty: 2, rate: 2000 },
+                    { name: 'Service B', desc: 'Installation', qty: 1, rate: 1500 },
+                    { name: isDelivery ? 'Package C' : 'Shipping', desc: 'Handling', qty: 1, rate: isDelivery ? 500 : 300 }
+                ],
+                taxes: isDelivery ? [] : [{ type: 'GST', percent: 9, desc: 'GST' }],
+                shipping: isDelivery ? { total: 0, items: [] } : { total: 300, items: [{ desc: 'Shipping', amount: 300 }] },
+                paymentNote: isQuotation ? 'Quotation valid for 30 days.' : isDelivery ? 'Goods received in good condition.' : 'Payment due as per agreed terms.',
+                watermark: { enabled: false, text: '' },
+                docType: doc.crumb
+            };
+        }
+
+        function previewHtml(doc, layout) {
+            const dataParam = encodeURIComponent(JSON.stringify(sampleDataForPreview(doc)));
+            return `
+                <div class="format-preview-stage">
+                    <iframe
+                        class="format-preview-frame"
+                        src="formats/${layout.format}?data=${dataParam}"
+                        title="${layout.title} preview"
+                        loading="lazy"
+                        tabindex="-1"
+                        aria-hidden="true"></iframe>
+                </div>
+            `;
+        }
+
+        function renderLayoutPicker() {
+            const doc = currentDoc();
+            const contentArea = document.querySelector('.content-area');
+            const breadcrumbLast = document.querySelector('.breadcrumb span:last-child');
+            const appTitle = document.querySelector('.app-title');
+            if (breadcrumbLast) breadcrumbLast.textContent = doc.title;
+            if (appTitle) appTitle.textContent = doc.title;
+            document.title = doc.title + ' - SmartBiz';
+            if (!contentArea) return;
+
+            contentArea.innerHTML = `
+                <section class="invoice-layouts-section">
+                    <div class="section-header">
+                        <h2><i class="fas ${doc.icon}"></i> Choose ${doc.crumb} Layout</h2>
+                        <button class="back-btn" onclick="navigateTo('home')"><i class="fas fa-arrow-left"></i> Back to Home</button>
+                    </div>
+                    <div class="layouts-grid">
+                        ${doc.formats.map(function (layout) {
+                            return `
+                                <div class="layout-card" onclick="selectLayout('${layout.format}')">
+                                    <div class="layout-preview">
+                                        ${previewHtml(doc, layout)}
+                                        <div class="layout-preview-overlay">
+                                            <i class="fas fa-eye preview-icon"></i>
+                                            <div class="preview-text">Use this layout</div>
+                                        </div>
+                                    </div>
+                                    <div class="layout-info">
+                                        <h3 class="layout-title">${layout.title}</h3>
+                                        <p class="layout-description">${layout.desc}</p>
+                                        <div class="layout-features">
+                                            ${layout.tags.map(function (tag) { return `<span class="feature-tag">${tag}</span>`; }).join('')}
+                                        </div>
+                                        <button class="select-layout-btn"><i class="fas fa-check"></i> Select Layout</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </section>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderLayoutPicker);
+    </script>
+    <script src="js/app-sidebar.js"></script>
+    <script src="js/simple-login-button.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+/* Address label styles for A4 (2 columns x 4 rows) */
+.a4-sheet{
+  width:210mm;
+  height:297mm;
+  box-sizing:border-box;
+  padding:10mm 8mm;
+  background: white;
+  margin: 10px auto;
+  border: 1px solid transparent;
+}
+.labels-grid{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  gap:6mm 6mm;
+  height:100%;
+}
+.label{
+  box-sizing:border-box;
+  border: 1px solid transparent;
+  padding:6mm 6mm;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+}
+.label-content{
+  font-family: 'Times New Roman', serif;
+  font-size:12pt;
+  line-height:1.25;
+}
+.lbl-name{ display:block; font-weight:700; margin-bottom:4px; font-size:13pt }
+.lbl-line{ color:#111; margin-bottom:2px }
+.lbl-phone{ margin-top:6px; font-size:11pt }
+
+/* Make preview look like printed label: faint box shadow */
+#sheetWrapper{ background:#f6f6f6; padding:12px }
+.a4-sheet{ box-shadow: 0 2px 0 rgba(0,0,0,0.08) }
+
+@media print{
+  body *{ visibility: hidden }
+  .a4-sheet, .a4-sheet *{ visibility: visible }
+  .a4-sheet{ position: absolute; left:0; top:0 }
+}

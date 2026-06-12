@@ -1,0 +1,2 @@
+/formats/*  /documents/formats/:splat  200
+/format-css/*  /documents/format-css/:splat  200

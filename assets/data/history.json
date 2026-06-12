@@ -1,0 +1,260 @@
+[
+  {
+    "id": 100004,
+    "invoiceNo": "TEST-PRO-001",
+    "invoiceDate": "2026-05-24",
+    "dueDate": "2026-06-10",
+    "clientName": "Test Client – Proforma / Propharma",
+    "grandTotal": "837.80",
+    "docType": "Proforma",
+    "format": "format7.html",
+    "createdAt": "2026-05-24T13:00:00.000Z",
+    "isTestDocument": true,
+    "fullData": {
+      "companyName": "SmartBiz Demo Company",
+      "companyGST": "24AAAAA0000A1Z5",
+      "companyAddress": "123 Demo Street, Ahmedabad, Gujarat 380001",
+      "companyPAN": "AAAAA0000A",
+      "companyMobile": "+91 9876543210",
+      "companyEmail": "demo@smartbiz.test",
+      "companyLogo": null,
+      "placeSupply": "Gujarat",
+      "items": [
+        {
+          "name": "SmartBiz Demo Widget",
+          "desc": "Canonical test product — same name, qty, rate, and HSN on all TEST-* documents",
+          "qty": 2,
+          "rate": 350,
+          "hsn": "8471",
+          "tax": "18",
+          "per": "Nos"
+        }
+      ],
+      "shipping": {
+        "items": [
+          {
+            "desc": "Delivery charges",
+            "amount": 10
+          }
+        ],
+        "total": 10
+      },
+      "taxes": [
+        {
+          "type": "GST",
+          "percent": 9,
+          "desc": "CGST 9% + SGST 9%"
+        }
+      ],
+      "signature": null,
+      "watermark": {
+        "enabled": true,
+        "text": "TEST"
+      },
+      "isTestDocument": true,
+      "clientName": "Test Client – Proforma / Propharma",
+      "clientGST": "24EEEEE0000E1Z5",
+      "clientAddress": "88 Clinic Street, Ahmedabad, Gujarat 380015",
+      "clientPAN": "",
+      "clientMobile": "+91 9876543214",
+      "invoiceNo": "TEST-PRO-001",
+      "invoiceDate": "2026-05-24",
+      "dueDate": "2026-06-10",
+      "poNumber": "PO-PHARMA-TEST",
+      "poDate": "2026-05-20",
+      "paymentNote": "TEST DOCUMENT — Proforma with same GST + delivery as TEST-INV-001 (₹837.80 ≈ $10)."
+    }
+  },
+  {
+    "id": 100003,
+    "invoiceNo": "TEST-DC-001",
+    "invoiceDate": "2026-05-24",
+    "dueDate": "",
+    "clientName": "Test Client – Delivery Challan",
+    "grandTotal": "710.00",
+    "docType": "Delivery Challan",
+    "format": "format3.html",
+    "createdAt": "2026-05-24T12:00:00.000Z",
+    "isTestDocument": true,
+    "fullData": {
+      "companyName": "SmartBiz Demo Company",
+      "companyGST": "24AAAAA0000A1Z5",
+      "companyAddress": "123 Demo Street, Ahmedabad, Gujarat 380001",
+      "companyPAN": "AAAAA0000A",
+      "companyMobile": "+91 9876543210",
+      "companyEmail": "demo@smartbiz.test",
+      "companyLogo": null,
+      "placeSupply": "Gujarat",
+      "items": [
+        {
+          "name": "SmartBiz Demo Widget",
+          "desc": "Canonical test product — same name, qty, rate, and HSN on all TEST-* documents",
+          "qty": 2,
+          "rate": 350,
+          "hsn": "8471",
+          "tax": "18",
+          "per": "Nos"
+        }
+      ],
+      "shipping": {
+        "items": [
+          {
+            "desc": "Delivery charges",
+            "amount": 10
+          }
+        ],
+        "total": 10
+      },
+      "taxes": [],
+      "signature": null,
+      "watermark": {
+        "enabled": true,
+        "text": "TEST"
+      },
+      "isTestDocument": true,
+      "clientName": "Test Client – Delivery Challan",
+      "clientGST": "24DDDDD0000D1Z5",
+      "clientAddress": "12 Warehouse Road, Rajkot, Gujarat 360001",
+      "clientPAN": "",
+      "clientMobile": "+91 9876543213",
+      "invoiceNo": "TEST-DC-001",
+      "invoiceDate": "2026-05-24",
+      "dueDate": "",
+      "poNumber": "",
+      "poDate": "",
+      "paymentNote": "TEST DOCUMENT — Delivery challan (no GST). Same product qty; includes ₹10 delivery in total."
+    }
+  },
+  {
+    "id": 100002,
+    "invoiceNo": "TEST-ALL-001",
+    "invoiceDate": "2026-05-24",
+    "dueDate": "2026-06-24",
+    "clientName": "Test Client – All Functions",
+    "grandTotal": "700.00",
+    "docType": "Quotation",
+    "format": "format2.html",
+    "createdAt": "2026-05-24T11:00:00.000Z",
+    "isTestDocument": true,
+    "fullData": {
+      "companyName": "SmartBiz Demo Company",
+      "companyGST": "24AAAAA0000A1Z5",
+      "companyAddress": "123 Demo Street, Ahmedabad, Gujarat 380001",
+      "companyPAN": "AAAAA0000A",
+      "companyMobile": "+91 9876543210",
+      "companyEmail": "demo@smartbiz.test",
+      "companyLogo": null,
+      "placeSupply": "Gujarat",
+      "items": [
+        {
+          "name": "SmartBiz Demo Widget",
+          "desc": "Canonical test product — same name, qty, rate, and HSN on all TEST-* documents",
+          "qty": 2,
+          "rate": 350,
+          "hsn": "8471",
+          "tax": "18",
+          "per": "Nos"
+        }
+      ],
+      "shipping": {
+        "items": [
+          {
+            "desc": "Delivery charges",
+            "amount": 10
+          }
+        ],
+        "total": 10
+      },
+      "taxes": [
+        {
+          "type": "GST",
+          "percent": 9,
+          "desc": "CGST 9% + SGST 9%"
+        }
+      ],
+      "signature": null,
+      "watermark": {
+        "enabled": true,
+        "text": "TEST"
+      },
+      "isTestDocument": true,
+      "clientName": "Test Client – All Functions",
+      "clientGST": "24CCCCC0000C1Z5",
+      "clientAddress": "789 Practice Lane, Vadodara, Gujarat 390001",
+      "clientPAN": "",
+      "clientMobile": "+91 9876543212",
+      "invoiceNo": "TEST-ALL-001",
+      "invoiceDate": "2026-05-24",
+      "dueDate": "2026-06-24",
+      "poNumber": "PO-TEST-ALL",
+      "poDate": "2026-05-22",
+      "paymentNote": "TEST DOCUMENT — Quotation (same lines as invoice). History total is taxable ₹700 before GST. Use Convert Document to invoice."
+    }
+  },
+  {
+    "id": 100001,
+    "invoiceNo": "TEST-INV-001",
+    "invoiceDate": "2026-05-24",
+    "dueDate": "2026-06-23",
+    "clientName": "Test Client – Sample Invoice",
+    "grandTotal": "837.80",
+    "docType": "Invoice",
+    "format": "format1.html",
+    "createdAt": "2026-05-24T10:00:00.000Z",
+    "isTestDocument": true,
+    "fullData": {
+      "companyName": "SmartBiz Demo Company",
+      "companyGST": "24AAAAA0000A1Z5",
+      "companyAddress": "123 Demo Street, Ahmedabad, Gujarat 380001",
+      "companyPAN": "AAAAA0000A",
+      "companyMobile": "+91 9876543210",
+      "companyEmail": "demo@smartbiz.test",
+      "companyLogo": null,
+      "placeSupply": "Gujarat",
+      "items": [
+        {
+          "name": "SmartBiz Demo Widget",
+          "desc": "Canonical test product — same name, qty, rate, and HSN on all TEST-* documents",
+          "qty": 2,
+          "rate": 350,
+          "hsn": "8471",
+          "tax": "18",
+          "per": "Nos"
+        }
+      ],
+      "shipping": {
+        "items": [
+          {
+            "desc": "Delivery charges",
+            "amount": 10
+          }
+        ],
+        "total": 10
+      },
+      "taxes": [
+        {
+          "type": "GST",
+          "percent": 9,
+          "desc": "CGST 9% + SGST 9%"
+        }
+      ],
+      "signature": null,
+      "watermark": {
+        "enabled": true,
+        "text": "TEST"
+      },
+      "isTestDocument": true,
+      "clientName": "Test Client – Sample Invoice",
+      "clientGST": "24BBBBB0000B1Z5",
+      "clientAddress": "456 Test Road, Surat, Gujarat 395001",
+      "clientPAN": "",
+      "clientMobile": "+91 9876543211",
+      "invoiceNo": "TEST-INV-001",
+      "invoiceDate": "2026-05-24",
+      "dueDate": "2026-06-23",
+      "poNumber": "PO-TEST-001",
+      "poDate": "2026-05-20",
+      "paymentNote": "TEST DOCUMENT — Tax invoice with GST + delivery. Grand total ₹837.80 (≈ $10.00 in Settings → $). Safe to edit or delete."
+    }
+  }
+]

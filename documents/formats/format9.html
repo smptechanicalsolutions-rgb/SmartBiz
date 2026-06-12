@@ -1,0 +1,627 @@
+ <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>Proforma Invoice - Format 9</title>
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+    <link rel="stylesheet" href="..\/format-css/responsive-mobile.css" />
+    <link rel="stylesheet" href="..\/format-css/document-common.css" />
+    <script src="../../assets/js/document-actions.js"></script>
+    <script src="../../assets/js/mobile-preview-chrome.js?v=20260602-preview-clean"></script>
+    <link rel="stylesheet" href="..\/format-css/format9.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../../assets/js/currency.js"></script>
+  </head>
+
+  <body>
+    <div id="invoice" class="proforma3">
+      <div id="proformaWatermark" class="proforma3-watermark">
+        <div class="wm" id="pWatermarkText">Proforma</div>
+      </div>
+      <div class="proforma3-header-title">
+        <div class="title">PROFORMA INVOICE</div>
+        <div class="right-tag">ORIGINAL FOR RECIPIENT</div>
+      </div>
+
+      <div class="proforma3-top">
+        <div class="proforma3-company">
+          <div class="name" id="pCompany">Company Name</div>
+          <div class="line">
+            <span class="label">GSTIN:</span> <span id="pCompanyGST"></span>
+          </div>
+          <div class="line">
+            <span class="label">PAN:</span> <span id="pCompanyPAN">-</span>
+          </div>
+          <div class="line" id="pCompanyAddress"></div>
+          <div class="line">
+            <span class="label">Mobile:</span>
+            <span id="pCompanyMobile"></span>
+          </div>
+          <div class="line" id="companyEmailLine">
+            <span class="label">Email:</span> <span id="pCompanyEmail"></span>
+          </div>
+        </div>
+
+        <div class="proforma3-info-table">
+          <div class="proforma3-info-cell">
+            <div class="label">Pro Forma Invoice #:</div>
+            <div id="pInvoiceNo">-</div>
+          </div>
+          <div class="proforma3-info-cell">
+            <div class="label">Proforma Invoice Date:</div>
+            <div id="pInvoiceDate">-</div>
+          </div>
+          <div class="proforma3-info-cell">
+            <div class="label">Place of Supply:</div>
+            <div id="pPlaceSupply">-</div>
+          </div>
+          <div class="proforma3-info-cell">
+            <div class="label">&nbsp;</div>
+            <div>&nbsp;</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="proforma3-customer">
+        <div class="proforma3-customer-left">
+          <div class="label">Customer Details:</div>
+          <div class="value" style="font-weight: 700" id="pClient">
+            Client Name
+          </div>
+          <div class="value">
+            <span class="label">GSTIN:</span> <span id="pClientGST"></span>
+          </div>
+          <div class="value">
+            <span class="label">PAN:</span> <span id="pClientPAN">-</span>
+          </div>
+          <div class="value"><span class="label">Billing Address:</span></div>
+          <div class="value" id="pClientAddress"></div>
+          <div class="value">
+            <span class="label">Ph:</span> <span id="pClientMobile"></span>
+          </div>
+        </div>
+        <div class="proforma3-customer-right">
+          &nbsp;
+        </div>
+      </div>
+
+      <table class="proforma3-items">
+        <thead>
+          <tr>
+            <th class="col-no">#</th>
+            <th class="col-item">Item</th>
+            <th class="col-hsn">HSN/SAC</th>
+            <th class="col-tax">Tax</th>
+            <th class="col-qty">Qty</th>
+            <th class="col-rate">Rate / Item</th>
+            <th class="col-per">Per</th>
+            <th class="col-amt">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="itemRows"></tbody>
+      </table>
+
+      <div class="proforma3-totals-row">
+        <div class="proforma3-totals-left">
+          <div class="totals-items-qty">
+            Total Items / Qty : <span id="pTotalItems">0</span> / <span id="pTotalQty">0</span>
+          </div>
+        </div>
+        <div class="proforma3-totals-right">
+          <div class="line">
+            <span>Delivery/Shipping Charges</span><span>₹<span id="pShipping">0.00</span></span>
+          </div>
+          <div class="line">
+            <span>Taxable Amount</span><span>₹<span id="pTaxable">0.00</span></span>
+          </div>
+          <div class="line">
+            <span>CGST <span id="pCgstRate">0</span>%</span><span>₹<span id="pCgst">0.00</span></span>
+          </div>
+          <div class="line">
+            <span>SGST <span id="pSgstRate">0</span>%</span><span>₹<span id="pSgst">0.00</span></span>
+          </div>
+          <div class="line">
+            <span>Round Off</span><span>₹<span id="pRoundOff">0.00</span></span>
+          </div>
+          <div class="line grand">
+            <span>Total</span><span>₹<span id="pTotal">0.00</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="proforma3-amount-words">
+        Total amount (in words): <span id="pAmountWords">-</span>
+      </div>
+
+      <table class="proforma3-taxbreak">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width: 80px">HSN/SAC</th>
+            <th rowspan="2">Taxable Value</th>
+            <th colspan="2">Central Tax</th>
+            <th colspan="2">State/UT Tax</th>
+            <th rowspan="2">Total Tax Amount</th>
+          </tr>
+          <tr>
+            <th style="width: 60px">Rate</th>
+            <th>Amount</th>
+            <th style="width: 60px">Rate</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="taxBreakRows"></tbody>
+        <tfoot>
+          <tr>
+            <th style="text-align: right" colspan="1">TOTAL</th>
+            <th style="text-align: right">₹<span id="pTaxBreakTaxable">0.00</span></th>
+            <th></th>
+            <th style="text-align: right">₹<span id="pTaxBreakCgst">0.00</span></th>
+            <th></th>
+            <th style="text-align: right">₹<span id="pTaxBreakSgst">0.00</span></th>
+            <th style="text-align: right">₹<span id="pTaxBreakTotalTax">0.00</span></th>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="proforma3-amount-payable">
+        <span>Amount Payable:</span>
+        <span class="value">₹<span id="pAmountPayable">0.00</span></span>
+      </div>
+
+      <div class="proforma3-bottom-grid">
+        <div class="proforma3-notes-box">
+          <div class="notes-title">Notes</div>
+          <div class="payment-instructions">
+            <div class="payment-details" id="pPaymentNote"></div>
+          </div>
+        </div>
+        <div class="proforma3-terms-box">
+          <div class="notes-title">Terms and Conditions</div>
+          <div class="payment-instructions">
+            <div class="payment-details" id="pTermsNote"></div>
+          </div>
+        </div>
+        <div class="proforma3-sign-box">
+          <div class="sig-company">
+            For <span id="pCompanySignature">Company Name</span>
+          </div>
+          <div class="sig-stamp-slot">
+            <img id="signature-image" src="" alt="Signature" style="display: none; object-fit: contain;" />
+            <img id="invoiceStampImage" src="" alt="Stamp" style="display: none; opacity: 0.95; pointer-events: none;" />
+          </div>
+          <div class="sig-signatory">Authorized Signatory</div>
+        </div>
+      </div>
+
+      <div class="invoice-footer">
+        <div class="powered-by">Powered By smartbiz</div>
+        <div class="digitally-signed">This is a digitally signed document</div>
+      </div>
+    </div>
+
+    <div
+      class="action-buttons"
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        margin: 18px 0;
+        flex-wrap: wrap;
+      "
+    >
+      <button
+        class="pdf-btn"
+        style="background: #dc3545"
+        onclick="cancelInvoice()"
+      >
+        Cancel Invoice
+      </button>
+      <button class="pdf-btn" onclick="showDownloadOptions()">Download / Share</button>
+      <button class="pdf-btn" style="background: #0d6efd" onclick="printVectorPDF()">
+        Print (Vector PDF)
+      </button>
+      <button class="pdf-btn" style="background: #6c757d" onclick="editInvoice()">
+        Edit Proforma
+      </button>
+      <button class="pdf-btn" style="background: #111827" onclick="deleteCurrentDocument()">
+        Delete
+      </button>
+    </div>
+
+    <!-- Download/Share Modal -->
+    <div
+      id="downloadModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered"
+        style="max-width: 500px; margin: 5% auto"
+      >
+        <div
+          class="modal-content"
+          style="background: white; border-radius: 8px; padding: 0"
+        >
+          <div
+            class="modal-header"
+            style="
+              background: #007bff;
+              color: white;
+              padding: 15px 20px;
+              border-radius: 8px 8px 0 0;
+            "
+          >
+            <h5 class="modal-title" style="margin: 0">Download / Share Proforma</h5>
+            <button
+              type="button"
+              onclick="closeDownloadModal()"
+              style="
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                width: 30px;
+                height: 30px;
+              "
+            >
+              &times;
+            </button>
+          </div>
+          <div class="modal-body" style="padding: 20px">
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <button
+                onclick="downloadPDFDirect()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #dc3545;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>📥</span> Download PDF
+              </button>
+              <button
+                onclick="printVectorPDF()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #0d6efd;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>🖨️</span> Print (Vector PDF)
+              </button>
+              <button
+                onclick="shareToWhatsApp()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #25d366;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>💬</span> Share on WhatsApp
+              </button>
+              <button
+                onclick="saveToGoogleDrive()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #4285f4;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>☁️</span> Save to Google Drive
+              </button>
+              <button
+                onclick="shareViaOtherApps()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #6c757d;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>📤</span> Share via Other Apps
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../assets/js/pdf.js"></script>
+    <script src="../../assets/js/signature.js"></script>
+    <script src="../../assets/js/stamp.js"></script>
+    <script src="../../assets/js/watermark.js"></script>
+
+    <script>
+      // Try to get data from URL parameter first, then fallback to localStorage
+      let data;
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get('data');
+        if (dataParam) {
+          data = JSON.parse(decodeURIComponent(dataParam));
+        } else {
+          data = JSON.parse(localStorage.getItem("invoiceData"));
+        }
+      } catch (e) {
+        console.error("Error parsing invoice data:", e);
+        data = JSON.parse(localStorage.getItem("invoiceData"));
+      }
+
+      function formatDate(dateStr) {
+        try {
+          if (!dateStr) return "-";
+          const d = new Date(dateStr);
+          if (isNaN(d.getTime())) return dateStr;
+          return d.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+        } catch (e) {
+          return dateStr || "-";
+        }
+      }
+
+      function safeText(v) {
+        return (v || "").toString();
+      }
+
+      function multilineHtml(text) {
+        return safeText(text)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\n/g, "<br>");
+      }
+
+      function toINR(n) {
+        const x = Number(n || 0);
+        return x.toFixed(2);
+      }
+
+      function numberToWordsINR(amount) {
+        const a = Math.round(Number(amount || 0));
+        if (!a) return "INR Zero Rupees Only. E. & O.E";
+        return `INR ${a.toLocaleString("en-IN")} Rupees Only. E. & O.E`;
+      }
+
+      if (data) {
+        document.getElementById("pCompany").innerText =
+          data.companyName || "Company Name";
+        document.getElementById("pCompanySignature").innerText =
+          data.companyName || "Company Name";
+        document.getElementById("pCompanyGST").innerText = data.companyGST || "";
+        document.getElementById("pCompanyAddress").innerHTML = multilineHtml(
+          data.companyAddress || ""
+        );
+        document.getElementById("pCompanyMobile").innerText =
+          data.companyMobile || "-";
+        document.getElementById("pCompanyEmail").innerText = data.companyEmail || "";
+        const emailLine = document.getElementById("companyEmailLine");
+        if (!data.companyEmail && emailLine) emailLine.style.display = "none";
+
+        document.getElementById("pClient").innerText =
+          data.clientName || "Client Name";
+        document.getElementById("pClientGST").innerText = data.clientGST || "";
+        document.getElementById("pClientAddress").innerHTML = multilineHtml(
+          data.clientAddress || ""
+        );
+        document.getElementById("pClientMobile").innerText =
+          data.clientMobile || "-";
+
+        document.getElementById("pInvoiceNo").innerText = data.invoiceNo || "-";
+        document.getElementById("pInvoiceDate").innerText = formatDate(
+          data.invoiceDate
+        );
+        document.getElementById("pPlaceSupply").innerText =
+          data.placeSupply || "-";
+
+        // Payment notes + terms
+        const paymentNoteEl = document.getElementById("pPaymentNote");
+        const termsNoteEl = document.getElementById("pTermsNote");
+        if (paymentNoteEl && data.paymentNote) {
+          paymentNoteEl.innerHTML = multilineHtml(data.paymentNote);
+        }
+        if (termsNoteEl && data.paymentNote) {
+          termsNoteEl.innerHTML = multilineHtml(data.paymentNote);
+        }
+
+        const tbody = document.getElementById("itemRows");
+        const items = Array.isArray(data.items) ? data.items : [];
+
+        const shippingTotal =
+          data.shipping && data.shipping.total ? Number(data.shipping.total) : 0;
+
+        const taxes = Array.isArray(data.taxes) ? data.taxes : [];
+        const gstRow = taxes.find((t) => (t.type || "").toUpperCase() === "GST");
+        const cgstRow = taxes.find((t) => (t.type || "").toUpperCase() === "CGST");
+        const sgstRow = taxes.find((t) => (t.type || "").toUpperCase() === "SGST");
+        let cgstEach = cgstRow ? Number(cgstRow.percent) || 0 : 0;
+        let sgstEach = sgstRow ? Number(sgstRow.percent) || 0 : 0;
+        if (!cgstRow && !sgstRow && gstRow) {
+          cgstEach = Number(gstRow.percent) || 0;
+          sgstEach = Number(gstRow.percent) || 0;
+        }
+        const taxPercentTotal = cgstEach + sgstEach;
+
+        let taxable = 0;
+        if (items.length) {
+          items.forEach((item, idx) => {
+            const qty = Number(item.qty || 0);
+            const rate = Number(item.rate || 0);
+            const amount = qty * rate;
+            taxable += amount;
+            const descHtml = item.desc
+              ? `<div class="item-desc">${safeText(item.desc)
+                  .replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")}</div>`
+              : "";
+            tbody.insertAdjacentHTML(
+              "beforeend",
+              `\n                <tr>\n                  <td class="col-no">${idx + 1}</td>\n                  <td class="col-item"><div class="item-name">${safeText(
+                item.name || "-"
+              )}</div>${descHtml}</td>\n                  <td class="col-hsn">${safeText(item.hsn || "-")}</td>\n                  <td class="col-tax">${item.tax ? safeText(item.tax) + "%" : (taxPercentTotal ? taxPercentTotal + "%" : "-")}</td>\n                  <td class="col-qty">${qty ? qty : 0} ${safeText(item.per || "NOS")}</td>\n                  <td class="col-rate">${toINR(rate)}</td>\n                  <td class="col-per">${safeText(item.per || "NOS")}</td>\n                  <td class="col-amt">${toINR(amount)}</td>\n                </tr>`
+            );
+          });
+        } else {
+          tbody.innerHTML =
+            '<tr><td colspan="8" style="text-align:center; padding:24px;">No items added</td></tr>';
+        }
+
+        const taxableWithShipping = taxable + shippingTotal;
+        const cgst = taxableWithShipping * (cgstEach / 100);
+        const sgst = taxableWithShipping * (sgstEach / 100);
+        const totalTax = cgst + sgst;
+        const grossTotal = taxableWithShipping + totalTax;
+        const rounded = Math.round(grossTotal);
+        const roundOff = rounded - grossTotal;
+        const grandTotal = rounded;
+
+        document.getElementById("pShipping").innerText = toINR(shippingTotal);
+        document.getElementById("pTaxable").innerText = toINR(taxableWithShipping);
+        document.getElementById("pCgstRate").innerText = cgstEach ? cgstEach : 0;
+        document.getElementById("pSgstRate").innerText = sgstEach ? sgstEach : 0;
+        document.getElementById("pCgst").innerText = toINR(cgst);
+        document.getElementById("pSgst").innerText = toINR(sgst);
+        document.getElementById("pRoundOff").innerText = toINR(roundOff);
+        document.getElementById("pTotal").innerText = toINR(grandTotal);
+        const payableEl = document.getElementById("pAmountPayable");
+        if (payableEl) payableEl.innerText = toINR(grandTotal);
+        const totalItemsEl = document.getElementById("pTotalItems");
+        const totalQtyEl = document.getElementById("pTotalQty");
+        if (totalItemsEl) totalItemsEl.innerText = String(items.length);
+        if (totalQtyEl) {
+          totalQtyEl.innerText = String(
+            items.reduce((sum, item) => sum + Number(item.qty || 0), 0)
+          );
+        }
+        document.getElementById("pAmountWords").innerText = numberToWordsINR(
+          grandTotal
+        );
+
+        const taxTbody = document.getElementById("taxBreakRows");
+        taxTbody.innerHTML = "";
+        const taxBase = taxableWithShipping;
+
+        if (gstRow) {
+          const cgstAmount = taxBase * (cgstEach / 100);
+          const sgstAmount = taxBase * (sgstEach / 100);
+          taxTbody.insertAdjacentHTML(
+            "beforeend",
+            `\n            <tr>\n              <td style="text-align:center">-</td>\n              <td style="text-align:right">${toINR(taxBase)}</td>\n              <td style="text-align:center">${cgstEach ? cgstEach + "%" : "-"}</td>\n              <td style="text-align:right">${toINR(cgstAmount)}</td>\n              <td style="text-align:center">${sgstEach ? sgstEach + "%" : "-"}</td>\n              <td style="text-align:right">${toINR(sgstAmount)}</td>\n              <td style="text-align:right">${toINR(cgstAmount + sgstAmount)}</td>\n            </tr>`
+          );
+        } else {
+          if (cgstRow) {
+            const cgstAmount = taxBase * (cgstEach / 100);
+            taxTbody.insertAdjacentHTML(
+              "beforeend",
+              `\n            <tr>\n              <td style="text-align:center">-</td>\n              <td style="text-align:right">${toINR(taxBase)}</td>\n              <td style="text-align:center">${cgstEach ? cgstEach + "%" : "-"}</td>\n              <td style="text-align:right">${toINR(cgstAmount)}</td>\n              <td style="text-align:center">-</td>\n              <td style="text-align:right">-</td>\n              <td style="text-align:right">${toINR(cgstAmount)}</td>\n            </tr>`
+            );
+          }
+          if (sgstRow) {
+            const sgstAmount = taxBase * (sgstEach / 100);
+            taxTbody.insertAdjacentHTML(
+              "beforeend",
+              `\n            <tr>\n              <td style="text-align:center">-</td>\n              <td style="text-align:right">${toINR(taxBase)}</td>\n              <td style="text-align:center">-</td>\n              <td style="text-align:right">-</td>\n              <td style="text-align:center">${sgstEach ? sgstEach + "%" : "-"}</td>\n              <td style="text-align:right">${toINR(sgstAmount)}</td>\n              <td style="text-align:right">${toINR(sgstAmount)}</td>\n            </tr>`
+            );
+          }
+        }
+
+        document.getElementById("pTaxBreakTaxable").innerText = toINR(
+          taxBase
+        );
+        document.getElementById("pTaxBreakCgst").innerText = toINR(cgst);
+        document.getElementById("pTaxBreakSgst").innerText = toINR(sgst);
+        document.getElementById("pTaxBreakTotalTax").innerText = toINR(
+          cgst + sgst
+        );
+
+        if (data.signature) {
+          const sig = document.getElementById("signature-image");
+          sig.src = data.signature;
+          sig.style.display = "block";
+        }
+
+        window.invoicePreviewData = data;
+        if (typeof applyInvoiceWatermark === "function") {
+          applyInvoiceWatermark(data);
+        }
+        if (typeof initDocumentChrome === "function") initDocumentChrome();
+      }
+
+      function editInvoice() {
+        window.open("../../index.html", "_self");
+      }
+
+      function cancelInvoice() {
+        window.open("../../index.html", "_self");
+      }
+    </script>
+  <script src="../../assets/js/theme-a11y.js"></script>
+  </body>
+</html>

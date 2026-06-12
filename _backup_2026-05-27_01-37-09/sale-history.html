@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale History - Item Management</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/page-login-promo.css">
+    <script src="js/navigation-manager.js"></script><script src="js/auth-service.js"></script>
+</head>
+<body
+    data-login-promo
+    data-login-redirect="sale-history.html"
+    data-login-title="Stock History"
+    data-login-desc="Sign in to track and review your stock movement and sales history."
+>
+    <div class="mobile-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <i class="fas fa-arrow-left back-icon" onclick="goBack()" title="Go Back"></i>
+                <h1 class="app-title">Sale History</h1>
+            </div>
+            <div class="header-right">
+                <span id="userEmail" style="font-size:0.9rem;opacity:0.8;margin-right:8px;"></span>
+                <a id="loginIcon" class="page-login-btn" href="login.html?redirect=sale-history.html">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <i class="fas fa-bell notification-icon"></i>
+                <i class="fas fa-cog settings-icon" onclick="goToSettings()"></i>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search and Filter Section -->
+            <section class="search-section">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search sales..." id="searchInput">
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterSales('all')">All</button>
+                    <button class="filter-btn" onclick="filterSales('today')">Today</button>
+                    <button class="filter-btn" onclick="filterSales('week')">This Week</button>
+                    <button class="filter-btn" onclick="filterSales('month')">This Month</button>
+                </div>
+            </section>
+
+            <!-- Sales List -->
+            <section class="sales-list-section">
+                <h2 class="section-title">Recent Sales</h2>
+                <div class="sales-list" id="salesList">
+                    <!-- Sample sales data -->
+                    <div class="sale-item">
+                        <div class="sale-header">
+                            <div class="sale-info">
+                                <h3>Invoice #INV-001</h3>
+                                <p class="sale-date">15 Jan 2026</p>
+                            </div>
+                            <div class="sale-amount">
+                                <span class="amount">₹5,000</span>
+                                <span class="status paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="sale-details">
+                            <p><strong>Customer:</strong> ABC Corporation</p>
+                            <p><strong>Items:</strong> 3 Products</p>
+                            <p><strong>Phone:</strong> +91 9876543210</p>
+                        </div>
+                        <div class="sale-actions">
+                            <button class="view-btn" onclick="viewInvoice('INV-001')">
+                                <i class="fas fa-eye"></i>
+                                View Invoice
+                            </button>
+                            <button class="download-btn" onclick="downloadInvoice('INV-001')">
+                                <i class="fas fa-download"></i>
+                                Download
+                            </button>
+                            <button class="message-btn" onclick="sendMessage('+91 9876543210', 'ABC Corporation')">
+                                <i class="fas fa-comment"></i>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sale-item">
+                        <div class="sale-header">
+                            <div class="sale-info">
+                                <h3>Invoice #INV-002</h3>
+                                <p class="sale-date">14 Jan 2026</p>
+                            </div>
+                            <div class="sale-amount">
+                                <span class="amount">₹12,500</span>
+                                <span class="status pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="sale-details">
+                            <p><strong>Customer:</strong> XYZ Enterprises</p>
+                            <p><strong>Items:</strong> 5 Products</p>
+                            <p><strong>Phone:</strong> +91 9876543211</p>
+                        </div>
+                        <div class="sale-actions">
+                            <button class="view-btn" onclick="viewInvoice('INV-002')">
+                                <i class="fas fa-eye"></i>
+                                View Invoice
+                            </button>
+                            <button class="download-btn" onclick="downloadInvoice('INV-002')">
+                                <i class="fas fa-download"></i>
+                                Download
+                            </button>
+                            <button class="message-btn" onclick="sendMessage('+91 9876543211', 'XYZ Enterprises')">
+                                <i class="fas fa-comment"></i>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sale-item">
+                        <div class="sale-header">
+                            <div class="sale-info">
+                                <h3>Invoice #INV-003</h3>
+                                <p class="sale-date">13 Jan 2026</p>
+                            </div>
+                            <div class="sale-amount">
+                                <span class="amount">₹8,200</span>
+                                <span class="status paid">Paid</span>
+                            </div>
+                        </div>
+                        <div class="sale-details">
+                            <p><strong>Customer:</strong> Global Solutions</p>
+                            <p><strong>Items:</strong> 2 Products</p>
+                            <p><strong>Phone:</strong> +91 9876543212</p>
+                        </div>
+                        <div class="sale-actions">
+                            <button class="view-btn" onclick="viewInvoice('INV-003')">
+                                <i class="fas fa-eye"></i>
+                                View Invoice
+                            </button>
+                            <button class="download-btn" onclick="downloadInvoice('INV-003')">
+                                <i class="fas fa-download"></i>
+                                Download
+                            </button>
+                            <button class="message-btn" onclick="sendMessage('+91 9876543212', 'Global Solutions')">
+                                <i class="fas fa-comment"></i>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Summary Section -->
+            <section class="summary-section">
+                <h2 class="section-title">Summary</h2>
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="summary-content">
+                            <h3>Total Sales</h3>
+                            <p class="summary-value">₹25,700</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="summary-content">
+                            <h3>Total Invoices</h3>
+                            <p class="summary-value">3</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="summary-content">
+                            <h3>Paid</h3>
+                            <p class="summary-value">2</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="goToHome()">
+                <i class="fas fa-home"></i>
+                <span>HOME</span>
+            </div>
+            <div class="nav-item" onclick="goToDashboard()">
+                <i class="fas fa-chart-bar"></i>
+                <span>DASHBOARD</span>
+            </div>
+            <div class="nav-item" onclick="goToProducts()">
+                <i class="fas fa-box"></i>
+                <span>ITEMS</span>
+            </div>
+            <div class="nav-item active" onclick="goToMenu()">
+                <i class="fas fa-bars"></i>
+                <span>MENU</span>
+            </div>
+            <div class="nav-item" onclick="getDesktop()">
+                <i class="fab fa-windows"></i>
+                <span>GET DESKTOP</span>
+            </div>
+        </nav>
+    </div>
+
+    <style>
+        .search-section {
+            margin-bottom: 25px;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e8ecf1;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .sales-list-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .sale-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e8ecf1;
+            transition: all 0.3s ease;
+        }
+
+        .sale-item:hover {
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .sale-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .sale-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .sale-date {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .sale-amount {
+            text-align: right;
+        }
+
+        .amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .status.paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .sale-details {
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .sale-details p {
+            margin: 5px 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .summary-section {
+            margin-bottom: 25px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e8ecf1;
+        }
+
+        .summary-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto 10px;
+        }
+
+        .summary-content h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .sale-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+
+        .view-btn,
+        .download-btn,
+        .message-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .message-btn {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            color: white;
+        }
+
+        .message-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+    </style>
+
+    <script>
+        // Navigation Functions
+        function goToHome() {
+            window.location.href = 'home.html';
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        function goToProducts() {
+            window.location.href = 'product.html';
+        }
+
+        function goToMenu() {
+            window.location.href = 'menu.html';
+        }
+
+        function getDesktop() {
+            alert('Get desktop version functionality coming soon!');
+        }
+
+        function goToSettings() {
+            alert('Settings functionality coming soon!');
+        }
+
+        // Document Functions
+        function viewInvoice(invoiceNumber) {
+            // Open invoice in new tab or modal
+            window.open(`index.html?view=invoice&number=${invoiceNumber}`, '_blank');
+        }
+
+        function downloadInvoice(invoiceNumber) {
+            // Generate and download invoice PDF
+            alert(`Downloading Invoice ${invoiceNumber}...`);
+            // In a real implementation, this would generate a PDF
+            console.log(`Download invoice: ${invoiceNumber}`);
+        }
+
+        // Message Function
+        function sendMessage(phoneNumber, customerName) {
+            // Remove any non-digit characters from phone number
+            const cleanNumber = phoneNumber.replace(/\D/g, '');
+            
+            // Create message template
+            const message = `Dear ${customerName},\n\nThis is a reminder regarding your recent transaction with us. Thank you for your business!\n\nRegards,\nShubham Patil`;
+            
+            // Open WhatsApp with pre-filled message
+            const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Filter Functions
+        function filterSales(period) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Get all sale items
+            const saleItems = document.querySelectorAll('.sale-item');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set to start of day
+            
+            saleItems.forEach(item => {
+                const dateElement = item.querySelector('.sale-date');
+                if (dateElement) {
+                    const saleDateText = dateElement.textContent.trim();
+                    const saleDate = parseSaleDate(saleDateText);
+                    
+                    let shouldShow = false;
+                    
+                    switch(period) {
+                        case 'all':
+                            shouldShow = true;
+                            break;
+                        case 'today':
+                            shouldShow = isSameDay(saleDate, today);
+                            break;
+                        case 'week':
+                            shouldShow = isThisWeek(saleDate, today);
+                            break;
+                        case 'month':
+                            shouldShow = isThisMonth(saleDate, today);
+                            break;
+                    }
+                    
+                    item.style.display = shouldShow ? 'block' : 'none';
+                }
+            });
+            
+            // Update summary based on visible items
+            updateSummary();
+        }
+
+        // Helper function to parse sale date
+        function parseSaleDate(dateText) {
+            // Parse format like "15 Jan 2026"
+            const parts = dateText.split(' ');
+            const day = parseInt(parts[0]);
+            const month = getMonthNumber(parts[1]);
+            const year = parseInt(parts[2]);
+            return new Date(year, month - 1, day);
+        }
+
+        // Helper function to get month number from month name
+        function getMonthNumber(monthName) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months.indexOf(monthName) + 1;
+        }
+
+        // Helper function to check if two dates are the same day
+        function isSameDay(date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
+
+        // Helper function to check if date is this week
+        function isThisWeek(date, today) {
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23, 59, 59, 999);
+            
+            return date >= startOfWeek && date <= endOfWeek;
+        }
+
+        // Helper function to check if date is this month
+        function isThisMonth(date, today) {
+            return date.getFullYear() === today.getFullYear() &&
+                   date.getMonth() === today.getMonth();
+        }
+
+        // Function to update summary based on visible items
+        function updateSummary() {
+            const visibleItems = document.querySelectorAll('.sale-item:not([style*="display: none"])');
+            let totalSales = 0;
+            let paidCount = 0;
+            
+            visibleItems.forEach(item => {
+                const amountElement = item.querySelector('.amount');
+                const statusElement = item.querySelector('.status');
+                
+                if (amountElement) {
+                    const raw = amountElement.getAttribute('data-amount') || amountElement.textContent;
+                    const amount = window.SmarbizCurrency
+                        ? SmarbizCurrency.parseAmount(raw)
+                        : parseFloat(String(raw).replace(/[₹$€,]/g, ''));
+                    if (amount != null) totalSales += amount;
+                }
+                
+                if (statusElement && statusElement.textContent.trim() === 'Paid') {
+                    paidCount++;
+                }
+            });
+            
+            // Update summary values
+            const totalSalesElement = document.querySelector('.summary-value');
+            const totalInvoicesElement = document.querySelectorAll('.summary-value')[1];
+            const paidElement = document.querySelectorAll('.summary-value')[2];
+            
+            if (totalSalesElement) {
+                totalSalesElement.setAttribute('data-amount', totalSales);
+                totalSalesElement.textContent = window.SmarbizCurrency
+                    ? SmarbizCurrency.format(totalSales)
+                    : `₹${totalSales.toLocaleString('en-IN')}`;
+            }
+            if (totalInvoicesElement) {
+                totalInvoicesElement.textContent = visibleItems.length;
+            }
+            if (paidElement) {
+                paidElement.textContent = paidCount;
+            }
+        }
+
+        // Search Function
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const saleItems = document.querySelectorAll('.sale-item');
+            
+            saleItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    <script src="js/test-documents.js"></script>
+    <script src="js/currency.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.SmarbizTestDocuments) return;
+            SmarbizTestDocuments.initTypedHistoryPage({
+                docTypes: ['Invoice'],
+                listId: 'salesList',
+                itemClass: 'sale',
+                numberPrefix: 'Invoice',
+                emptyLabel: 'invoices',
+                onUpdate: function (items) {
+                    if (typeof updateSummary === 'function') updateSummary();
+                }
+            });
+        });
+    </script>
+    <script src="js/simple-login-button.js"></script>
+    <script src="js/auth-status.js"></script>
+    <script src="js/page-login-promo.js"></script>
+</body>
+</html>
+

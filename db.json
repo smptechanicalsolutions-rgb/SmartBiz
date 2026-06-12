@@ -1,0 +1,12 @@
+{
+  "users": {
+    "test@example.com": {
+      "id": "cb250668-af86-49fd-8f14-8b7ae1cc05ef",
+      "email": "test@example.com",
+      "password_hash": "$2b$10$ndxZoJA8hyqruLGWMG5TgeOKSaTN7aghIkNVFsUHUBwuzoRQKXvfq",
+      "emailVerified": true,
+      "createdAt": "2026-05-24T07:42:15.313Z",
+      "name": "Test User"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+/* Mobile layout - fit mobile screen exactly */
+@media (max-width: 768px) {
+  body {
+    margin: 0;
+    padding: 5px;
+  }
+  
+  #invoice, .invoice, div#invoice {
+    transform: scale(0.6);
+    transform-origin: top center;
+    margin: 5px auto;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    margin: 0;
+    padding: 3px;
+  }
+  
+  #invoice, .invoice, div#invoice {
+    transform: scale(0.45);
+    transform-origin: top center;
+    margin: 3px auto;
+    width: 100%;
+    max-width: 100%;
+  }
+}

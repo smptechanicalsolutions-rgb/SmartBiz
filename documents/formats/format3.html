@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>Delivery Challan</title>
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+
+    <!-- Format 1 CSS -->
+    <link rel="stylesheet" href="..\/format-css/format1.css" />
+    <link rel="stylesheet" href="..\/format-css/responsive-mobile.css" />
+    <link rel="stylesheet" href="..\/format-css/document-common.css" />
+    <script src="../../assets/js/document-actions.js"></script>
+    <script src="../../assets/js/mobile-preview-chrome.js?v=20260602-preview-clean"></script>
+    <!-- Apply Format-2 layout/styles for consistent header and buttons -->
+    <link rel="stylesheet" href="..\/format-css/format2.css" />
+
+    <!-- PDF libs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../../assets/js/currency.js"></script>
+  </head>
+
+  <body>
+    <div id="invoice">
+      <div class="watermark">
+        <div class="wm">OFFICIAL</div>
+      </div>
+      <!-- HEADER -->
+      <div class="invoice-header">
+        <div class="company">
+          <h3 id="pCompany">LTIMindtree</h3>
+          <p>
+            GSTIN: <span id="pCompanyGST"></span><br />
+            <span id="pCompanyAddress"></span><br />
+            Mobile: <span id="pCompanyMobile"></span><br />
+            <span id="companyEmailLine"
+              >Email: <span id="pCompanyEmail"></span
+            ></span>
+          </p>
+        </div>
+
+        <div class="invoice-info">
+          <h2>DELIVERY CHALLAN</h2>
+          <p>
+            Challan #: <span id="pInvoiceNo"></span><br />
+            Date: <span id="pInvoiceDate"></span><br />
+            <span id="poNumberLine" style="display: none"
+              >PO No.: <span id="pPONumber"></span><br
+            /></span>
+            <span id="poDateLine" style="display: none"
+              >PO Date: <span id="pPODate"></span><br
+            /></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- PAYMENT INSTRUCTIONS -->
+      <div id="paymentBox" class="payment-box" style="display: none">
+        <strong>Payment Instructions:</strong>
+        <p id="pPayment"></p>
+      </div>
+
+      <hr />
+
+      <!-- BILL TO -->
+      <div class="bill-section">
+        <div>
+          <strong>Bill To:</strong><br />
+          <strong id="pClient"></strong><br />
+          GSTIN: <span id="pClientGST"></span><br />
+          <span id="pClientAddress"></span><br />
+          Mobile: <span id="pClientMobile"></span>
+        </div>
+
+        <div class="due-date">
+          <strong>Due Date:</strong><br />
+          <span id="pDueDate"></span>
+        </div>
+      </div>
+
+      <!-- ITEMS TABLE -->
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>HSN/SAC</th>
+            <th>Tax</th>
+            <th>Rate</th>
+            <th>Qty</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="itemRows">
+          <!-- JS inserts rows -->
+        </tbody>
+      </table>
+
+      <!-- TOTALS -->
+      <div class="total-box">
+        <p>Taxable Amount: ₹0.00</p>
+        <div id="pTaxLines">
+          <!-- JS will insert tax lines like CGST/SGST/IGST here -->
+        </div>
+        <p>Shipping: ₹0.00</p>
+        <h3>Total: ₹0.00</h3>
+      </div>
+
+      <!-- reserved gap for stamp between totals and signature -->
+      <div class="stamp-gap" aria-hidden="true"></div>
+
+      <!-- SIGNATURE -->
+      <div class="signature-section">
+        <div class="signature-right">
+          <img
+            id="signature-image"
+            src=""
+            alt="Signature"
+            style="
+              max-width: 200px;
+              max-height: 80px;
+              display: none;
+              margin: 0 auto 10px auto;
+              object-fit: contain;
+            "
+          />
+          <img
+            id="invoiceStampImage"
+            src=""
+            alt="Stamp"
+            style="position: absolute; display: none; opacity: 0.95"
+          />
+          <div class="signature-line"></div>
+          <p class="sign-text">Authorized Signature</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Download/Share Modal -->
+    <div
+      id="downloadModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered"
+        style="max-width: 500px; margin: 5% auto"
+      >
+        <div
+          class="modal-content"
+          style="background: white; border-radius: 8px; padding: 0"
+        >
+          <div
+            class="modal-header"
+            style="
+              background: #007bff;
+              color: white;
+              padding: 15px 20px;
+              border-radius: 8px 8px 0 0;
+            "
+          >
+            <h5 class="modal-title" style="margin: 0">
+              Download / Share Invoice
+            </h5>
+            <button
+              type="button"
+              onclick="closeDownloadModal()"
+              style="
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 0;
+                width: 30px;
+                height: 30px;
+              "
+            >
+              &times;
+            </button>
+          </div>
+          <div class="modal-body" style="padding: 20px">
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <button
+                onclick="downloadPDFDirect()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #dc3545;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>📥</span> Download PDF
+              </button>
+              <button
+                onclick="shareToWhatsApp()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #25d366;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>💬</span> Share on WhatsApp
+              </button>
+              <button
+                onclick="saveToGoogleDrive()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #4285f4;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>☁️</span> Save to Google Drive
+              </button>
+              <button
+                onclick="shareViaOtherApps()"
+                class="download-option-btn"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background: #6c757d;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-size: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 10px;
+                "
+              >
+                <span>📤</span> Share via Other Apps
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons (outside invoice) -->
+    <div
+      class="action-buttons"
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        margin: 18px 0;
+        flex-wrap: wrap;
+      "
+    >
+      <button
+        class="pdf-btn"
+        style="background: #dc3545"
+        onclick="cancelInvoice()"
+      >
+        Cancel Challan
+      </button>
+      <button class="pdf-btn" onclick="showDownloadOptions()">
+        Download / Share
+      </button>
+      <button class="pdf-btn" style="background: #0d6efd" onclick="printVectorPDF()">
+        Print (Vector PDF)
+      </button>
+      <button
+        class="pdf-btn"
+        style="background: #6c757d"
+        onclick="editInvoice()"
+      >
+        Edit Challan
+      </button>
+      <button class="pdf-btn" style="background: #111827" onclick="deleteCurrentDocument()">
+        Delete
+      </button>
+    </div>
+
+    <!-- Signature -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="../../assets/js/signature.js"></script>
+    <script src="../../assets/js/stamp.js"></script>
+    <script src="../../assets/js/watermark.js"></script>
+    <script src="../../assets/js/pdf.js"></script>
+
+    <!-- DATA LOAD -->
+    <script>
+      // Try to get data from URL parameter first, then fallback to localStorage
+      let data;
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get('data');
+        if (dataParam) {
+          data = JSON.parse(decodeURIComponent(dataParam));
+        } else {
+          data = JSON.parse(localStorage.getItem("invoiceData"));
+        }
+      } catch (e) {
+        console.error("Error parsing invoice data:", e);
+        data = JSON.parse(localStorage.getItem("invoiceData"));
+      }
+
+      if (data) {
+        pCompany.innerText = data.companyName;
+        pCompanyGST.innerText = data.companyGST;
+        pCompanyAddress.innerText = data.companyAddress;
+        pCompanyMobile.innerText = data.companyMobile || "-";
+        const pCompanyEmail = document.getElementById("pCompanyEmail");
+        const companyEmailLine = document.getElementById("companyEmailLine");
+        if (pCompanyEmail) {
+          pCompanyEmail.innerText = data.companyEmail || "";
+          if (!data.companyEmail && companyEmailLine)
+            companyEmailLine.style.display = "none";
+        }
+
+        pClient.innerText = data.clientName;
+        pClientGST.innerText = data.clientGST;
+        pClientAddress.innerText = data.clientAddress;
+        pClientMobile.innerText = data.clientMobile || "-";
+
+        pInvoiceNo.innerText = data.invoiceNo;
+
+        // Format Invoice Date
+        if (data.invoiceDate) {
+          const invoiceDate = new Date(data.invoiceDate);
+          const options = { day: "numeric", month: "short", year: "numeric" };
+          pInvoiceDate.innerText = invoiceDate.toLocaleDateString(
+            "en-GB",
+            options
+          );
+        } else {
+          pInvoiceDate.innerText = new Date().toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+        }
+
+        // Due Date
+        const dueDateEl = document.getElementById("pDueDate");
+        if (data.dueDate && dueDateEl) {
+          const dueDate = new Date(data.dueDate);
+          const options = { day: "numeric", month: "short", year: "numeric" };
+          dueDateEl.innerText = dueDate.toLocaleDateString("en-GB", options);
+        } else if (dueDateEl) {
+          // Default to 30 days from invoice date if not provided
+          const invoiceDate = data.invoiceDate
+            ? new Date(data.invoiceDate)
+            : new Date();
+          const defaultDueDate = new Date(invoiceDate);
+          defaultDueDate.setDate(invoiceDate.getDate() + 30);
+          const options = { day: "numeric", month: "short", year: "numeric" };
+          dueDateEl.innerText = defaultDueDate.toLocaleDateString(
+            "en-GB",
+            options
+          );
+        }
+
+        // PO Number and PO Date
+        const poNumberEl = document.getElementById("pPONumber");
+        const poDateEl = document.getElementById("pPODate");
+        const poNumberLine = document.getElementById("poNumberLine");
+        const poDateLine = document.getElementById("poDateLine");
+        if (data.poNumber && poNumberEl && poNumberLine) {
+          poNumberEl.innerText = data.poNumber;
+          poNumberLine.style.display = "inline";
+        } else if (poNumberLine) {
+          poNumberLine.style.display = "none";
+        }
+        if (data.poDate && poDateEl && poDateLine) {
+          poDateEl.innerText = data.poDate;
+          poDateLine.style.display = "inline";
+        } else if (poDateLine) {
+          poDateLine.style.display = "none";
+        }
+
+        let tbody = document.getElementById("itemRows");
+        const escapeHtml = (text) =>
+          (text || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+        // For delivery challan, show items without rate and amount (set to 0)
+        data.items.forEach((item, i) => {
+          const descHtml = item.desc
+            ? `<br><small style="color: #666;">${escapeHtml(item.desc)}</small>`
+            : "";
+          tbody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${item.name}${descHtml}</td>
+        <td>${escapeHtml(item.hsn || "-")}</td>
+        <td>${escapeHtml(item.tax ? item.tax + "%" : "-")}</td>
+        <td>₹0</td>
+        <td>${item.qty} ${escapeHtml(item.per || "")}</td>
+        <td>₹0.00</td>
+      </tr>
+    `;
+        });
+
+        // All totals are 0 for delivery challan
+        const taxLinesEl = document.getElementById("pTaxLines");
+        taxLinesEl.innerHTML = "";
+
+        // Payment Instructions - only show if there's content
+        const paymentBox = document.getElementById("paymentBox");
+        if (data.paymentNote && data.paymentNote.trim()) {
+          pPayment.innerText = data.paymentNote.trim();
+          if (paymentBox) paymentBox.style.display = "block";
+        } else {
+          if (paymentBox) paymentBox.style.display = "none";
+        }
+
+        // Display signature if available
+        if (data.signature) {
+          const signatureImg = document.getElementById("signature-image");
+          if (signatureImg) {
+            signatureImg.src = data.signature;
+            signatureImg.style.display = "block";
+          }
+        }
+
+        window.invoicePreviewData = data;
+        if (typeof applyInvoiceWatermark === "function") {
+          applyInvoiceWatermark(data);
+        }
+        if (typeof initDocumentChrome === "function") initDocumentChrome();
+      }
+    </script>
+
+    <script>
+      function editInvoice() {
+        // open the editor (index.html) in same tab so user can edit saved data
+        window.open("../../index.html", "_self");
+      }
+
+      function cancelInvoice() {
+        if (!confirm("Cancel challan and clear saved data?")) return;
+        localStorage.removeItem("invoiceData");
+        try {
+          window.close();
+        } catch (e) {
+          /* ignore */
+        }
+      }
+    </script>
+  <script src="../../assets/js/theme-a11y.js"></script>
+  </body>
+</html>

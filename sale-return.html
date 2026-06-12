@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Return - Item Management</title>
+    <link rel="stylesheet" href="assets/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="assets/js/auth-service.js"></script>
+    <script src="assets/js/auth-status.js"></script>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <i class="fas fa-arrow-left back-icon" onclick="goToMenu()"></i>
+                <h1 class="app-title">Sale Return</h1>
+            </div>
+            <div class="header-right">
+                <i class="fas fa-bell notification-icon"></i>
+                <i class="fas fa-cog settings-icon" onclick="goToSettings()"></i>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search Invoice Section -->
+            <section class="search-invoice-section">
+                <h2 class="section-title">Find Invoice</h2>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search by invoice number or customer..." id="searchInvoice">
+                </div>
+            </section>
+
+            <!-- Recent Invoices -->
+            <section class="recent-invoices-section">
+                <h2 class="section-title">Recent Invoices</h2>
+                <div class="invoices-list" id="invoicesList">
+                    <div class="invoice-item" onclick="selectInvoice('INV-001')">
+                        <div class="invoice-header">
+                            <div class="invoice-info">
+                                <h3>Invoice #INV-001</h3>
+                                <p class="invoice-date">15 Jan 2026</p>
+                            </div>
+                            <div class="invoice-amount">
+                                <span class="amount">₹5,000</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        <div class="invoice-details">
+                            <p><strong>Customer:</strong> ABC Corporation</p>
+                            <p><strong>Status:</strong> <span class="status paid">Paid</span></p>
+                        </div>
+                    </div>
+
+                    <div class="invoice-item" onclick="selectInvoice('INV-002')">
+                        <div class="invoice-header">
+                            <div class="invoice-info">
+                                <h3>Invoice #INV-002</h3>
+                                <p class="invoice-date">14 Jan 2026</p>
+                            </div>
+                            <div class="invoice-amount">
+                                <span class="amount">₹12,500</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        <div class="invoice-details">
+                            <p><strong>Customer:</strong> XYZ Enterprises</p>
+                            <p><strong>Status:</strong> <span class="status pending">Pending</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Return Form (Hidden by default) -->
+            <section class="return-form-section" id="returnFormSection" style="display: none;">
+                <h2 class="section-title">Process Return</h2>
+                <div class="invoice-summary">
+                    <div class="summary-row">
+                        <span>Invoice Number:</span>
+                        <span id="selectedInvoice">INV-001</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Customer:</span>
+                        <span id="selectedCustomer">ABC Corporation</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Original Amount:</span>
+                        <span id="originalAmount">₹5,000</span>
+                    </div>
+                </div>
+
+                <form class="return-form" onsubmit="processReturn(event)">
+                    <div class="form-group">
+                        <label class="form-label">Return Reason *</label>
+                        <select class="form-select" required>
+                            <option value="">Select reason...</option>
+                            <option value="damaged">Damaged Goods</option>
+                            <option value="wrong">Wrong Item Delivered</option>
+                            <option value="defective">Defective Product</option>
+                            <option value="customer_dissatisfaction">Customer Dissatisfaction</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Return Amount *</label>
+                        <input type="number" class="form-input" placeholder="Enter return amount" required min="0" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-input textarea" placeholder="Describe the reason for return..." rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Refund Method *</label>
+                        <select class="form-select" required>
+                            <option value="">Select method...</option>
+                            <option value="cash">Cash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="credit_note">Credit Note</option>
+                            <option value="replacement">Replacement</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-check"></i>
+                            Process Return
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="cancelReturn()">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="goToHome()">
+                <i class="fas fa-home"></i>
+                <span>HOME</span>
+            </div>
+            <div class="nav-item" onclick="goToDashboard()">
+                <i class="fas fa-chart-bar"></i>
+                <span>DASHBOARD</span>
+            </div>
+            <div class="nav-item" onclick="goToProducts()">
+                <i class="fas fa-box"></i>
+                <span>ITEMS</span>
+            </div>
+            <div class="nav-item active" onclick="goToMenu()">
+                <i class="fas fa-bars"></i>
+                <span>MENU</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('settings')">
+                <i class="fas fa-cog"></i>
+                <span>SETTINGS</span>
+            </div>
+        </nav>
+    </div>
+
+    <style>
+        .search-invoice-section,
+        .recent-invoices-section,
+        .return-form-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .invoice-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e8ecf1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .invoice-item:hover {
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .invoice-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .invoice-date {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .invoice-amount {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .invoice-details {
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .invoice-details p {
+            margin: 5px 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .status.paid {
+            background: #d4edda;
+            color: #155724;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .invoice-summary {
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-row span:first-child {
+            color: #666;
+        }
+
+        .summary-row span:last-child {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .return-form {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e8ecf1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e8ecf1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+    </style>
+
+    <script>
+        // Navigation Functions
+        function goToHome() {
+            window.location.href = 'home.html';
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        function goToProducts() {
+            window.location.href = 'product.html';
+        }
+
+        function goToMenu() {
+            window.location.href = 'menu.html';
+        }
+        function goToSettings() {
+            window.location.href = 'settings.html';
+        }
+
+        // Select Invoice
+        function selectInvoice(invoiceNumber) {
+            // Update selected invoice details
+            document.getElementById('selectedInvoice').textContent = invoiceNumber;
+            document.getElementById('selectedCustomer').textContent = 'ABC Corporation'; // Get from data
+            document.getElementById('originalAmount').textContent = '₹5,000'; // Get from data
+
+            // Show return form
+            document.getElementById('returnFormSection').style.display = 'block';
+            
+            // Scroll to form
+            document.getElementById('returnFormSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Process Return
+        function processReturn(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const formData = {
+                invoiceNumber: document.getElementById('selectedInvoice').textContent,
+                reason: document.querySelector('.return-form select').value,
+                amount: document.querySelector('.return-form input[type="number"]').value,
+                description: document.querySelector('.return-form textarea').value,
+                refundMethod: document.querySelectorAll('.return-form select')[1].value
+            };
+
+            // Save to localStorage (placeholder)
+            const returns = JSON.parse(localStorage.getItem('saleReturns') || '[]');
+            returns.push({
+                ...formData,
+                id: Date.now(),
+                date: new Date().toISOString(),
+                status: 'processed'
+            });
+            localStorage.setItem('saleReturns', JSON.stringify(returns));
+
+            alert('Return processed successfully!');
+            cancelReturn();
+        }
+
+        // Cancel Return
+        function cancelReturn() {
+            document.getElementById('returnFormSection').style.display = 'none';
+            document.querySelector('.return-form').reset();
+        }
+
+        // Search Function
+        document.getElementById('searchInvoice').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const invoiceItems = document.querySelectorAll('.invoice-item');
+            
+            invoiceItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    <script src="assets/js/simple-login-button.js"></script>
+</body>
+</html>

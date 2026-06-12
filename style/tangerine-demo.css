@@ -1,0 +1,55 @@
+/* Tangerine Theme Demo Styles */
+:root{
+  --tangerine:#ff8c42;
+  --white:#ffffff;
+  --navy:#0b2545;
+  --teal:#00b3a6;
+  --muted:#f4f6f8;
+}
+*{box-sizing:border-box}
+body{font-family:Poppins,system-ui,Segoe UI,Arial; margin:0; color:var(--navy); background:linear-gradient(180deg,#fbfbfd 0%, #f6f8fb 100%);}
+.hero{background:linear-gradient(135deg,var(--tangerine) 0%, #ffb37a 100%); color:var(--white); padding:72px 20px 56px; display:flex; align-items:center; justify-content:center}
+.hero-inner{max-width:1100px; width:100%; text-align:center}
+.brand{margin:0; line-height:0.92; font-family:'Playfair Display', serif}
+.brand-word.big{display:inline-block; font-size:84px; letter-spacing:0.06em; font-weight:700; text-transform:uppercase; margin-right:10px}
+.brand-word.small{display:inline-block; font-size:28px; font-weight:500; opacity:0.95; text-transform:lowercase; vertical-align:bottom}
+.tag{margin-top:12px; font-size:18px; opacity:0.95}
+.actions{margin-top:20px; display:flex; gap:12px; justify-content:center}
+.btn{display:inline-block; padding:12px 20px;border-radius:8px; text-decoration:none; font-weight:600}
+.btn.primary{background:var(--white); color:var(--tangerine); box-shadow:0 6px 18px rgba(11,37,69,0.12)}
+.btn.ghost{background:transparent; border:2px solid rgba(255,255,255,0.18); color:var(--white)}
+.container{max-width:1100px;margin:-40px auto 40px;padding:20px}
+.showcase{display:grid; grid-template-columns: 1fr 320px; gap:20px; align-items:start}
+.card{background:var(--white); border-radius:12px; padding:28px; box-shadow:0 12px 30px rgba(11,37,69,0.06)}
+.card h2{font-family:'Playfair Display',serif; margin:0 0 12px; color:var(--navy)}
+.card p{color:#334155; margin:0 0 14px}
+.example{margin-top:16px}
+.example .xlarge{font-size:44px; font-weight:700; color:var(--tangerine); margin-right:8px}
+.example .medium{font-size:20px; font-weight:500; color:var(--navy); margin-right:8px}
+.example .smallcaps{font-variant:small-caps; color:#667084}
+.palette{display:flex; flex-direction:column; gap:12px}
+.swatch{display:flex; gap:12px; align-items:center}
+.swatch-color{width:64px; height:48px; border-radius:8px; box-shadow:0 6px 14px rgba(11,37,69,0.06)}
+.swatch-label{font-size:13px; color:#243449}
+.swatch-color.tangerine{background:var(--tangerine)}
+.swatch-color.white{background:var(--white); border:1px solid #e6e9ee}
+.swatch-color.navy{background:var(--navy)}
+.swatch-color.teal{background:var(--teal)}
+.features{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:26px}
+.feature{background:var(--muted); padding:20px; border-radius:10px; text-align:center}
+.feature h3{margin:0 0 8px; color:var(--navy)}
+.feature p{margin:0; color:#4b5563}
+.footer{padding:28px; text-align:center; color:#4b5563}
+.heart{color:var(--tangerine); font-weight:700}
+@media (max-width:900px){
+  .showcase{grid-template-columns:1fr;}
+  .brand-word.big{font-size:56px}
+  .brand-word.small{font-size:20px}
+  .features{grid-template-columns:1fr}
+}
+@media (max-width:420px){
+  .brand-word.big{font-size:40px}
+  .brand-word.small{display:block; margin-top:6px}
+}
+/* Utility: alternate dark hero variant */
+.hero.dark{background:var(--navy); color:var(--tangerine)}

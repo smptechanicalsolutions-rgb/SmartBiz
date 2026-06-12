@@ -1,0 +1,232 @@
+/* Shared invoice preview base styles (applies to all `formats/format*.html`) */
+:root {
+  /* Existing invoice variables */
+  --inv-text: #0b1220;
+  --inv-muted: #475569;
+  --inv-border: rgba(0, 0, 0, 0.18);
+  --inv-surface: #ffffff;
+  --inv-bg: #f4f6f8;
+  --inv-radius: 10px;
+  --inv-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+
+  /* Tangerine theme variables (applies site-wide) */
+  --brand-tangerine: #ff8c42;
+  --brand-tangerine-2: #ffb37a;
+  --brand-tangerine-dark: #e06b20;
+  --brand-white: #ffffff;
+  --brand-navy: #0b2545;
+  --brand-teal: #00b3a6;
+  --brand-muted: #f4f6f8;
+  --brand-radius: 10px;
+  --brand-shadow: 0 12px 30px rgba(11,37,69,0.06);
+}
+
+body {
+  font-family: Poppins, Arial, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--inv-text);
+  background: linear-gradient(180deg, var(--brand-muted) 0%, #f6f8fb 100%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Global brand styles */
+a { color: var(--brand-tangerine); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.btn { display: inline-block; padding: 10px 14px; border-radius: 8px; font-weight:600; cursor: pointer; text-decoration:none; transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; }
+.btn-primary, .btn.btn-primary { background: var(--brand-tangerine-dark); color: var(--brand-white); border: 0; box-shadow: var(--brand-shadow); }
+.btn-secondary, .btn.btn-secondary { background: var(--brand-white); color: var(--brand-tangerine); border: 1px solid rgba(11,37,69,0.06); }
+.btn-ghost { background: transparent; color: var(--brand-white); border: 2px solid rgba(255,255,255,0.18); }
+
+/* Hover & focus states for buttons */
+.btn:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(11,37,69,0.12); }
+.btn:active { transform: translateY(-1px) scale(.995); }
+.btn:focus-visible { outline: 3px solid rgba(0,179,166,0.14); outline-offset: 3px; box-shadow: 0 0 0 4px rgba(0,179,166,0.06); }
+
+/* Low-contrast corrective class applied by a11y script */
+.low-contrast { box-shadow: 0 0 0 3px rgba(255,140,66,0.12) !important; }
+
+/* Header / site-branding */
+.header, .site-header { background: linear-gradient(135deg, var(--brand-tangerine) 0%, var(--brand-tangerine-2) 100%); color: var(--brand-white); }
+.company-logo, .site-logo { color: var(--brand-white); }
+.company-name, .site-title { color: var(--brand-white); font-weight:700 }
+
+/* Cards and surfaces */
+.card, .panel { background: var(--brand-white); border-radius: var(--brand-radius); box-shadow: var(--brand-shadow); }
+
+/* Accent headings */
+h1, h2, h3, h4 { color: var(--brand-navy); }
+h1.display { font-family: 'Playfair Display', serif; font-weight:700; color: var(--brand-navy); }
+
+/* Utility for dark hero variant */
+.hero { padding: 48px 20px; text-align:center }
+.hero.dark { background: var(--brand-navy); color: var(--brand-tangerine); }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
+.right {
+  text-align: right;
+}
+
+.signature-area {
+  margin-top: 40px;
+}
+
+canvas {
+  border: 1px solid #000;
+  width: 200px;
+  height: 80px;
+}
+
+/* Visual polish for invoice container without changing A4 sizing logic in format CSS */
+@media screen {
+  #invoice {
+    background: var(--inv-surface);
+    border-radius: var(--inv-radius);
+    box-shadow: var(--inv-shadow);
+  }
+}
+
+/* Consistent table typography when templates use `.invoice-table` */
+.invoice-table th,
+.invoice-table td {
+  line-height: 1.25;
+  vertical-align: top;
+}
+
+.invoice-header h2,
+.invoice-header h3 {
+  letter-spacing: 0.2px;
+}
+
+.invoice-header p,
+.bill-section,
+.totals-row {
+  color: var(--inv-text);
+}
+
+.bill-section {
+  line-height: 1.35;
+}
+
+/* Ensure invoice preview uses A4-like height so signature/stamp sit at bottom
+   regardless of how much content is present. This keeps totals from being
+   overlapped by the stamp and preserves consistent layout. */
+#invoice {
+  min-height: 1122px; /* ~A4 height at 96dpi */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Select wrapper for mobile - keeps dropdowns within viewport */
+.format-select-wrapper,
+.invoice-select-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Desktop selects - normal sizing */
+.form-select {
+  width: 100%;
+}
+
+/* Tablet adjustments */
+@media (max-width: 768px) {
+  .format-select-wrapper,
+  .invoice-select-wrapper {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+  }
+
+  .form-select {
+    width: 100% !important;
+    font-size: 14px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+  }
+
+  .form-select option {
+    font-size: 13px;
+    padding: 6px;
+  }
+}
+
+/* Mobile adjustments - extra small screens */
+@media (max-width: 576px) {
+  .format-select-wrapper,
+  .invoice-select-wrapper {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    overflow: visible;
+  }
+
+  .form-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 12px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+  }
+
+  .form-select option {
+    font-size: 11px;
+    padding: 3px;
+    margin: 0;
+  }
+}
+
+@media print {
+  /* Print should always be flat, regardless of screen polish */
+  #invoice {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .action-buttons {
+    display: none !important;
+  }
+
+  .actions {
+    display: none !important;
+  }
+
+  #downloadModal {
+    display: none !important;
+  }
+
+  body > button {
+    display: none !important;
+  }
+}
+
+ .action-buttons .pdf-btn {
+  margin: 0 !important;
+ }
+
+ .action-buttons .pdf-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+ }

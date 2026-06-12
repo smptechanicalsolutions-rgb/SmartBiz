@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, shrink-to-fit=no" />
+    <title>Proforma Invoice - Format 8</title>
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        const viewportMeta = document.querySelector('meta[name="viewport"]');
+        if (window.innerWidth < 600) {
+          viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.2, maximum-scale=5.0, user-scalable=yes, shrink-to-fit=no');
+        }
+      });
+    </script>
+
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="../style/style.css" />
+    <link rel="stylesheet" href="..\/format-css/responsive-mobile.css" />
+    <link rel="stylesheet" href="..\/format-css/document-common.css" />
+
+    <!-- Format 8 CSS (copy of format2 with custom overrides) -->
+    <link rel="stylesheet" href="..\/format-css/format2.css" />
+    <link rel="stylesheet" href="..\/format-css/format1.css" />
+    <link rel="stylesheet" href="..\/format-css/format8.css" />
+
+    <!-- PDF libs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../js/currency.js"></script>
+  </head>
+
+  <body>
+    <div id="invoice" style="position: relative">
+      <div class="watermark">
+        <div class="wm">OFFICIAL</div>
+      </div>
+      <!-- Use Format-2 style header -->
+      <div class="top-header-section">
+        <div class="company-header-section">
+          <div class="logo-container">
+            <img
+              id="companyLogoImg"
+              src=""
+              alt="Company Logo"
+              style="
+                display: none;
+                max-width: 80px;
+                max-height: 80px;
+                object-fit: contain;
+              "
+            />
+            <div id="logoPlaceholder" class="logo-placeholder">
+              <span>+</span><span class="logo-text">Logo</span>
+            </div>
+          </div>
+          <h1 id="pCompany" class="company-name">Company Name</h1>
+        </div>
+        <div class="red-contact-bar">
+          <div class="contact-info">
+            <span class="contact-item">
+              <svg
+                class="contact-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  stroke="white"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <span id="pCompanyMobileHeader"></span>
+            </span>
+            <span class="contact-item">
+              <svg
+                class="contact-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                  stroke="white"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <polyline
+                  points="22,6 12,13 2,6"
+                  stroke="white"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <span id="pCompanyEmailHeader"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="invoice-bill-section">
+        <div class="invoice-title-bill-left">
+          <h2 class="tax-invoice-title">PROFORMA INVOICE</h2>
+          <div class="bill-to-section">
+            <h3 class="bill-to-title">Bill To</h3>
+            <div class="client-info">
+              <strong id="pClient" class="client-name">Client Name</strong>
+              <p class="client-address"><span id="pClientAddress"></span></p>
+              <p class="client-contact">
+                Contact No.: <span id="pClientMobile"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="invoice-details-right">
+          <p>Proforma No.: <span id="pInvoiceNo"></span></p>
+          <p>Date: <span id="pInvoiceDate"></span></p>
+          <p id="poNumberLine" style="display: none">
+            PO No.: <span id="pPONumber"></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- ITEMS TABLE -->
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product Name</th>
+            <th>HSN/ SAC</th>
+            <th>Quantity</th>
+            <th>Price/ Unit</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="itemRows"></tbody>
+        <tfoot>
+          <tr class="table-total-row">
+            <td colspan="5" class="total-label">Subtotal</td>
+            <td class="total-amount">₹<span id="pTableTotal">0.00</span></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="summary-section">
+        <div class="summary-left">
+          <div class="amount-in-words">
+            <strong>Invoice Amount In Words</strong>
+            <p id="pAmountInWords">Zero Rupees only</p>
+          </div>
+          <div id="termsSection" class="terms-section" style="display: none">
+            <strong>Terms And Conditions</strong>
+            <p id="pTerms">Thank you for doing business with us.</p>
+          </div>
+        </div>
+
+        <div class="summary-right">
+          <div class="total-box">
+            <div class="total-header">Total</div>
+            <div class="total-amount-box">₹<span id="pTotal">0.00</span></div>
+            <div class="received-section">
+              <span>Received</span>
+              <span>₹<span id="pReceived">0.00</span></span>
+            </div>
+            <div class="balance-section">
+              <span>Balance</span>
+              <span>₹<span id="pBalance">0.00</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="certificationsSection"
+        class="certifications-section"
+        style="display: none"
+      >
+        <h6 class="certifications-title">Certifications & Compliance</h6>
+        <div id="certificationsDisplay" class="certifications-list"></div>
+      </div>
+
+      <div class="stamp-gap" aria-hidden="true"></div>
+
+      <div class="signature-section">
+        <div class="signature-left">
+          <p class="for-company">From: <span id="pCompanySignature"></span></p>
+        </div>
+        <div class="signature-right">
+          <img
+            id="signature-image"
+            src=""
+            alt="Signature"
+            style="
+              max-width: 200px;
+              max-height: 80px;
+              display: none;
+              margin-bottom: 10px;
+              object-fit: contain;
+            "
+          />
+          <div class="signature-line"></div>
+          <!-- Stamp overlay image (populated from saved stamp) -->
+          <img
+            id="invoiceStampImage"
+            src=""
+            alt="Stamp"
+            style="position: absolute; display: none; pointer-events: none"
+          />
+          <p class="sign-text">Authorized Signature</p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="action-buttons"
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        margin: 18px 0;
+        flex-wrap: wrap;
+      "
+    >
+      <button class="pdf-btn" style="background: #6c757d" onclick="editInvoice()">
+        Edit Invoice
+      </button>
+      <button class="pdf-btn" onclick="showDownloadOptions()">Download / Share</button>
+    </div>
+
+    <script src="../js/pdf.js"></script>
+    <script src="../js/stamp.js"></script>
+    <script src="../js/watermark.js"></script>
+
+    <script>
+      let data;
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get("data");
+        if (dataParam) {
+          data = JSON.parse(decodeURIComponent(dataParam));
+        } else {
+          data = JSON.parse(localStorage.getItem("invoiceData"));
+        }
+      } catch (e) {
+        data = JSON.parse(localStorage.getItem("invoiceData"));
+      }
+
+      if (data) {
+        document.getElementById("pCompany").innerText =
+          data.companyName || "Company Name";
+        document.getElementById("pCompanyMobileHeader").innerText =
+          data.companyMobile || "-";
+        const emailHeaderEl = document.getElementById("pCompanyEmailHeader");
+        if (emailHeaderEl) {
+          emailHeaderEl.innerText = data.companyEmail || "";
+          if (!data.companyEmail) {
+            const parent = emailHeaderEl.parentElement;
+            if (parent) parent.style.display = "none";
+          }
+        }
+        document.getElementById("pCompanySignature").innerText =
+          data.companyName || "Company Name";
+
+        document.getElementById("pClient").innerText =
+          data.clientName || "Client Name";
+        document.getElementById("pClientAddress").innerText =
+          data.clientAddress || "-";
+        document.getElementById("pClientMobile").innerText =
+          data.clientMobile || "-";
+
+        document.getElementById("pInvoiceNo").innerText = data.invoiceNo || "-";
+        const invoiceDateEl = document.getElementById("pInvoiceDate");
+        if (data.invoiceDate && invoiceDateEl) {
+          const invoiceDate = new Date(data.invoiceDate);
+          invoiceDateEl.innerText = invoiceDate.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+        } else if (invoiceDateEl) {
+          invoiceDateEl.innerText = new Date().toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+        }
+
+        // items
+        let tbody = document.getElementById("itemRows");
+        let taxable = 0;
+        if (data.items && data.items.length > 0) {
+          data.items.forEach((item, i) => {
+            let amount = (item.qty || 0) * (item.rate || 0);
+            taxable += amount;
+            const descHtml = item.desc
+              ? `<br><small style="color:#666;">${(item.desc || "").replace(
+                  /&/g,
+                  "&amp;"
+                )}</small>`
+              : "";
+            tbody.innerHTML += `\n              <tr>\n                <td>${
+              i + 1
+            }</td>\n                <td>${
+              item.name || "-"
+            }${descHtml}</td>\n                <td>-</td>\n                <td>${
+              item.qty || 0
+            }</td>\n                <td>₹${
+              item.rate || 0
+            }</td>\n                <td>₹${amount.toFixed(
+              2
+            )}</td>\n              </tr>\n            `;
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px;">No items added</td></tr>`;
+        }
+
+        // Calculate shipping total
+        const shippingTotal =
+          data.shipping && data.shipping.total
+            ? Number(data.shipping.total)
+            : 0;
+
+        // Calculate taxes (only for invoices, not for quotations or challans)
+        let totalTax = 0;
+        if (data.taxes && data.taxes.length > 0) {
+          data.taxes.forEach((t) => {
+            let percent = Number(t.percent) || 0;
+            // For GST (CGST + SGST), the rate represents each component, so total GST = 2 × percent
+            if (t.type === "GST") {
+              percent = percent * 2; // Double the rate for combined CGST + SGST
+            }
+            // Apply tax to both products and shipping
+            const productTax = taxable * (percent / 100);
+            const shippingTax = shippingTotal * (percent / 100);
+            totalTax += productTax + shippingTax;
+          });
+        }
+
+        const grandTotal = taxable + totalTax + shippingTotal;
+
+        document.getElementById("pTableTotal").innerText =
+          grandTotal.toFixed(2);
+        document.getElementById("pTotal").innerText = grandTotal.toFixed(2);
+        document.getElementById("pReceived").innerText = "0.00";
+        document.getElementById("pBalance").innerText = grandTotal.toFixed(2);
+
+        // Amount in words (same as format2)
+        function numberToWords(amount) {
+          if (amount === 0) return "Zero Rupees only";
+          if (amount >= 100000) {
+            const lakhs = Math.floor(amount / 100000);
+            const remainder = amount % 100000;
+            if (remainder === 0) {
+              return `${lakhs} Lakh${lakhs > 1 ? "s" : ""} Rupees only`;
+            }
+            return `${lakhs} Lakh${lakhs > 1 ? "s" : ""} ${numberToWords(
+              remainder
+            ).toLowerCase()}`;
+          }
+          return `${amount.toLocaleString("en-IN")} Rupees only`;
+        }
+        document.getElementById("pAmountInWords").innerText = numberToWords(
+          Math.round(grandTotal)
+        );
+
+        // Terms - only show if there's content
+        const termsSection = document.getElementById("termsSection");
+        const pTerms = document.getElementById("pTerms");
+        if (data.paymentNote && data.paymentNote.trim()) {
+          pTerms.innerText = data.paymentNote.trim();
+          if (termsSection) termsSection.style.display = "block";
+        } else {
+          if (termsSection) termsSection.style.display = "none";
+        }
+
+        if (data.signature) {
+          const signatureImg = document.getElementById("signature-image");
+          if (signatureImg) {
+            signatureImg.src = data.signature;
+            signatureImg.style.display = "block";
+          }
+        }
+
+        window.invoicePreviewData = data;
+        if (typeof applyInvoiceWatermark === "function") {
+          applyInvoiceWatermark(data);
+        }
+        if (typeof initDocumentChrome === "function") initDocumentChrome();
+      }
+
+      function editInvoice() {
+        window.open("../index.html", "_self");
+      }
+    </script>
+  <script src="../js/theme-a11y.js"></script>
+  </body>
+</html>

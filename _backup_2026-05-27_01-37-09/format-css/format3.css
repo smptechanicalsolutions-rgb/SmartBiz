@@ -1,0 +1,150 @@
+/* Delivery Challan - Format 3 */
+
+body {
+  background: #f4f6f8;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 10px;
+  overflow-x: auto;
+}
+
+#invoice {
+  max-width: 794px;
+  width: 100%;
+  margin: 30px auto;
+  background: #fff;
+  padding: 30px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.payment-box {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  border-radius: 4px;
+  font-size: 12px; /* Reduced from default */
+}
+
+.payment-box .payment-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.payment-box .payment-content {
+  color: #555;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+/* Watermark */
+.watermark {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.07;
+}
+
+.watermark .wm {
+  font-size: 72px;
+  font-weight: bold;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 8px;
+  transform: rotate(-45deg);
+  white-space: nowrap;
+}
+
+.invoice-info h2 {
+  font-size: 22px; /* Reduced from default */
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Ensure content stays above watermark */
+#invoice .invoice-header,
+#invoice .bill-section,
+#invoice .invoice-table,
+#invoice .total-box,
+#invoice .signature-section,
+#invoice .payment-instructions,
+#invoice .payment-box {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 5px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #invoice {
+    margin: 10px auto;
+    padding: 20px;
+    max-width: 794px;
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px;
+  }
+
+  #invoice {
+    margin: 2px auto;
+    padding: 12px;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+/* A4 Page Size for Printing */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  #invoice {
+    width: 210mm;
+    height: 297mm;
+    max-width: 210mm;
+    margin: 0;
+    padding: 15mm;
+    box-shadow: none;
+    border: none;
+    page-break-after: avoid;
+    transform: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}

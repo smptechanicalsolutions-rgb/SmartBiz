@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Generator</title>
+    <meta http-equiv="refresh" content="0; url=home.html">
+    <script>if(location.pathname === '/' || location.pathname.endsWith('index.html')){location.replace('home.html');}</script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://accounts.google.com/gapi/client"></script>
+    <script src="js/stamp.js"></script>
+    <script src="js/signature.js"></script>
+    <script src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
+
+    <!-- Enhanced Styling for Professional Look -->
+    <style>
+      .form-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(11, 37, 69, 0.06);
+        padding: 30px;
+        margin-bottom: 30px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 28px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e0e0e0;
+      }
+
+      .section-header h5 {
+        margin: 0;
+        color: #0b2545;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+
+      /* Uniform Button Sizing */
+      .section-header .btn {
+        padding: 10px 20px !important;
+        min-width: 140px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+      }
+
+      .btn {
+        padding: 10px 16px !important;
+        height: 40px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+      }
+
+      .form-section {
+        background: #f9fafb;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .invoice-tab-panel {
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  
+  <!-- Script to hide remove buttons -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide any "-" buttons in Payment and Shipping sections
+      function hideRemoveButtons() {
+        const paymentContainer = document.getElementById('paymentContainer');
+        const shippingContainer = document.getElementById('shippingContainer');
+        
+        if (paymentContainer) {
+          const removeButtons = paymentContainer.querySelectorAll('button');
+          removeButtons.forEach(btn => {
+            if (btn.textContent.trim() === '-' || btn.innerText.trim() === '-') {
+              btn.style.display = 'none';
+            }
+          });
+        }
+        
+        if (shippingContainer) {
+          const removeButtons = shippingContainer.querySelectorAll('button');
+          removeButtons.forEach(btn => {
+            if (btn.textContent.trim() === '-' || btn.innerText.trim() === '-') {
+              btn.style.display = 'none';
+            }
+          });
+        }
+      }
+      
+      // Run initially and after any dynamic content changes
+      hideRemoveButtons();
+      
+      // Observer to catch dynamically added buttons
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'childList') {
+            hideRemoveButtons();
+          }
+        });
+      });
+      
+      // Start observing both containers
+      const paymentContainer = document.getElementById('paymentContainer');
+      const shippingContainer = document.getElementById('shippingContainer');
+      
+      if (paymentContainer) {
+        observer.observe(paymentContainer, { childList: true, subtree: true });
+      }
+      if (shippingContainer) {
+        observer.observe(shippingContainer, { childList: true, subtree: true });
+      }
+    });
+  </script>
+  
+  <!-- Payment Functions -->
+  <script>
+    function savePaymentInstruction() {
+      const paymentNote = document.getElementById('paymentNoteSingle').value.trim();
+      if (!paymentNote) {
+        alert('Please enter payment instructions before saving.');
+        return;
+      }
+      
+      localStorage.setItem('savedPayment', JSON.stringify({
+        text: paymentNote,
+        createdAt: new Date().toISOString()
+      }));
+      
+      alert('Payment instructions saved successfully!');
+    }
+    
+    function manageSavedPaymentInstruction() {
+      const saved = JSON.parse(localStorage.getItem('savedPayment') || 'null');
+      if (!saved) {
+        alert('No saved payment instructions found.');
+        return;
+      }
+      
+      if (confirm(`Saved payment instructions:\n\n${saved.text}\n\nDelete these instructions?`)) {
+        localStorage.removeItem('savedPayment');
+        alert('Payment instructions deleted successfully!');
+      }
+    }
+    
+    function loadSavedPaymentInstruction() {
+      const saved = JSON.parse(localStorage.getItem('savedPayment') || 'null');
+      if (!saved) {
+        alert('No saved payment instructions found.');
+        return;
+      }
+      
+      document.getElementById('paymentNoteSingle').value = saved.text;
+      alert('Payment instructions loaded successfully!');
+    }
+    
+    function removeSavedPaymentInstruction() {
+      if (confirm('Are you sure you want to remove saved payment instructions?')) {
+        localStorage.removeItem('savedPayment');
+        document.getElementById('paymentNoteSingle').value = '';
+        alert('Payment instructions removed successfully!');
+      }
+    }
+  </script>
+  
+  <!-- Shipping Functions -->
+  <script>
+    function saveShippingCharge() {
+      const desc = document.querySelector('.shipping-desc').value.trim();
+      const amount = document.querySelector('.shipping-amount').value.trim();
+      
+      if (!amount) {
+        alert('Please enter shipping amount before saving.');
+        return;
+      }
+      
+      localStorage.setItem('savedShipping', JSON.stringify({
+        description: desc,
+        amount: amount,
+        createdAt: new Date().toISOString()
+      }));
+      
+      alert('Shipping charges saved successfully!');
+    }
+    
+    function manageSavedShippingCharge() {
+      const saved = JSON.parse(localStorage.getItem('savedShipping') || 'null');
+      if (!saved) {
+        alert('No saved shipping charges found.');
+        return;
+      }
+      
+      const amtLabel = window.SmarbizCurrency ? SmarbizCurrency.format(saved.amount) : `₹${saved.amount}`;
+      if (confirm(`Saved shipping charges:\n\nDescription: ${saved.description || 'N/A'}\nAmount: ${amtLabel}\n\nDelete these charges?`)) {
+        localStorage.removeItem('savedShipping');
+        alert('Shipping charges deleted successfully!');
+      }
+    }
+    
+    function loadSavedShippingCharge() {
+      const saved = JSON.parse(localStorage.getItem('savedShipping') || 'null');
+      if (!saved) {
+        alert('No saved shipping charges found.');
+        return;
+      }
+      
+      document.querySelector('.shipping-desc').value = saved.description || '';
+      document.querySelector('.shipping-amount').value = saved.amount;
+      alert('Shipping charges loaded successfully!');
+    }
+    
+    function removeSavedShippingCharge() {
+      if (confirm('Are you sure you want to remove saved shipping charges?')) {
+        localStorage.removeItem('savedShipping');
+        document.querySelector('.shipping-desc').value = '';
+        document.querySelector('.shipping-amount').value = '';
+        alert('Shipping charges removed successfully!');
+      }
+    }
+  </script>
+  </head>
+
+  <body>
+    <div class="container my-4">
+      <div class="form-card">
+        <!-- HEADER SECTION - MATCHING format1.html DESIGN -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e0e0e0;">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas fa-arrow-left" style="cursor: pointer; font-size: 1.5rem; color: #ff8c42;" onclick="window.location.href='home.html'" title="Go Back"></i>
+            <div>
+              <h2 style="margin: 0; color: #0b2545; font-size: 28px; font-weight: 700;">GST Invoice Generator</h2>
+              <p style="margin: 5px 0 0 0; color: #475569; font-size: 14px;">Create professional invoices with ease</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPANY HEADER CARD - PROFESSIONAL LAYOUT -->
+        <div class="invoice-header-card" style="background: linear-gradient(135deg, #ff8c42 0%, #ffb37a 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 12px 30px rgba(11,37,69,0.06);">
+          <div class="invoice-header-card__row" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="invoice-brand">
+              <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="invoice-brand__icon" style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
+                  <svg width="28" height="28" fill="white" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                  </svg>
+                </div>
+                <div class="invoice-brand__meta">
+                  <h3 id="pCompany" class="invoice-brand__company" style="color: white; margin: 0; font-size: 20px; font-weight: 700;">LTIMindtree</h3>
+                  <p class="invoice-brand__subtitle" style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0; font-size: 13px;">GST Tax Invoice Generator</p>
+                </div>
+              </div>
+            </div>
+            <div class="invoice-header-card__right" style="text-align: right;">
+              <h2 class="invoice-header-card__title" style="color: white; margin: 0; font-size: 24px; font-weight: 700;">INVOICE</h2>
+              <p class="invoice-header-card__meta" style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 13px;">
+                Reference #: <span id="pInvoiceNo" style="font-weight: 600;">Auto</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABS - IMPROVED STYLING -->
+        <div class="invoice-tabs" role="tablist" aria-label="Invoice sections" style="display: flex; gap: 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 30px; background: #f9fafb; border-radius: 8px 8px 0 0;">
+          <button type="button" class="tab-button active" data-invoice-tab="transaction" role="tab" aria-selected="true" aria-controls="transactionTabPanel" style="flex: 1; padding: 15px 20px; background: white; border-bottom: 3px solid #ff8c42; color: #0b2545; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px 0 0 0; transition: all 0.3s ease;">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+            </svg>
+            Transaction Details
+          </button>
+          <button type="button" class="tab-button" data-invoice-tab="party" role="tab" aria-selected="false" aria-controls="partyTabPanel" style="flex: 1; padding: 15px 20px; background: #f9fafb; border-bottom: 3px solid transparent; color: #475569; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 0; transition: all 0.3s ease;" onmouseover="this.style.background='#f0f1f3'" onmouseout="this.style.background='#f9fafb'">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.5-9h-3l-2 4.86V22h5zm-11.5-9.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S7 10.17 7 11s.67 1.5 1.5 1.5zM5.5 22h8v-6h2l-2.5-9h-5l-2 4.86V22z"/>
+            </svg>
+            Party Details
+          </button>
+        </div>
+
+        <div id="partyTabPanel" class="invoice-tab-panel" role="tabpanel" hidden>
+        <!-- COMPANY DETAILS -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Company Details</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleCompanySection()"
+            id="toggleCompanyBtn"
+          >
+            Add Company
+          </button>
+        </div>
+        <div id="companyFormSection" class="form-section" style="display: none">
+          <div class="row">
+            <div class="col-12 col-md-6 mb-2">
+              <input
+                id="companyName"
+                class="form-control"
+                placeholder="Company Name"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <input
+                id="companyGST"
+                class="form-control"
+                placeholder="Company GSTIN"
+              />
+            </div>
+            <div class="col-12 mb-3">
+              <textarea
+                id="companyAddress"
+                class="form-control"
+                placeholder="Company Address"
+              ></textarea>
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <input
+                id="companyMobile"
+                class="form-control"
+                placeholder="Company Mobile Number"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <input
+                id="companyEmail"
+                class="form-control"
+                type="email"
+                placeholder="Company Email"
+              />
+            </div>
+            <div class="col-12 mb-3">
+              <label class="form-label">Company Logo (Image/PDF)</label>
+              <input
+                id="companyLogo"
+                class="form-control"
+                type="file"
+                accept="image/*,.pdf"
+                onchange="handleLogoUpload(this)"
+              />
+              <small class="form-text text-muted"
+                >Upload a logo image (PNG, JPG) or PDF</small
+              >
+              <div id="logoPreview" class="mt-2" style="display: none">
+                <img
+                  id="logoPreviewImg"
+                  src=""
+                  alt="Logo Preview"
+                  style="
+                    max-width: 150px;
+                    max-height: 100px;
+                    border: 1px solid #ddd;
+                    padding: 5px;
+                  "
+                />
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger ms-2"
+                  onclick="removeLogo()"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+            <div class="col-12 mb-2">
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="saveCompany()"
+              >
+                Save Company Details
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                onclick="manageCompanies()"
+              >
+                Manage Companies
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                onclick="clearCompanyData()"
+              >
+                Clear Company Data
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT DETAILS -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Client Details</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleClientSection()"
+            id="toggleClientBtn"
+          >
+            Add Client
+          </button>
+        </div>
+        <div id="clientFormSection" class="form-section" style="display: none">
+          <div class="row">
+            <div class="col-12 mb-2">
+              <label class="form-label">Select Saved Client (Optional)</label>
+              <select
+                id="clientSelect"
+                class="form-select mb-2"
+                onchange="loadSavedClient(this.value)"
+              >
+                <option value="">-- Select a saved client or add new --</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <input
+                id="clientName"
+                class="form-control"
+                placeholder="Client Name"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <input
+                id="clientGST"
+                class="form-control"
+                placeholder="Client GSTIN"
+              />
+            </div>
+            <div class="col-12 mb-3">
+              <textarea
+                id="clientAddress"
+                class="form-control"
+                placeholder="Client Address"
+              ></textarea>
+            </div>
+            <div class="col-12 mb-2">
+              <input
+                id="clientMobile"
+                class="form-control"
+                placeholder="Client Mobile Number"
+              />
+            </div>
+            <div class="col-12 mb-2">
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="saveClient()"
+              >
+                Save Client
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                onclick="manageClients()"
+              >
+                Manage Clients
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                onclick="clearClientData()"
+              >
+                Clear Client Data
+              </button>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <div id="transactionTabPanel" class="invoice-tab-panel" role="tabpanel">
+        <!-- INVOICE INFO -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Invoice Info</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleInvoiceInfoSection()"
+            id="toggleInvoiceInfoBtn"
+          >
+            Add Invoice Info
+          </button>
+        </div>
+        <div
+          id="invoiceInfoFormSection"
+          class="form-section"
+          style="display: none"
+        >
+          <div class="row">
+            <div class="col-12 mb-2">
+              <label class="form-label"
+                >Select Saved Invoice Info (Optional)</label
+              >
+              <div class="invoice-select-wrapper">
+                <select
+                  id="invoiceInfoSelect"
+                  class="form-select mb-2"
+                  onchange="loadSavedInvoiceInfo(this.value)"
+                >
+                  <option value="">
+                    -- Select saved invoice info or add new --
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12 col-md-4 mb-2">
+              <label for="invoiceNo" class="form-label mb-1"
+                >Invoice Number</label
+              >
+              <input
+                id="invoiceNo"
+                class="form-control"
+                placeholder="Invoice Number"
+              />
+            </div>
+            <div class="col-12 col-md-4 mb-2">
+              <label for="invoiceDate" class="form-label mb-1"
+                >Invoice Date</label
+              >
+              <input id="invoiceDate" type="date" class="form-control" />
+            </div>
+            <div class="col-12 col-md-4 mb-2">
+              <label for="dueDate" class="form-label mb-1"
+                >Due Date (Optional)</label
+              >
+              <input id="dueDate" type="date" class="form-control" />
+            </div>
+            <div class="col-12 col-md-4 mb-2">
+              <label for="placeSupply" class="form-label mb-1"
+                >Place of Supply</label
+              >
+              <input
+                id="placeSupply"
+                class="form-control"
+                placeholder="Place of Supply"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <label for="poNumber" class="form-label mb-1"
+                >PO Number (Optional)</label
+              >
+              <input
+                id="poNumber"
+                class="form-control"
+                placeholder="PO Number (Optional)"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+              <label for="poDate" class="form-label">PO Date (Optional)</label>
+              <input
+                id="poDate"
+                type="date"
+                class="form-control"
+                placeholder="PO Date (Optional)"
+              />
+            </div>
+            <div class="col-12 mb-2">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                onclick="saveInvoiceInfo()"
+              >
+                Save Invoice Info
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm"
+                onclick="manageInvoiceInfo()"
+              >
+                Manage Invoice Info
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                onclick="clearInvoiceInfoData()"
+              >
+                Clear Invoice Info
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CERTIFICATIONS -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Company Certifications</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleCertificationsSection()"
+            id="toggleCertificationsBtn"
+          >
+            Add Certificate
+          </button>
+        </div>
+        <div
+          id="certificationsFormSection"
+          class="form-section"
+          style="display: none"
+        >
+          <div class="row mb-3">
+            <div class="col-12">
+              <div id="googleSignInContainer" class="mb-2"></div>
+              <p id="googleAuthStatus" class="text-muted small">
+                Sign in with Google to upload certificates to cloud
+              </p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Certificate Type</label>
+              <div class="cert-select-wrapper">
+                <select id="certificationType" class="form-select">
+                  <option value="">-- Select or enter new type --</option>
+                  <option value="HSN Code">HSN Code</option>
+                  <option value="ISO 9001">ISO 9001</option>
+                  <option value="ISO 27001">ISO 27001</option>
+                  <option value="GST Registration">GST Registration</option>
+                  <option value="PAN Card">PAN Card</option>
+                  <option value="MSME Certificate">MSME Certificate</option>
+                  <option value="Startup Certificate">
+                    Startup Certificate
+                  </option>
+                  <option value="Other">Other (specify)</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Certificate Name/Description</label>
+              <input
+                id="certDescription"
+                type="text"
+                class="form-control"
+                placeholder="e.g., ISO Certification 2024"
+              />
+            </div>
+            <div class="col-12 mb-2">
+              <label class="form-label">Upload Certificate File</label>
+              <input
+                id="certFile"
+                type="file"
+                class="form-control"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              />
+              <small class="form-text text-muted"
+                >Supported: PDF, JPG, PNG, DOC, DOCX (Max 5MB)</small
+              >
+            </div>
+            <div class="col-12 mb-2">
+              <div id="certificationsContainer" class="mb-3">
+                <!-- Added certifications will appear here -->
+              </div>
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                onclick="addCertification()"
+              >
+                Save Certificate
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm ms-2"
+                onclick="clearCertifications()"
+              >
+                Clear All Certificates
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAXES -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Taxes</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleTaxesSection()"
+            id="toggleTaxesBtn"
+          >
+            Add Tax
+          </button>
+        </div>
+        <div id="taxesFormSection" class="form-section" style="display: none">
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="form-label"
+                >Select Saved Tax Template (Optional)</label
+              >
+              <select
+                id="taxTemplateSelect"
+                class="form-select mb-2"
+                onchange="loadSavedTaxTemplate(this.value)"
+              >
+                <option value="">
+                  -- Select saved tax template or add new --
+                </option>
+              </select>
+            </div>
+          </div>
+          <div id="taxContainer">
+            <div class="row tax-row mb-2">
+              <div class="col-12 col-md-4 mb-2 mb-md-0">
+                <select class="form-select tax-type">
+                  <option value="GST">GST (CGST + SGST)</option>
+                  <option value="IGST">IGST</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-4 mb-2 mb-md-0">
+                <input
+                  type="number"
+                  class="form-control tax-percent"
+                  placeholder="Percent"
+                  value="9"
+                />
+              </div>
+              <div class="col-12 col-md-4 mb-2 mb-md-0">
+                <input
+                  class="form-control tax-desc"
+                  placeholder="Description (optional)"
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="mb-3 payment-controls"
+            style="
+              position: relative;
+              z-index: 50;
+              display: flex;
+              gap: 8px;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              onclick="addTaxRow()"
+            >
+              Add Tax
+            </button>
+            <button
+              type="button"
+              class="btn btn-success btn-sm ms-2"
+              onclick="saveTaxTemplate()"
+            >
+              Save Tax Template
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm ms-2"
+              onclick="manageTaxTemplates()"
+            >
+              Manage Tax Templates
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-danger btn-sm ms-2"
+              onclick="clearTaxData()"
+            >
+              Clear Tax Data
+            </button>
+          </div>
+        </div>
+
+        <!-- PRODUCT -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Product Details</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleProductSection()"
+            id="toggleProductBtn"
+          >
+            Add Product
+          </button>
+        </div>
+        <div id="productFormSection" class="form-section" style="display: none">
+          <div class="row">
+            <div id="itemsContainer" class="col-12 mb-2">
+              <div class="row item-row mb-2">
+                <div class="col-12 col-md-4 mb-2 mb-md-0">
+                  <input
+                    class="form-control item-name"
+                    placeholder="Product Name"
+                  />
+                </div>
+                <div class="col-12 col-md-4 mb-2 mb-md-0">
+                  <input
+                    class="form-control item-desc"
+                    placeholder="Product Description (Optional)"
+                  />
+                </div>
+                <div class="col-6 col-md-2 mb-2 mb-md-0">
+                  <input
+                    type="number"
+                    class="form-control item-qty"
+                    placeholder="Qty"
+                  />
+                </div>
+                <div class="col-6 col-md-2 mb-2 mb-md-0">
+                  <input
+                    type="number"
+                    class="form-control item-rate"
+                    placeholder="Rate"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-12 mb-2">
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                onclick="addItemRow()"
+              >
+                Add Product Row
+              </button>
+            </div>
+            <div class="col-12 mb-3">
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="saveProductTemplate()"
+              >
+                Save Product Template
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                onclick="manageProductTemplates()"
+              >
+                Manage Product Templates
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-info"
+                onclick="loadProductTemplate()"
+              >
+                Load Product Template
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STAMP / SEAL -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Stamp / Seal</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleStampSection()"
+            id="toggleStampBtn"
+          >
+            Add Stamp
+          </button>
+        </div>
+        <div id="stampFormSection" class="form-section" style="display: none">
+          <div class="row mt-2">
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Top Text</label>
+              <input
+                id="stampTopText"
+                type="text"
+                class="form-control"
+                placeholder="e.g., COMPANY NAME"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Stamp Preset</label>
+              <select
+                id="stampPreset"
+                class="form-select"
+                onchange="applyStampPreset(this.value)"
+              >
+                <option value="">-- Select preset --</option>
+                <option value="official">Official</option>
+                <option value="received">Received</option>
+                <option value="paid">Paid</option>
+                <option value="company_seal">Company Seal</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Preset Name</label>
+              <input
+                id="stampPresetName"
+                type="text"
+                class="form-control"
+                placeholder="Enter name for this preset"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Bottom Text</label>
+              <input
+                id="stampBottomText"
+                type="text"
+                class="form-control"
+                placeholder="e.g., CUSTOM TEXT HERE"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Company Name (Center)</label>
+              <input
+                id="stampCompanyName"
+                type="text"
+                class="form-control"
+                placeholder="Defaults to Company Name above"
+              />
+            </div>
+            <div class="col-12">
+              <div class="mb-2">
+                <label class="form-label">Stamp Color</label>
+                <input type="hidden" id="stampColor" value="#000000" />
+                <div id="stampColorRow" class="d-flex align-items-center mt-1">
+                  <div
+                    class="stamp-color-swatch"
+                    data-color="#0d6efd"
+                    title="Blue"
+                    style="background: #0d6efd"
+                  ></div>
+                  <div
+                    class="stamp-color-swatch"
+                    data-color="#dc3545"
+                    title="Red"
+                    style="background: #dc3545"
+                  ></div>
+                  <div
+                    class="stamp-color-swatch selected"
+                    data-color="#000000"
+                    title="Black"
+                    style="background: #000000"
+                  ></div>
+                  <div
+                    class="stamp-color-swatch"
+                    data-color="#6f42c1"
+                    title="Purple"
+                    style="background: #6f42c1"
+                  ></div>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm mt-2"
+                onclick="applyStamp()"
+              >
+                Apply Stamp
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-info btn-sm mt-2"
+                onclick="testNewStamp()"
+              >
+                Preview Stamp
+              </button>
+              <small class="d-block text-muted mt-2"
+                >Stamp will appear over signature in actual invoice.</small
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- WATERMARK -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Watermark</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleWatermarkSection()"
+            id="toggleWatermarkBtn"
+          >
+            Add Watermark
+          </button>
+        </div>
+        <div id="watermarkFormSection" class="form-section" style="display: none">
+          <div class="row mt-2">
+            <div class="col-12 col-md-4 mb-2">
+              <div class="form-check mt-4">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="watermarkEnable"
+                />
+                <label class="form-check-label" for="watermarkEnable">
+                  Enable watermark
+                </label>
+              </div>
+            </div>
+            <div class="col-12 col-md-8 mb-2">
+              <label class="form-label">Watermark Text</label>
+              <input
+                id="watermarkText"
+                type="text"
+                class="form-control"
+                placeholder="e.g., Proforma"
+              />
+              <small class="form-text text-muted"
+                >If disabled or empty, watermark will not show in formats that support it.</small
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- PAYMENT INSTRUCTIONS -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Payment Instructions</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="togglePaymentSection()"
+            id="togglePaymentBtn"
+          >
+            Add Payment Instructions
+          </button>
+        </div>
+        <div id="paymentFormSection" class="form-section" style="display: none">
+          <div class="row mt-2">
+            <div class="col-12">
+              <div class="mb-2">
+                <textarea
+                  id="paymentNoteSingle"
+                  class="form-control payment-note mb-2"
+                  placeholder="Bank / UPI / Payment Terms"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="mt-2">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm me-2"
+                  onclick="savePaymentInstruction()"
+                >
+                  <i class="fas fa-save me-1"></i>Save
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-info btn-sm me-2"
+                  onclick="loadSavedPaymentInstruction()"
+                >
+                  <i class="fas fa-folder-open me-1"></i>Load Saved
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  onclick="removeSavedPaymentInstruction()"
+                >
+                  <i class="fas fa-trash me-1"></i>Remove Saved
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SHIPPING CHARGES -->
+        <div class="section-header">
+          <h5 class="d-inline-block mb-0">Shipping Charges</h5>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm ms-2"
+            onclick="toggleShippingSection()"
+            id="toggleShippingBtn"
+          >
+            Add Shipping Charges
+          </button>
+        </div>
+        <div id="shippingFormSection" class="form-section" style="display: none">
+          <div class="row mt-2">
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Description</label>
+              <input
+                type="text"
+                class="form-control shipping-desc"
+                placeholder="e.g., Standard Delivery"
+              />
+            </div>
+            <div class="col-12 col-md-6 mb-2">
+              <label class="form-label">Amount (₹)</label>
+              <input
+                type="number"
+                class="form-control shipping-amount"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div class="col-12">
+              <div class="mt-2">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm me-2"
+                  onclick="saveShippingCharge()"
+                >
+                  <i class="fas fa-save me-1"></i>Save
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-info btn-sm me-2"
+                  onclick="loadSavedShippingCharge()"
+                >
+                  <i class="fas fa-folder-open me-1"></i>Load Saved
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  onclick="removeSavedShippingCharge()"
+                >
+                  <i class="fas fa-trash me-1"></i>Remove Saved
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h5>Authorized Signature</h5>
+        <div class="mb-4" style="margin-top: 20px;">
+          <div class="signature-container mb-3">
+            <canvas id="signature-pad" class="signature-canvas" style="
+              border: 2px solid #ccc;
+              border-radius: 8px;
+              background: white;
+              width: 100%;
+              max-width: 500px;
+              height: 200px;
+              display: block;
+              margin: 0 auto;
+              cursor: crosshair;
+              touch-action: none;
+              -webkit-touch-callout: none;
+              -webkit-user-select: none;
+              user-select: none;
+            "></canvas>
+            <small class="form-text text-muted d-block text-center mt-2">
+              Draw your signature above using mouse or touch
+            </small>
+          </div>
+          
+          <!-- Quick Load Signature Dropdown -->
+          <div class="mb-3">
+            <label class="form-label">Quick Load Saved Signature:</label>
+            <div class="input-group">
+              <select id="quickSignatureSelect" class="form-select" onchange="loadSavedSignature(this.value)">
+                <option value="">-- Select a signature to load --</option>
+              </select>
+              <button class="btn btn-outline-secondary" type="button" onclick="updateQuickSignatureDropdown()">
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+            </div>
+          </div>
+          
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm flex-fill flex-md-grow-0"
+              onclick="clearSignature()"
+            >
+              Clear Signature
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-sm flex-fill flex-md-grow-0"
+              onclick="saveSignature()"
+            >
+              Save Signature
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-danger btn-sm flex-fill flex-md-grow-0"
+              onclick="deleteSavedSignature()"
+            >
+              Delete Saved
+            </button>
+            <button
+              type="button"
+              class="btn btn-info btn-sm flex-fill flex-md-grow-0"
+              onclick="showSignatureGallery()"
+            >
+              <i class="fas fa-cog"></i> Manage
+            </button>
+          </div>
+        </div>
+
+        <!-- FORMAT: selected from the Choose Layout page -->
+        <div class="format-select-wrapper" style="display: none;">
+          <select id="format" class="form-select mb-4">
+            <option value="format1.html">Invoice 1</option>
+            <option value="format2.html">Invoice 2</option>
+            <option value="format10.html">Invoice 3 (New Layout)</option>
+            <option value="format13.html">Invoice 4 (Clean Accent)</option>
+            <option value="format14.html">Invoice 5 (Modern Panel)</option>
+            <option value="format3.html">Delivery Challan 1</option>
+            <option value="format4.html">Delivery Challan 2</option>
+            <option value="format11.html">Delivery Challan 3 (New Layout)</option>
+            <option value="format15.html">Delivery Challan 4 (Clean Accent)</option>
+            <option value="format16.html">Delivery Challan 5 (Modern Panel)</option>
+            <option value="format5.html">Quotation 1</option>
+            <option value="format6.html">Quotation 2</option>
+            <option value="format12.html">Quotation 3 (New Layout)</option>
+            <option value="format17.html">Quotation 4 (Clean Accent)</option>
+            <option value="format18.html">Quotation 5 (Modern Panel)</option>
+            <option value="format7.html">Proforma 1</option>
+            <option value="format8.html">Proforma 2</option>
+            <option value="format9.html">Proforma 3</option>
+            <option value="format19.html">Proforma 4 (Clean Accent)</option>
+            <option value="format20.html">Proforma 5 (Modern Panel)</option>
+          </select>
+        </div>
+
+        <!-- BUTTONS - PROFESSIONAL LAYOUT -->
+        <div style="display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap;">
+          <button onclick="previewInvoice()" class="btn btn-primary" style="flex: 1; min-width: 200px; padding: 14px 24px; background: linear-gradient(135deg, #ff8c42 0%, #e06b20 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 12px 30px rgba(11,37,69,0.06);">
+            <i class="fas fa-eye me-2"></i>Preview Document
+          </button>
+
+          <button class="btn btn-secondary" onclick="openHistory()" style="flex: 1; min-width: 200px; padding: 14px 24px; background: #f9fafb; color: #0b2545; border: 2px solid #e0e0e0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <i class="fas fa-history me-2"></i>📋 Document History
+          </button>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Saved Payment Modal -->
+    <div
+      id="managePaymentModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+      "
+    >
+      <div
+        style="
+          max-width: 600px;
+          margin: 6% auto;
+          background: #fff;
+          border-radius: 8px;
+          padding: 16px;
+        "
+      >
+        <h5 style="margin: 0 0 8px 0">Manage Saved Payment Instruction</h5>
+        <textarea
+          id="managePaymentTextarea"
+          style="width: 100%; min-height: 120px; margin-bottom: 8px"
+        ></textarea>
+        <div style="display: flex; gap: 8px; justify-content: flex-end">
+          <button
+            type="button"
+            class="btn btn-danger"
+            onclick="deleteSavedPaymentFromModal()"
+          >
+            Delete Saved
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeManagePaymentModal()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="savePaymentFromModal()"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Client Management Modal -->
+    <div
+      id="clientsModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-lg"
+        style="max-width: 800px; margin: 2% auto"
+      >
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Manage Clients</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              onclick="closeClientsModal()"
+            ></button>
+          </div>
+          <div
+            class="modal-body"
+            id="clientsList"
+            style="max-height: 60vh; overflow-y: auto"
+          >
+            <!-- Clients list will be generated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeClientsModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Management Modal -->
+    <div
+      id="companiesModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-lg"
+        style="max-width: 800px; margin: 2% auto"
+      >
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">Manage Companies</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              onclick="closeCompaniesModal()"
+            ></button>
+          </div>
+          <div
+            class="modal-body"
+            id="companiesList"
+            style="max-height: 60vh; overflow-y: auto"
+          >
+            <!-- Companies list will be generated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeCompaniesModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Templates Management Modal -->
+    <div
+      id="productsModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-lg"
+        style="max-width: 900px; margin: 2% auto"
+      >
+        <div class="modal-content">
+          <div class="modal-header bg-info text-white">
+            <h5 class="modal-title">Manage Product Templates</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              onclick="closeProductsModal()"
+            ></button>
+          </div>
+          <div
+            class="modal-body"
+            id="productsList"
+            style="max-height: 60vh; overflow-y: auto"
+          >
+            <!-- Product templates list will be generated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeProductsModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Template Selection Modal -->
+    <div
+      id="productTemplateSelectModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-lg"
+        style="max-width: 800px; margin: 2% auto"
+      >
+        <div class="modal-content">
+          <div class="modal-header bg-info text-white">
+            <h5 class="modal-title">Select Product Template</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              onclick="closeProductTemplateSelectModal()"
+            ></button>
+          </div>
+          <div
+            class="modal-body"
+            id="productTemplateSelectList"
+            style="max-height: 60vh; overflow-y: auto"
+          >
+            <!-- Product templates selection list will be generated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeProductTemplateSelectModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div
+      id="historyModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-lg"
+        style="max-width: 900px; margin: 2% auto"
+      >
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Document History</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              onclick="closeHistoryModal()"
+            ></button>
+          </div>
+          <div
+            class="modal-body"
+            style="max-height: 70vh; overflow-y: auto; padding: 20px"
+          >
+            <div id="historyList">
+              <!-- History list will be generated here -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeHistoryModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Info Management Modal -->
+    <div
+      id="invoiceInfoModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-lg"
+        style="max-width: 800px; margin: 2% auto"
+      >
+        <div class="modal-content">
+          <div class="modal-header bg-info text-white">
+            <h5 class="modal-title">Manage Invoice Info</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              onclick="closeInvoiceInfoModal()"
+            ></button>
+          </div>
+          <div
+            class="modal-body"
+            id="invoiceInfoList"
+            style="max-height: 60vh; overflow-y: auto"
+          >
+            <!-- Invoice info list will be generated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeInvoiceInfoModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tax Templates Management Modal -->
+    <div
+      id="taxTemplatesModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-lg"
+        style="max-width: 800px; margin: 2% auto"
+      >
+        <div class="modal-content">
+          <div class="modal-header bg-warning text-white">
+            <h5 class="modal-title">Manage Tax Templates</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              onclick="closeTaxTemplatesModal()"
+            ></button>
+          </div>
+          <div
+            class="modal-body"
+            id="taxTemplatesList"
+            style="max-height: 60vh; overflow-y: auto"
+          >
+            <!-- Tax templates list will be generated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeTaxTemplatesModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/currency.js"></script>
+    <script src="js/document-download.js"></script>
+    <script src="js/test-documents.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        if (window.SmarbizTestDocuments) SmarbizTestDocuments.syncInvoiceHistory();
+      });
+    </script>
+    <script src="js/google-drive.js"></script>
+
+    <!-- Ensure all dropdowns stay closed on load -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Handle all select elements
+        const allSelects = document.querySelectorAll("select");
+        allSelects.forEach((select) => {
+          // Force dropdown to close immediately
+          select.blur();
+          // Also blur after a short delay to catch any late focus
+          setTimeout(() => select.blur(), 10);
+          setTimeout(() => select.blur(), 100);
+          // Prevent dropdown from opening when value is set
+          select.addEventListener("change", function () {
+            setTimeout(() => this.blur(), 0);
+          });
+        });
+
+        // Also handle dynamically added selects
+        const observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
+            mutation.addedNodes.forEach(function (node) {
+              if (node.nodeType === 1) {
+                // Element node
+                if (node.tagName === "SELECT") {
+                  node.blur();
+                  setTimeout(() => node.blur(), 10);
+                }
+                // Check for selects inside the added node
+                const selects =
+                  node.querySelectorAll && node.querySelectorAll("select");
+                if (selects) {
+                  selects.forEach((select) => {
+                    select.blur();
+                    setTimeout(() => select.blur(), 10);
+                  });
+                }
+              }
+            });
+          });
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+      });
+    </script>
+    
+    <!-- Signature Gallery Modal -->
+    <div id="signatureGalleryModal" class="modal modal-overlay">
+      <div class="modal-dialog modal-lg modal-panel">
+        <div class="modal-content">
+          <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center;">
+            <h5 class="modal-title" style="margin: 0; color: #333;">
+              <i class="fas fa-signature me-2"></i>Signature Gallery
+            </h5>
+            <button type="button" onclick="closeSignatureGallery()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+          </div>
+          <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+            <div id="signatureGalleryContent">
+              <!-- Signatures will be loaded here -->
+            </div>
+            <div id="noSignaturesGallery" style="text-align: center; padding: 40px; color: #666; display: none;">
+              <i class="fas fa-signature" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+              <p>No saved signatures found.</p>
+              <p style="font-size: 14px;">Draw and save a signature to see it here.</p>
+            </div>
+          </div>
+          <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center;">
+            <small style="color: #666;">Click on a signature to load it to the signature pad</small>
+            <button type="button" class="btn btn-secondary" onclick="closeSignatureGallery()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Stamp Functions -->
+    <script>
+      function applyStamp() {
+        const topText = document.getElementById('stampTopText')?.value || '';
+        const bottomText = document.getElementById('stampBottomText')?.value || 'OFFICIAL';
+        const centerText = document.getElementById('stampCompanyName')?.value || '';
+        const color = document.querySelector('.stamp-color-swatch.selected')?.dataset?.color || '#000000';
+        
+        StampTool.saveStamp(topText, bottomText, centerText, 140, color);
+        alert('Stamp saved successfully!');
+      }
+
+      function testNewStamp() {
+        const stamp = StampTool.createStamp(
+          "SMP TECHNICAL SOLUTIONS",
+          "OFFICIAL", 
+          "MUMBAI",
+          140,
+          "#000000"
+        );
+        
+        // Create preview modal with signature area
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0,0,0,0.8); display: flex; align-items: center; 
+          justify-content: center; z-index: 9999;
+        `;
+        
+        modal.innerHTML = `
+          <div style="background: white; padding: 20px; border-radius: 8px; max-width: 400px;">
+            <h3>Stamp Preview</h3>
+            <div style="text-align: center; margin: 20px 0;">
+              ${stamp.svg}
+            </div>
+            <div style="text-align: center; margin: 15px 0; padding: 15px; border: 1px solid #ddd; background: #f9f9f9;">
+              <p style="margin: 0 0 10px 0; font-size: 12px; color: #666;">
+                <strong>Test Signature Area:</strong><br>
+                This shows how stamp will appear over signature in actual invoice.
+              </p>
+              <div style="position: relative; height: 80px; width: 200px; border: 1px solid #ccc; background: #fff; display: flex; align-items: center; justify-content: center;">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                  ${stamp.svg}
+                </div>
+              </div>
+            </div>
+            <button onclick="this.closest('div').parentElement.remove()" 
+                    class="btn btn-primary">Close</button>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+      }
+
+      // Color swatch functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const swatches = document.querySelectorAll('.stamp-color-swatch');
+        swatches.forEach(swatch => {
+          swatch.addEventListener('click', function() {
+            swatches.forEach(s => s.classList.remove('selected'));
+            this.classList.add('selected');
+          });
+        });
+      });
+
+      // Toggle Functions for Additional Features
+      function toggleStampSection() {
+        const section = document.getElementById('stampFormSection');
+        const button = document.getElementById('toggleStampBtn');
+        
+        if (section.style.display === 'none') {
+          section.style.display = 'block';
+          button.textContent = 'Hide Stamp';
+          button.classList.remove('btn-primary');
+          button.classList.add('btn-secondary');
+        } else {
+          section.style.display = 'none';
+          button.textContent = 'Add Stamp';
+          button.classList.remove('btn-secondary');
+          button.classList.add('btn-primary');
+        }
+      }
+
+      function toggleWatermarkSection() {
+        const section = document.getElementById('watermarkFormSection');
+        const button = document.getElementById('toggleWatermarkBtn');
+        
+        if (section.style.display === 'none') {
+          section.style.display = 'block';
+          button.textContent = 'Hide Watermark';
+          button.classList.remove('btn-primary');
+          button.classList.add('btn-secondary');
+        } else {
+          section.style.display = 'none';
+          button.textContent = 'Add Watermark';
+          button.classList.remove('btn-secondary');
+          button.classList.add('btn-primary');
+        }
+      }
+
+      function togglePaymentSection() {
+        const section = document.getElementById('paymentFormSection');
+        const button = document.getElementById('togglePaymentBtn');
+        
+        if (section.style.display === 'none') {
+          section.style.display = 'block';
+          button.textContent = 'Hide Payment Instructions';
+          button.classList.remove('btn-primary');
+          button.classList.add('btn-secondary');
+        } else {
+          section.style.display = 'none';
+          button.textContent = 'Add Payment Instructions';
+          button.classList.remove('btn-secondary');
+          button.classList.add('btn-primary');
+        }
+      }
+
+      function toggleShippingSection() {
+        const section = document.getElementById('shippingFormSection');
+        const button = document.getElementById('toggleShippingBtn');
+        
+        if (section.style.display === 'none') {
+          section.style.display = 'block';
+          button.textContent = 'Hide Shipping Charges';
+          button.classList.remove('btn-primary');
+          button.classList.add('btn-secondary');
+        } else {
+          section.style.display = 'none';
+          button.textContent = 'Add Shipping Charges';
+          button.classList.remove('btn-secondary');
+          button.classList.add('btn-primary');
+        }
+      }
+    </script>
+    <script src="js/theme-a11y.js"></script>
+  </body>
+</html>

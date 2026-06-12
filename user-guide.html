@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Guide - SmartBiz</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/app-shell.css" />
+  <link rel="stylesheet" href="assets/css/user-guide.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background: #f5f6fa; overflow-x: hidden; font-family: 'DM Sans', Arial, sans-serif; }
+    .app-container { display: flex; flex-direction: column; min-height: 100vh; }
+    .main-layout { display: flex; flex: 1; width: 100%; }
+    .main-content { flex: 1; overflow-y: auto; padding: 32px 40px; width: 100%; }
+    
+    /* Header with back button */
+    .content-header { margin-bottom: 32px; display: flex; align-items: center; gap: 16px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; color: #1f2937; text-decoration: none; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .back-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+    
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #6b7280; flex-wrap: wrap; flex: 1; }
+    .breadcrumb a { color: #667eea; text-decoration: none; font-weight: 500; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    
+    /* Guide hero section */
+    .guide-hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 48px; border-radius: 12px; margin-bottom: 40px; }
+    .guide-hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 12px; }
+    .guide-hero p { font-size: 1.1rem; margin-bottom: 24px; opacity: 0.95; }
+    .guide-hero-badges { display: flex; gap: 16px; flex-wrap: wrap; }
+    .guide-badge { background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+    
+    /* Layout for TOC and content */
+    .guide-layout { display: grid; grid-template-columns: 280px 1fr; gap: 40px; }
+    
+    .guide-toc { position: sticky; top: 20px; height: fit-content; }
+    .guide-toc h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: #1f2937; }
+    .guide-toc nav { display: flex; flex-direction: column; gap: 8px; }
+    .guide-toc a { color: #667eea; text-decoration: none; font-size: 0.95rem; padding: 8px 0; border-left: 3px solid transparent; padding-left: 12px; transition: all 0.2s; }
+    .guide-toc a:hover { border-left-color: #667eea; color: #764ba2; }
+    
+    .guide-sections { display: flex; flex-direction: column; gap: 32px; }
+    
+    /* Guide blocks (sections) */
+    .guide-block { background: white; padding: 32px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .guide-block-header { display: flex; gap: 16px; margin-bottom: 24px; }
+    .guide-block-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; flex-shrink: 0; }
+    .guide-block-icon.purple { background: #9333ea; }
+    .guide-block-icon.blue { background: #3b82f6; }
+    .guide-block-icon.teal { background: #14b8a6; }
+    .guide-block-icon.green { background: #22c55e; }
+    .guide-block-icon.red { background: #ef4444; }
+    .guide-block-icon.orange { background: #f97316; }
+    
+    .guide-block-header h2 { font-size: 1.5rem; margin-bottom: 8px; color: #1f2937; }
+    .guide-lead { color: #6b7280; font-size: 0.95rem; }
+    
+    /* Steps and lists */
+    .guide-steps { list-style: decimal; padding-left: 24px; }
+    .guide-steps li { margin-bottom: 16px; line-height: 1.6; color: #374151; }
+    .guide-steps strong { font-weight: 600; color: #1f2937; }
+    
+    .guide-start-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; margin-top: 24px; }
+    .guide-start-card { background: #f3f4f6; padding: 16px; border-radius: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .guide-start-card i { font-size: 1.8rem; color: #667eea; }
+    .guide-start-card span { font-size: 0.85rem; font-weight: 500; color: #374151; }
+    
+    /* Subheadings and tips */
+    .guide-subhead { font-size: 1.1rem; font-weight: 600; color: #1f2937; margin: 24px 0 12px 0; }
+    .guide-muted { color: #6b7280; font-size: 0.95rem; margin-bottom: 16px; }
+    .guide-tip { background: #fef3c7; border-left: 4px solid #fbbf24; padding: 16px; border-radius: 6px; margin: 16px 0; }
+    .guide-tip strong { color: #92400e; }
+    
+    /* Tables */
+    .guide-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .guide-table thead { background: #f3f4f6; }
+    .guide-table th, .guide-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .guide-table-compact th, .guide-table-compact td { padding: 10px 12px; font-size: 0.9rem; }
+    
+    /* Links and buttons */
+    .guide-link-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 12px 24px; background: #667eea; color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.2s; }
+    .guide-link-btn:hover { background: #764ba2; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-content { padding: 20px 16px; }
+      .guide-layout { grid-template-columns: 1fr; gap: 24px; }
+      .guide-toc { position: static; }
+      .guide-hero h1 { font-size: 1.8rem; }
+      .guide-hero { padding: 32px 20px; }
+      .guide-block { padding: 20px; }
+      .guide-start-cards { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container guide-page">
+    <main class="main-content">
+      <div class="content-header">
+        <a href="home.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <div class="breadcrumb">
+          <span>User Guide</span>
+        </div>
+      </div>
+
+        <section class="guide-hero">
+          <h1>Complete SmartBiz User Guide</h1>
+          <p>
+            Everything you need to create invoices, manage stock, and print professional documents —
+            explained in simple steps. Bookmark this page and follow along section by section.
+          </p>
+          <div class="guide-hero-badges">
+            <span class="guide-badge"><i class="fas fa-clock"></i> ~15 min read</span>
+            <span class="guide-badge"><i class="fas fa-mobile-alt"></i> Works on mobile</span>
+            <span class="guide-badge"><i class="fas fa-book-open"></i> Step-by-step</span>
+          </div>
+        </section>
+
+        <div class="guide-layout">
+          <aside class="guide-toc">
+            <h2>On this page</h2>
+            <nav>
+              <a href="#start">Getting started</a>
+              <a href="#home">Home &amp; quick actions</a>
+              <a href="#invoice">Tax invoice</a>
+              <a href="#delivery">Delivery challan</a>
+              <a href="#quotation">Quotation</a>
+              <a href="#propharma">Propharma invoice</a>
+              <a href="#address">Address labels</a>
+              <a href="#convert">Convert document</a>
+              <a href="#preview">Preview &amp; PDF</a>
+              <a href="#inventory">Inventory &amp; stock</a>
+              <a href="#catalog">Catalog / menu builder</a>
+              <a href="#dashboard">Dashboard</a>
+              <a href="#business-card">Business card</a>
+              <a href="#notifications">Notifications</a>
+              <a href="#recurring">Recurring invoices</a>
+              <a href="#data-backup">Backup &amp; data</a>
+              <a href="#settings">Settings</a>
+              <a href="#personal">Personal info</a>
+              <a href="#signature">Signature &amp; stamp</a>
+              <a href="#history">Document history</a>
+              <a href="#cms">CMS editor</a>
+              <a href="#test-documents">Test documents</a>
+              <a href="#login">Login &amp; account</a>
+            </nav>
+          </aside>
+
+          <div class="guide-sections">
+            <article class="guide-block" id="start">
+              <div class="guide-block-header">
+                <div class="guide-block-icon purple"><i class="fas fa-rocket"></i></div>
+                <div>
+                  <h2>Getting started</h2>
+                  <p class="guide-lead">Your first-time checklist before creating any document.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li><strong>Optional first step:</strong> Click <strong>Login / Sign up</strong> on Home to create a secure account (email + password). This protects your data, but it's optional.</li>
+                <li>Open <strong>Home</strong> from the left sidebar — this is your main dashboard.</li>
+                <li>Tap the <strong>person icon</strong> (top) or go to <strong>Settings → Personal Information</strong> to add your company name, GSTIN, address, and logo.</li>
+                <li>Open <strong>Menu</strong> to see the demo food catalog, or <strong>Inventory</strong> to add products you sell (name, rate, HSN, tax).</li>
+                <li>Pick a document type from <strong>Quick Actions</strong> (Invoice, Delivery Challan, Quotation, etc.).</li>
+                <li>Fill the form, choose a <strong>layout/format</strong>, then tap <strong>Preview Document</strong>.</li>
+                <li>On the preview page use <strong>Download / Share</strong> or <strong>Print</strong> to save or send the PDF.</li>
+                <li>You'll see <strong>notifications</strong> (toasts) when actions complete — they're helpful confirmations.</li>
+                <li><strong>Back up regularly:</strong> Go to Settings → Your Data → click <strong>Download</strong> to back up all your data as a JSON file you own.</li>
+                <li>Not ready to enter real data? Open the <a href="#test-documents">test documents</a> section — four <strong>TEST-*</strong> samples share one product (2 × ₹350), ₹10 delivery, and GST (invoice total ₹837.80 ≈ $10).</li>
+              </ol>
+              <div class="guide-start-cards">
+                <div class="guide-start-card"><i class="fas fa-home"></i><span>Start at Home</span></div>
+                <div class="guide-start-card"><i class="fas fa-edit"></i><span>Fill details</span></div>
+                <div class="guide-start-card"><i class="fas fa-eye"></i><span>Preview</span></div>
+                <div class="guide-start-card"><i class="fas fa-file-pdf"></i><span>Download PDF</span></div>
+              </div>
+            </article>
+
+            <article class="guide-block" id="home">
+              <div class="guide-block-header">
+                <div class="guide-block-icon blue"><i class="fas fa-bolt"></i></div>
+                <div>
+                  <h2>Home page &amp; quick actions</h2>
+                  <p class="guide-lead">Home has three zones — learn them top to bottom. Quick Actions are shortcuts; you do not type invoice data on Home itself.</p>
+                </div>
+              </div>
+
+              <div class="guide-diagram">
+                <div class="guide-diagram-zone"><span class="guide-diagram-num">1</span><strong>Quick Actions</strong><p>8 buttons — start a document or open help</p></div>
+                <div class="guide-diagram-arrow"><i class="fas fa-arrow-down"></i></div>
+                <div class="guide-diagram-zone"><span class="guide-diagram-num">2</span><strong>Dashboard cards</strong><p>Counts + last 3 docs per type (Invoice, Quote, …)</p></div>
+                <div class="guide-diagram-arrow"><i class="fas fa-arrow-down"></i></div>
+                <div class="guide-diagram-zone"><span class="guide-diagram-num">3</span><strong>All Transactions</strong><p>Full list · View · Delete · TEST badge on samples</p></div>
+              </div>
+
+              <h3 class="guide-subhead">Quick Actions — what each button does</h3>
+              <p class="guide-muted">Tap a button on Home. You leave Home and open the tool shown in the <strong>Goes to</strong> column.</p>
+
+              <div class="guide-qa-grid">
+                <div class="guide-qa-card">
+                  <div class="guide-qa-icon green"><i class="fas fa-plus"></i></div>
+                  <div>
+                    <h4>New Invoice</h4>
+                    <p class="guide-qa-goes"><strong>Goes to:</strong> Layout picker → GST invoice editor</p>
+                    <p class="guide-qa-when"><strong>Use for:</strong> Tax invoice with line items, CGST/SGST, delivery charges, PDF.</p>
+                  </div>
+                </div>
+                <div class="guide-qa-card">
+                  <div class="guide-qa-icon orange"><i class="fas fa-truck"></i></div>
+                  <div>
+                    <h4>Delivery Challan</h4>
+                    <p class="guide-qa-goes"><strong>Goes to:</strong> Delivery challan history</p>
+                    <p class="guide-qa-when"><strong>Use for:</strong> Recording goods sent out (no tax bill yet).</p>
+                  </div>
+                </div>
+                <div class="guide-qa-card">
+                  <div class="guide-qa-icon purple"><i class="fas fa-quote-right"></i></div>
+                  <div>
+                    <h4>Quotation</h4>
+                    <p class="guide-qa-goes"><strong>Goes to:</strong> Quotation history</p>
+                    <p class="guide-qa-when"><strong>Use for:</strong> Price quote before sale. Later: <strong>Convert Document</strong> → Invoice.</p>
+                  </div>
+                </div>
+                <div class="guide-qa-card">
+                  <div class="guide-qa-icon teal"><i class="fas fa-file-invoice"></i></div>
+                  <div>
+                    <h4>Propharma Invoice</h4>
+                    <p class="guide-qa-goes"><strong>Goes to:</strong> Propharma / proforma flow</p>
+                    <p class="guide-qa-when"><strong>Use for:</strong> Pharmacy-style bills (batch, expiry, MRP where available).</p>
+                  </div>
+                </div>
+                <div class="guide-qa-card">
+                  <div class="guide-qa-icon blue"><i class="fas fa-address-book"></i></div>
+                  <div>
+                    <h4>Address</h4>
+                    <p class="guide-qa-goes"><strong>Goes to:</strong> Address label page</p>
+                    <p class="guide-qa-when"><strong>Use for:</strong> Saving and printing shipping / courier labels.</p>
+                  </div>
+                </div>
+                <div class="guide-qa-card">
+                  <div class="guide-qa-icon orange"><i class="fas fa-exchange-alt"></i></div>
+                  <div>
+                    <h4>Convert Document</h4>
+                    <p class="guide-qa-goes"><strong>Goes to:</strong> Popup on Home — pick saved doc → new type</p>
+                    <p class="guide-qa-when"><strong>Use for:</strong> Quotation → Invoice without retyping. Try <code>TEST-ALL-001</code>.</p>
+                  </div>
+                </div>
+                <div class="guide-qa-card">
+                  <div class="guide-qa-icon purple"><i class="fas fa-book-open"></i></div>
+                  <div>
+                    <h4>User Guide</h4>
+                    <p class="guide-qa-goes"><strong>Goes to:</strong> This help page</p>
+                    <p class="guide-qa-when"><strong>Use for:</strong> Instructions when you are stuck (Home, Menu, invoices, …).</p>
+                  </div>
+                </div>
+                <div class="guide-qa-card">
+                  <div class="guide-qa-icon blue"><i class="fas fa-user-circle"></i></div>
+                  <div>
+                    <h4>Login / Sign up</h4>
+                    <p class="guide-qa-goes"><strong>Goes to:</strong> Login (returns to Home after)</p>
+                    <p class="guide-qa-when"><strong>Use for:</strong> Syncing history and settings on your account.</p>
+                  </div>
+                </div>
+              </div>
+
+              <h3 class="guide-subhead">Your first 2 minutes on Home</h3>
+              <ol class="guide-steps">
+                <li>Open <strong>Home</strong> from the sidebar (or bottom nav on mobile).</li>
+                <li>If you see the welcome banner, tap <strong>Login / Sign up</strong> — optional but recommended for sync.</li>
+                <li>Scroll to <strong>All Transactions</strong> → tap <strong>View</strong> on <code>TEST-INV-001</code> to see a sample tax invoice (no typing needed).</li>
+                <li>Tap <strong>← Back</strong> on preview, then try <strong>New Invoice</strong> when you are ready for your own data.</li>
+                <li>Need a price list for clients? Sidebar → <strong>Menu</strong> (demo food catalog loads automatically — see <a href="#catalog">Catalog / menu builder</a>).</li>
+              </ol>
+
+              <h3 class="guide-subhead">Zone 2 &amp; 3 — cards and transaction list</h3>
+              <table class="guide-table guide-table-compact">
+                <thead><tr><th>Area</th><th>What you see</th><th>What to do</th></tr></thead>
+                <tbody>
+                  <tr><td>Dashboard cards</td><td>4 tiles with document count + 3 recent names</td><td>Tap a tile to open that type’s history page</td></tr>
+                  <tr><td>All Transactions</td><td>Every saved doc; yellow <strong>TEST</strong> = sample</td><td><strong>View</strong> = preview · Trash = delete</td></tr>
+                  <tr><td>Header search</td><td>Search box above the list</td><td>Filter by client name or invoice number</td></tr>
+                </tbody>
+              </table>
+
+              <p class="guide-tip"><strong>Remember:</strong> Home does not edit invoices — it only opens other pages. All editing happens in the invoice editor after you pick a Quick Action.</p>
+              <a class="guide-link-btn" href="home.html"><i class="fas fa-arrow-right"></i> Go to Home</a>
+            </article>
+
+            <article class="guide-block" id="invoice">
+              <div class="guide-block-header">
+                <div class="guide-block-icon green"><i class="fas fa-file-invoice"></i></div>
+                <div>
+                  <h2>Creating a tax invoice</h2>
+                  <p class="guide-lead">GST invoices with items, tax, signature, and stamp.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>From Home, tap <strong>New Invoice</strong> or open <strong>Invoice Layouts</strong> and pick Format 1, 2, or 3.</li>
+                <li>On the editor (<strong>GST Invoice Generator</strong>), use tabs: <strong>Party Details</strong> for company &amp; client, <strong>Transaction Details</strong> for invoice lines and totals.</li>
+                <li>Tap <strong>Add Company</strong> / <strong>Add Client</strong> to enter details, or load saved profiles from the dropdown.</li>
+                <li>Under <strong>Invoice Info</strong>, set invoice number, date, due date, and place of supply.</li>
+                <li>Add <strong>products</strong> (name, qty, rate, HSN, tax %). Use <strong>+</strong> for more rows.</li>
+                <li>Optional: <strong>Taxes</strong>, <strong>Payment instructions</strong>, <strong>Shipping charges</strong>, <strong>Watermark</strong>, <strong>Stamp</strong>.</li>
+                <li>Draw or load a <strong>signature</strong> in the signature pad section.</li>
+                <li>Tax calculation now rounds consistently to two decimals and GST types automatically split into <strong>CGST + SGST</strong>.</li>
+                <li>Select <strong>format</strong> at the bottom and click <strong>Preview Document</strong>.</li>
+              </ol>
+              <p class="guide-tip"><strong>Tip:</strong> Use <strong>Document History</strong> on the editor to reopen past invoices without retyping.</p>
+              <a class="guide-link-btn" href="index.html"><i class="fas fa-plus"></i> Open invoice editor</a>
+            </article>
+
+            <article class="guide-block" id="delivery">
+              <div class="guide-block-header">
+                <div class="guide-block-icon orange"><i class="fas fa-truck"></i></div>
+                <div>
+                  <h2>Delivery challan</h2>
+                  <p class="guide-lead">Record goods dispatched without a tax invoice.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>From Home → <strong>Delivery Challan</strong> or sidebar workflows.</li>
+                <li>View past challans in the history list; search by client or number.</li>
+                <li>Create new: use the editor with delivery challan formats (Format 3, 4, or 11).</li>
+                <li>Fill sender, receiver, items shipped, and vehicle/transport details as shown on the form.</li>
+                <li>Preview and print — same <strong>Back</strong> button returns to the previous screen.</li>
+              </ol>
+              <a class="guide-link-btn" href="delivery-challan-history.html"><i class="fas fa-truck"></i> Delivery challans</a>
+            </article>
+
+            <article class="guide-block" id="quotation">
+              <div class="guide-block-header">
+                <div class="guide-block-icon purple"><i class="fas fa-quote-right"></i></div>
+                <div>
+                  <h2>Quotation</h2>
+                  <p class="guide-lead">Send prices before confirming a sale.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Home → <strong>Quotation</strong> to open quotation history.</li>
+                <li>Create a new quotation from the editor; choose Format 5, 6, or 12.</li>
+                <li>Add client, items, validity date, and terms — structure is similar to invoices.</li>
+                <li>Preview and share PDF with your client.</li>
+                <li>Later, use <strong>Convert Document</strong> on Home to turn an accepted quotation into an invoice.</li>
+              </ol>
+              <a class="guide-link-btn" href="quotation-history.html"><i class="fas fa-quote-right"></i> Quotations</a>
+            </article>
+
+            <article class="guide-block" id="propharma">
+              <div class="guide-block-header">
+                <div class="guide-block-icon teal"><i class="fas fa-pills"></i></div>
+                <div>
+                  <h2>Propharma invoice</h2>
+                  <p class="guide-lead">Dedicated flow for pharmacy-style billing.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Home → <strong>Propharma Invoice</strong>.</li>
+                <li>Follow the on-screen fields for batch, expiry, MRP, and line items as applicable.</li>
+                <li>Preview using propharma formats (7, 8, or 9) for print-ready layout.</li>
+              </ol>
+              <a class="guide-link-btn" href="propharma-invoice.html"><i class="fas fa-file-medical"></i> Propharma</a>
+            </article>
+
+            <article class="guide-block" id="address">
+              <div class="guide-block-header">
+                <div class="guide-block-icon blue"><i class="fas fa-address-book"></i></div>
+                <div>
+                  <h2>Address labels</h2>
+                  <p class="guide-lead">Save and print frequent shipping addresses.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Home → <strong>Address</strong>.</li>
+                <li>Enter label name, party name, company, full address, city, pincode.</li>
+                <li><strong>Save</strong> to your address book; <strong>Search</strong> saved entries later.</li>
+                <li>Print or export labels for couriers and packages.</li>
+              </ol>
+              <a class="guide-link-btn" href="documents/formats/address.html"><i class="fas fa-map-marker-alt"></i> Address labels</a>
+            </article>
+
+            <article class="guide-block" id="convert">
+              <div class="guide-block-header">
+                <div class="guide-block-icon orange"><i class="fas fa-exchange-alt"></i></div>
+                <div>
+                  <h2>Convert document</h2>
+                  <p class="guide-lead">Reuse data from one document type in another.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Home → <strong>Convert Document</strong>.</li>
+                <li>Pick a saved document from the list (must exist in history).</li>
+                <li>Choose the target type — e.g. Quotation → Invoice.</li>
+                <li>Confirm; the editor opens with fields pre-filled. Review totals and preview.</li>
+              </ol>
+              <p class="guide-tip"><strong>Tip:</strong> Create at least one invoice or quotation first so history has something to convert.</p>
+            </article>
+
+            <article class="guide-block" id="preview">
+              <div class="guide-block-header">
+                <div class="guide-block-icon green"><i class="fas fa-eye"></i></div>
+                <div>
+                  <h2>Document preview, PDF &amp; print</h2>
+                  <p class="guide-lead">What you see after tapping Preview Document.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>The preview opens in a new tab with your chosen <strong>format layout</strong>.</li>
+                <li>Use <strong>← Back</strong> (top-left) to return without losing data in the editor.</li>
+                <li><strong>Download / Share</strong> — save PDF or share via apps on your device.</li>
+                <li><strong>Print (Vector PDF)</strong> — best quality for professional printing.</li>
+                <li><strong>Edit Invoice</strong> — jumps back to the editor with your data.</li>
+                <li>Watermark and stamp appear on the document if you enabled them in the editor.</li>
+                <li>Screenshot protection is active on the app page when supported: browser screenshot and copy shortcuts are blocked, and a temporary overlay is shown.</li>
+                <li>Note: OS-level screen capture tools may still capture the page, so use PDF export for the safest copy.</li>
+              </ol>
+            </article>
+
+            <article class="guide-block" id="inventory">
+              <div class="guide-block-header">
+                <div class="guide-block-icon orange"><i class="fas fa-box"></i></div>
+                <div>
+                  <h2>Inventory &amp; stock history</h2>
+                  <p class="guide-lead">Products, quantities, and stock movements.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Sidebar → <strong>Inventory</strong> to add and edit products.</li>
+                <li>Set name, SKU, category, stock quantity, purchase and sale rates.</li>
+                <li>When creating invoices, product templates can speed up line-item entry.</li>
+                <li><strong>Stock History</strong> in the sidebar tracks ins/outs and adjustments over time.</li>
+              </ol>
+              <a class="guide-link-btn" href="product.html"><i class="fas fa-warehouse"></i> Open inventory</a>
+            </article>
+
+            <article class="guide-block" id="catalog">
+              <div class="guide-block-header">
+                <div class="guide-block-icon purple"><i class="fas fa-list"></i></div>
+                <div>
+                  <h2>Catalog &amp; menu builder — how to use</h2>
+                  <p class="guide-lead">Sidebar → <strong>Menu</strong>. Build a shareable price list (restaurant menu, shop catalog, services). <strong>Left = edit</strong>, <strong>right = live preview</strong> — changes save automatically.</p>
+                </div>
+              </div>
+
+              <div class="guide-diagram guide-diagram-horizontal">
+                <div class="guide-diagram-zone"><span class="guide-diagram-num">1</span><strong>Name your catalog</strong><p>Title + subtitle at top</p></div>
+                <div class="guide-diagram-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="guide-diagram-zone"><span class="guide-diagram-num">2</span><strong>Edit (left panel)</strong><p>Categories → items → prices</p></div>
+                <div class="guide-diagram-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="guide-diagram-zone"><span class="guide-diagram-num">3</span><strong>Preview (right)</strong><p>What clients see</p></div>
+              </div>
+
+              <h3 class="guide-subhead">Screen layout (Menu page)</h3>
+              <table class="guide-table">
+                <thead><tr><th>Part of page</th><th>What it is</th><th>What you do</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>How to use</strong> strip (top)</td><td>4 numbered steps — always visible</td><td>Follow when learning; tap <strong>Hide steps</strong> when you know the flow</td></tr>
+                  <tr><td><strong>Step 1 — Catalog name</strong></td><td>Title + subtitle fields</td><td>e.g. “My Restaurant Menu” / “Prices incl. GST”</td></tr>
+                  <tr><td><strong>Toolbar buttons</strong></td><td>Actions row below Step 1</td><td>Add category, load demo, import stock, reset</td></tr>
+                  <tr><td><strong>Step 2 — Edit catalog</strong> (left)</td><td>Categories with items inside</td><td>Rename category · <strong>+</strong> add item · edit fields · trash to delete</td></tr>
+                  <tr><td><strong>Step 3 — Live preview</strong> (right)</td><td>Client-facing list</td><td>Read-only; updates as you type</td></tr>
+                  <tr><td><strong>Export</strong> (page header)</td><td>Download icon</td><td>Saves catalog as JSON file</td></tr>
+                </tbody>
+              </table>
+
+              <h3 class="guide-subhead">Toolbar buttons explained</h3>
+              <table class="guide-table guide-table-compact">
+                <thead><tr><th>Button</th><th>Action</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Add category</strong></td><td>New section (e.g. “Beverages”, “Services”)</td></tr>
+                  <tr><td><strong>Load demo food menu</strong></td><td>Restores sample restaurant menu (14 items, 5 categories)</td></tr>
+                  <tr><td><strong>Import from inventory</strong></td><td>Copies products from Inventory into a “From Inventory” category</td></tr>
+                  <tr><td><strong>Reset catalog</strong></td><td>Empty template (2 blank categories) — asks for confirmation</td></tr>
+                </tbody>
+              </table>
+
+              <h3 class="guide-subhead">Editing one item (inside a category)</h3>
+              <ol class="guide-steps">
+                <li>Find the gray <strong>item card</strong> under a category heading.</li>
+                <li><strong>Item name</strong> — what customers see (e.g. Butter Chicken).</li>
+                <li><strong>Description</strong> — optional line under the name on preview.</li>
+                <li><strong>SKU / code</strong> — optional internal code (ST-01, MN-02).</li>
+                <li><strong>Price (₹)</strong> — amount in rupees; Settings can display as $ or € on preview.</li>
+                <li>Tap <strong>+ Add item</strong> on the category row for another dish or product.</li>
+                <li>Red trash on an item or category deletes it (category deletes all items inside).</li>
+              </ol>
+
+              <h3 class="guide-subhead">First visit</h3>
+              <p class="guide-muted">If you never saved a catalog before, SmartBiz loads <strong>Spice Garden — Food Menu (Demo)</strong> automatically so you can explore. Replace the title and items with yours anytime.</p>
+
+              <p class="guide-tip"><strong>Not the same as invoices:</strong> Menu builds a <em>price list</em> for sharing. To bill a customer with GST, use Home → <strong>New Invoice</strong>. You can import Inventory products into Menu, but invoices use the separate invoice editor.</p>
+              <a class="guide-link-btn" href="menu.html"><i class="fas fa-list"></i> Open Menu builder</a>
+            </article>
+
+            <article class="guide-block" id="dashboard">
+              <div class="guide-block-header">
+                <div class="guide-block-icon blue"><i class="fas fa-chart-bar"></i></div>
+                <div>
+                  <h2>Dashboard</h2>
+                  <p class="guide-lead">Overview of business activity at a glance.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Sidebar → <strong>Dashboard</strong> for summaries and recent transactions.</li>
+                <li>Use it to monitor sales trends and jump into detailed lists.</li>
+                <li>Pair with <strong>Invoice</strong> history pages for full document lists.</li>
+              </ol>
+              <a class="guide-link-btn" href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+            </article>
+
+            <article class="guide-block" id="business-card">
+              <div class="guide-block-header">
+                <div class="guide-block-icon purple"><i class="fas fa-id-card"></i></div>
+                <div>
+                  <h2>Business card generator</h2>
+                  <p class="guide-lead">Digital card with your brand and contact details.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Sidebar → <strong>Business Card</strong>.</li>
+                <li>Enter name, designation, phone, email, website, and logo.</li>
+                <li>Customize colors and preview; download or share the card image.</li>
+              </ol>
+              <a class="guide-link-btn" href="company-card-generator.html"><i class="fas fa-id-card"></i> Business card</a>
+            </article>
+
+            <article class="guide-block" id="notifications">
+              <div class="guide-block-header">
+                <div class="guide-block-icon blue"><i class="fas fa-bell"></i></div>
+                <div>
+                  <h2>Notifications 🔔</h2>
+                  <p class="guide-lead">Stay informed with in-app notifications for actions and reminders.</p>
+                </div>
+              </div>
+              <h3 class="guide-subhead">What are notifications?</h3>
+              <p class="guide-muted">Notifications appear as brief messages (toasts) when you perform actions in SmartBiz, like creating invoices, saving data, or when backups are due. They're stored locally and never sent anywhere.</p>
+              
+              <h3 class="guide-subhead">Where do notifications appear?</h3>
+              <ul class="guide-steps">
+                <li><strong>Toast notifications</strong> — appear at the top-right of your screen automatically and fade after 5 seconds (or stay if you need more time).</li>
+                <li><strong>Bell icon</strong> — on the Home page header, showing count of unread notifications.</li>
+                <li><strong>Notification history</strong> — accessible from Settings → Notifications to review all notifications.</li>
+              </ul>
+
+              <h3 class="guide-subhead">Common notifications you'll see</h3>
+              <table class="guide-table guide-table-compact">
+                <thead><tr><th>Message</th><th>What it means</th></tr></thead>
+                <tbody>
+                  <tr><td>✅ Invoice #INV-001 created successfully!</td><td>Your invoice was saved</td></tr>
+                  <tr><td>📥 Invoice downloaded</td><td>PDF file is on your device</td></tr>
+                  <tr><td>💾 Backup created successfully</td><td>Your data was backed up</td></tr>
+                  <tr><td>⚙️ Auto-save enabled</td><td>Changes are being auto-saved</td></tr>
+                  <tr><td>⚠️ It's been 7 days since your last backup</td><td>Time to create a backup</td></tr>
+                </tbody>
+              </table>
+
+              <h3 class="guide-subhead">How to manage notifications</h3>
+              <ol class="guide-steps">
+                <li>Go to <strong>Settings</strong> → <strong>Notifications</strong>.</li>
+                <li>Toggle <strong>Enable Notifications</strong> on/off (default: on).</li>
+                <li>Click <strong>Send Test Notification</strong> to see how they work.</li>
+                <li>View your <strong>Notification History</strong> to see past messages.</li>
+                <li>Click <strong>Clear All</strong> to remove old notifications (they're not deleted from your backup).</li>
+              </ol>
+
+              <p class="guide-tip"><strong>Tip:</strong> Notifications are saved locally on your device. Clearing them doesn't affect your data — it just removes the notification messages.</p>
+            </article>
+
+            <article class="guide-block" id="recurring">
+              <div class="guide-block-header">
+                <div class="guide-block-icon orange"><i class="fas fa-retweet"></i></div>
+                <div>
+                  <h2>Recurring invoices</h2>
+                  <p class="guide-lead">Set up automatic invoice schedules and reminders from the recurring dashboard.</p>
+                </div>
+              </div>
+
+              <h3 class="guide-subhead">How recurring invoices work</h3>
+              <p class="guide-muted">Recurring invoices are automatically generated from your schedule each time the next run date arrives. You can create a schedule, choose a frequency, add an optional recipient email, and pause or delete it anytime.</p>
+
+              <ol class="guide-steps">
+                <li>Go to the <strong>Recurring</strong> page from the menu or Home quick actions.</li>
+                <li>Click <strong>Create schedule</strong> and fill in the title, client, amount, frequency, interval, and start date.</li>
+                <li>Optionally add a recipient email and reminder days before the next run.</li>
+                <li>Click <strong>Create schedule</strong> to save it. It appears in the schedule list immediately.</li>
+                <li>The system calculates the next run date using your frequency and interval.</li>
+                <li>The schedule remains active until you click <strong>Pause</strong> or delete it.</li>
+              </ol>
+
+              <h3 class="guide-subhead">Tips for using recurring invoices</h3>
+              <ul class="guide-steps">
+                <li><strong>Use a clear title</strong> so you can identify each schedule quickly in the list.</li>
+                <li><strong>Keep recipient email optional</strong> unless you want reminders sent directly.</li>
+                <li><strong>Pause instead of deleting</strong> when you want to stop a schedule temporarily.</li>
+                <li><strong>Check next run dates</strong> at the top of the Recurring page to stay on schedule.</li>
+              </ul>
+
+              <a class="guide-link-btn" href="recurring.html"><i class="fas fa-retweet"></i> Open Recurring page</a>
+            </article>
+
+            <article class="guide-block" id="data-backup">
+              <div class="guide-block-header">
+                <div class="guide-block-icon green"><i class="fas fa-download"></i></div>
+                <div>
+                  <h2>Backup &amp; data management 💾</h2>
+                  <p class="guide-lead">Download your complete data as a backup file that you own and control.</p>
+                </div>
+              </div>
+
+              <h3 class="guide-subhead">What's included in a backup?</h3>
+              <p class="guide-muted">Your backup includes everything: invoices, clients, products, settings, notifications, and more — all in a single JSON file.</p>
+              <ul class="guide-steps">
+                <li>All invoices and documents</li>
+                <li>Client and product information</li>
+                <li>Your settings and preferences</li>
+                <li>Signatures and stamps</li>
+                <li>Catalog / menu data</li>
+                <li>Auto-save settings</li>
+              </ul>
+
+              <h3 class="guide-subhead">How to download a backup</h3>
+              <ol class="guide-steps">
+                <li>Open <strong>Settings</strong> from the sidebar.</li>
+                <li>Go to <strong>Your Data</strong> section.</li>
+                <li>You'll see a summary: "12 data items stored — 2.5 MB".</li>
+                <li>Click the blue <strong>Download</strong> button.</li>
+                <li>A file called <code>smarbiz-backup-2026-05-27.json</code> downloads to your device's Downloads folder.</li>
+                <li>Save it somewhere safe — this is your complete data backup.</li>
+              </ol>
+
+              <h3 class="guide-subhead">How to restore from backup</h3>
+              <ol class="guide-steps">
+                <li>Open <strong>Settings</strong> → <strong>Your Data</strong>.</li>
+                <li>Click the orange <strong>Restore</strong> button.</li>
+                <li>Select a backup file you downloaded previously.</li>
+                <li>You'll be asked to confirm: <em>"This will replace all your current data."</em></li>
+                <li>Click <strong>Confirm</strong> — your data is restored instantly.</li>
+                <li>A success notification appears when complete.</li>
+              </ol>
+
+              <h3 class="guide-subhead">Backup file information</h3>
+              <table class="guide-table guide-table-compact">
+                <thead><tr><th>Detail</th><th>Information</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Format</strong></td><td>JSON (human-readable text format)</td></tr>
+                  <tr><td><strong>File name</strong></td><td>smarbiz-backup-YYYY-MM-DD.json (e.g., smarbiz-backup-2026-05-27.json)</td></tr>
+                  <tr><td><strong>Location</strong></td><td>Your device's Downloads folder (you control it)</td></tr>
+                  <tr><td><strong>Cloud?</strong></td><td>No — backup stays on your device. You control it completely.</td></tr>
+                  <tr><td><strong>Size</strong></td><td>Varies (typically 1-5 MB depending on data)</td></tr>
+                </tbody>
+              </table>
+
+              <h3 class="guide-subhead">Backup best practices</h3>
+              <ul class="guide-steps">
+                <li><strong>Back up weekly</strong> — click Download once a week to have fresh backups.</li>
+                <li><strong>Keep multiple copies</strong> — save backups on your computer and perhaps external storage.</li>
+                <li><strong>Before major changes</strong> — always download a backup before trying new features.</li>
+                <li><strong>Share safely</strong> — backup files are JSON text; only share with trusted people or systems.</li>
+                <li><strong>Device migration</strong> — backup on your old device, restore on your new one to keep all data.</li>
+              </ul>
+
+              <h3 class="guide-subhead">Clearing temporary data</h3>
+              <p class="guide-muted">Sometimes your browser stores temporary files. You can clear them without losing important data:</p>
+              <ol class="guide-steps">
+                <li>Settings → <strong>Your Data</strong> → click <strong>Clear Temporary Data</strong>.</li>
+                <li>This removes cache files but keeps invoices, clients, and settings.</li>
+                <li>If something breaks, you can restore from a backup file anytime.</li>
+              </ol>
+
+              <p class="guide-tip"><strong>Important:</strong> Your backup is yours. You own the file, can share it, store it wherever you want, and restore it anytime. No external service, no subscriptions — complete control.</p>
+              <a class="guide-link-btn" href="settings.html"><i class="fas fa-cog"></i> Go to Settings</a>
+            </article>
+
+            <article class="guide-block" id="settings">
+              <div class="guide-block-header">
+                <div class="guide-block-icon teal"><i class="fas fa-cog"></i></div>
+                <div>
+                  <h2>Settings</h2>
+                  <p class="guide-lead">Currency, defaults, and app behaviour.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Sidebar → <strong>Settings</strong>.</li>
+                <li><strong>Appearance</strong> — display currency and defaults (₹ stored; $/€ converted live).</li>
+                <li><strong>Documents &amp; defaults</strong> — auto-save, default GST %, layout, watermark.</li>
+                <li><strong>Notifications</strong> — enable/disable notifications, send test, view history (see <a href="#notifications">Notifications</a>).</li>
+                <li><strong>Company profile</strong> — opens Personal Information (GSTIN, logo, address).</li>
+                <li><strong>Your data</strong> — download JSON backup, restore from backup, clear temporary cache (see <a href="#data-backup">Backup &amp; data</a>).</li>
+                <li><strong>Help &amp; legal</strong> — full <a href="help-support.html">Help &amp; Support</a>, <a href="privacy-policy.html">Privacy Policy</a>, and <a href="terms-of-service.html">Terms of Service</a> pages (not popups).</li>
+              </ol>
+              <a class="guide-link-btn" href="settings.html"><i class="fas fa-sliders-h"></i> Settings</a>
+            </article>
+
+            <article class="guide-block" id="personal">
+              <div class="guide-block-header">
+                <div class="guide-block-icon green"><i class="fas fa-user"></i></div>
+                <div>
+                  <h2>Personal &amp; company information</h2>
+                  <p class="guide-lead">Your profile shown on invoices and cards.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Tap the <strong>profile / edit icon</strong> in the header or open Personal Information from the menu.</li>
+                <li>Fill legal business name, GSTIN, PAN, address, phone, email, and upload logo.</li>
+                <li>Save — these details auto-fill on new invoices where supported.</li>
+              </ol>
+              <a class="guide-link-btn" href="personal-info.html"><i class="fas fa-building"></i> Personal info</a>
+            </article>
+
+            <article class="guide-block" id="signature">
+              <div class="guide-block-header">
+                <div class="guide-block-icon red"><i class="fas fa-signature"></i></div>
+                <div>
+                  <h2>Signature &amp; round stamp</h2>
+                  <p class="guide-lead">Authorize documents like a physical stamp.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>In the invoice editor, scroll to <strong>Signature</strong> — draw on the pad or load a saved signature.</li>
+                <li>Tap <strong>Save Signature</strong>; use <strong>Manage</strong> to pick from the gallery.</li>
+                <li>For the round seal: tap <strong>Add Stamp</strong>, enter top ring text (company), bottom text (e.g. OFFICIAL), center city.</li>
+                <li>Choose stamp colour and save; it overlays the signature area on preview.</li>
+                <li>Adjust stamp size in settings if the app stores a size preference.</li>
+              </ol>
+              <p class="guide-tip"><strong>Tip:</strong> On preview pages only one <strong>Back</strong> button appears (top-left) — use it to return to the editor.</p>
+            </article>
+
+            <article class="guide-block" id="history">
+              <div class="guide-block-header">
+                <div class="guide-block-icon blue"><i class="fas fa-history"></i></div>
+                <div>
+                  <h2>Document history</h2>
+                  <p class="guide-lead">Find and reopen past work.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>On the invoice editor, tap <strong>Document History</strong>.</li>
+                <li>Browse by client name, invoice number, or date.</li>
+                <li>Open a row to reload that document into the editor or preview.</li>
+                <li>History is stored on the server and in your browser; refresh Home to see the latest list.</li>
+              </ol>
+            </article>
+
+            <article class="guide-block" id="cms">
+              <div class="guide-block-header">
+                <div class="guide-block-icon teal"><i class="fas fa-cubes"></i></div>
+                <div>
+                  <h2>CMS editor</h2>
+                  <p class="guide-lead">Manage pages, SEO metadata, scheduling, and drafts from one central dashboard.</p>
+                </div>
+              </div>
+              <ol class="guide-steps">
+                <li>Open <strong>CMS</strong> from the Home menu or visit <strong>/cms.html</strong>.</li>
+                <li>Enter the private CMS password to unlock the dashboard.</li>
+                <li>Use the CMS toolbar to search pages, filter by <strong>type</strong>, and filter by <strong>status</strong> (Published, Draft, Scheduled).</li>
+                <li>Click <strong>New Page</strong> to create a page, or use <strong>Edit</strong>, <strong>Duplicate</strong>, and <strong>Delete</strong> on existing pages.</li>
+                <li>In the editor, fill page details including <strong>Slug</strong>, <strong>Title</strong>, <strong>Meta description</strong>, <strong>Meta title</strong>, <strong>Keywords</strong>, and <strong>Canonical URL</strong>.</li>
+                <li>Select a <strong>Page type</strong> (Custom, Landing, Blog, FAQ, Product) to organize your content better.</li>
+                <li>Use the <strong>Schedule publishing</strong> toggle to set a publish date and optional unpublish date.</li>
+                <li>Press <strong>Preview</strong> to open the page in a new tab and verify the live content and SEO metadata.</li>
+                <li>The editor auto-saves drafts every 20 seconds when editing an existing page.</li>
+                <li>Use <strong>Page versions</strong> to view history and revert to a previous save if needed.</li>
+                <li>Export pages as JSON for backups, or import JSON pages into the CMS dashboard.</li>
+              </ol>
+              <p class="guide-tip"><strong>Tip:</strong> Only published pages are served on the site. Scheduled pages stay hidden until the publish time, and pages with an unpublish date expire automatically.</p>
+              <a class="guide-link-btn" href="cms/index.html"><i class="fas fa-tools"></i> Open CMS dashboard</a>
+            </article>
+
+            <article class="guide-block" id="test-documents">
+              <div class="guide-block-header">
+                <div class="guide-block-icon orange"><i class="fas fa-flask"></i></div>
+                <div>
+                  <h2>Test documents (~$10 samples)</h2>
+                  <p class="guide-lead">Four pre-loaded <strong>TEST-*</strong> documents share the <em>same product, quantity, HSN, delivery charges, and GST</em> so totals stay consistent and easy to verify.</p>
+                </div>
+              </div>
+              <p style="margin-bottom:16px;color:#4b5563;">
+                Find them on <strong>Home → All Transactions</strong> (yellow <strong>TEST</strong> badge), in typed history pages, and in <strong>Document History</strong> on the editor. Safe to edit or delete when finished.
+              </p>
+              <h3 style="margin:0 0 10px;font-size:1rem;color:#1e293b;">Shared line (all four documents)</h3>
+              <table class="guide-table guide-table-compact">
+                <thead>
+                  <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Product</td><td><strong>SmartBiz Demo Widget</strong></td></tr>
+                  <tr><td>Quantity × Rate</td><td>2 × ₹350 = <strong>₹700.00</strong> taxable</td></tr>
+                  <tr><td>HSN / line GST</td><td>8471 · 18%</td></tr>
+                  <tr><td>Delivery charges</td><td>₹10.00 (<em>Delivery charges</em> row)</td></tr>
+                  <tr><td>Document GST</td><td>CGST 9% + SGST 9% (= 18% on taxable + delivery)</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin:18px 0 10px;font-size:1rem;color:#1e293b;">GST math (tax invoice &amp; proforma)</h3>
+              <table class="guide-table guide-table-compact">
+                <thead>
+                  <tr><th>Step</th><th>Amount (₹)</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Taxable (2 × 350)</td><td>700.00</td></tr>
+                  <tr><td>Delivery charges</td><td>10.00</td></tr>
+                  <tr><td>CGST 9% on ₹710</td><td>63.90</td></tr>
+                  <tr><td>SGST 9% on ₹710</td><td>63.90</td></tr>
+                  <tr><td><strong>Grand total</strong></td><td><strong>837.80</strong> (≈ <strong>$10.00</strong> when Settings → Currency is <strong>$</strong>)</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin:18px 0 10px;font-size:1rem;color:#1e293b;">The four TEST documents</h3>
+              <table class="guide-table">
+                <thead>
+                  <tr>
+                    <th>Number</th>
+                    <th>Type</th>
+                    <th>History total (₹)</th>
+                    <th>Best for</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>TEST-INV-001</code></td>
+                    <td>Tax invoice</td>
+                    <td>837.80</td>
+                    <td>Preview, PDF, GST + delivery on print layout, watermark</td>
+                  </tr>
+                  <tr>
+                    <td><code>TEST-ALL-001</code></td>
+                    <td>Quotation</td>
+                    <td>700.00 <small>(taxable only; GST on preview)</small></td>
+                    <td><strong>Convert Document</strong> → Invoice (same lines, totals recalc)</td>
+                  </tr>
+                  <tr>
+                    <td><code>TEST-DC-001</code></td>
+                    <td>Delivery challan</td>
+                    <td>710.00 <small>(₹700 + ₹10 delivery, no GST)</small></td>
+                    <td>Dispatch record without tax invoice</td>
+                  </tr>
+                  <tr>
+                    <td><code>TEST-PRO-001</code></td>
+                    <td>Proforma / Propharma</td>
+                    <td>837.80</td>
+                    <td>Propharma formats; same GST + delivery as invoice</td>
+                  </tr>
+                </tbody>
+              </table>
+              <ol class="guide-steps">
+                <li>On <strong>Home</strong>, scroll to <strong>All Transactions</strong> and tap <strong>View</strong> on <code>TEST-INV-001</code> — confirm line item, delivery row, and grand total.</li>
+                <li>Set <strong>Settings → Currency → $</strong> and refresh Home; the invoice total should show about <strong>$10.00</strong>.</li>
+                <li>Home → <strong>Convert Document</strong> → choose <code>TEST-ALL-001</code> → target <strong>Invoice</strong> → preview; grand total becomes ₹837.80 with GST applied.</li>
+                <li>Compare <code>TEST-DC-001</code> (no GST) with <code>TEST-INV-001</code> (same product qty, different document rules).</li>
+              </ol>
+              <p class="guide-tip"><strong>Note:</strong> Quotation history stores the taxable subtotal (₹700) before GST; the editor and preview still show GST and delivery lines for practice.</p>
+              <a class="guide-link-btn" href="home.html"><i class="fas fa-home"></i> Open Home &amp; view test documents</a>
+            </article>
+
+            <article class="guide-block" id="login">
+              <div class="guide-block-header">
+                <div class="guide-block-icon purple"><i class="fas fa-user-shield"></i></div>
+                <div>
+                  <h2>Login, signup &amp; account 🔐</h2>
+                  <p class="guide-lead">Secure sign-in to protect your data and keep your session active.</p>
+                </div>
+              </div>
+
+              <h3 class="guide-subhead">Why sign up?</h3>
+              <ul class="guide-steps">
+                <li><strong>Protection</strong> — only you can access your data with email &amp; password.</li>
+                <li><strong>Email verification</strong> — confirms your email is real.</li>
+                <li><strong>Session persistence</strong> — your settings stay with your account.</li>
+                <li><strong>Remember me</strong> — option to stay logged in longer on your device.</li>
+              </ul>
+
+              <h3 class="guide-subhead">How to sign up</h3>
+              <ol class="guide-steps">
+                <li>Click <strong>Login / Sign up</strong> on Home or the top header.</li>
+                <li>On the login page, click <strong>Create a new account</strong>.</li>
+                <li>Enter your <strong>email</strong> and <strong>password</strong> (at least 8 characters recommended).</li>
+                <li>Confirm your password.</li>
+                <li>Click <strong>Sign up</strong> — an email verification link appears.</li>
+                <li>Check your browser console (F12 → Console tab) for the verification link.</li>
+                <li>Click the link to verify your email.</li>
+                <li>Return to login and sign in with your email and password.</li>
+              </ol>
+
+              <h3 class="guide-subhead">How to sign in</h3>
+              <ol class="guide-steps">
+                <li>Click <strong>Login / Sign up</strong> on Home or the header.</li>
+                <li>Enter your <strong>email</strong> and <strong>password</strong>.</li>
+                <li>Optional: check <strong>Remember me</strong> to stay logged in for one week (default: 2 hours).</li>
+                <li>Click <strong>Sign in</strong> or press <strong>Enter</strong>.</li>
+                <li>After login, you'll see your email in the header with a logout option.</li>
+              </ol>
+
+              <h3 class="guide-subhead">Forgot your password?</h3>
+              <ol class="guide-steps">
+                <li>On the login page, click <strong>Forgot password?</strong>.</li>
+                <li>Enter your email address and click <strong>Send reset link</strong>.</li>
+                <li>A reset link appears in the browser console (F12 → Console).</li>
+                <li>Click the link or copy it into the address bar.</li>
+                <li>Set your new password (8+ characters) and click <strong>Reset password</strong>.</li>
+                <li>Return to login and sign in with your new password.</li>
+              </ol>
+
+              <h3 class="guide-subhead">How to log out</h3>
+              <ul class="guide-steps">
+                <li>Look for your email in the header (top-right area).</li>
+                <li>Click the <strong>logout icon</strong> (usually an arrow or × symbol next to your email).</li>
+                <li>You'll be logged out and returned to the login page.</li>
+              </ul>
+
+              <h3 class="guide-subhead">Security tips</h3>
+              <ul class="guide-steps">
+                <li><strong>Use a strong password</strong> — mix letters, numbers, and symbols (not just your name).</li>
+                <li><strong>Don't share your password</strong> — SmartBiz support will never ask for it.</li>
+                <li><strong>Log out on shared devices</strong> — always click logout when using someone else's computer.</li>
+                <li><strong>Check "Remember me" carefully</strong> — only on your personal device if you want the extended session.</li>
+              </ul>
+
+              <p class="guide-tip"><strong>Note:</strong> Email verification and password reset links appear in the browser console. This is for development/local use. In production, you would receive real emails.</p>
+              <a class="guide-link-btn" href="login.html?redirect=user-guide.html"><i class="fas fa-sign-in-alt"></i> Go to Login</a>
+            </article>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  <script src="assets/js/navigation-manager.js"></script>
+  <script src="assets/js/app-sidebar.js"></script>
+  <script>
+    function navigateTo(page) {
+      const routes = {
+        home: "home.html",
+        dashboard: "dashboard.html",
+        products: "product.html",
+        product: "product.html",
+        menu: "menu.html",
+        invoice: "invoice-layouts.html",
+        delivery: "delivery-challan-history.html",
+        quotation: "quotation-history.html",
+        propharma: "propharma-invoice.html",
+        transactions: "payment-receipt-history.html",
+        "business-card": "company-card-generator.html",
+        settings: "settings.html",
+        "personal-info": "personal-info.html",
+        address: "documents/formats/address.html",
+        guide: "user-guide.html"
+      };
+      if (routes[page]) window.location.href = routes[page];
+    }
+  </script>
+</body>
+</html>

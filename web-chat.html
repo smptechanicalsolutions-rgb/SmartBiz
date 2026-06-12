@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Help Chat</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top, #e0f2fe 0%, #eef4ff 35%, #f9fafb 100%); font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; color: #111827; }
+    html { scroll-behavior: smooth; }
+    .chat-shell { max-width: 1040px; margin: 0 auto; padding: 28px 16px 36px; }
+    .chat-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+    .chat-title { margin: 0; font-size: clamp(2rem, 2.6vw, 2.8rem); font-weight: 800; letter-spacing: -0.04em; color: #0f172a; }
+    .chat-subtitle { margin: 10px 0 0; color: #475569; max-width: 70ch; line-height: 1.75; font-size: 1rem; }
+    .topic-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 0; }
+    .topic-chip { border: 1px solid rgba(37, 99, 235, 0.25); background: rgba(37, 99, 235, 0.10); color: #1d4ed8; border-radius: 9999px; padding: 10px 16px; font-size: 0.92rem; cursor: pointer; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; }
+    .topic-chip:hover { background: rgba(37, 99, 235, 0.18); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12); }
+    .chat-panel { background: #ffffff; border-radius: 32px; box-shadow: 0 32px 96px rgba(15, 23, 42, 0.14); overflow: hidden; border: 1px solid rgba(148, 163, 184, 0.18); display: flex; flex-direction: column; min-height: 72vh; }
+    .chat-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; overflow-y: auto; }
+    .message { display: flex; gap: 14px; align-items: flex-end; }
+    .message.user { justify-content: flex-end; }
+    .message .bubble { max-width: 78%; padding: 18px 20px; border-radius: 24px; line-height: 1.75; white-space: pre-line; word-break: break-word; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08); }
+    .message.user .bubble { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #ffffff; border-bottom-right-radius: 8px; border-top-right-radius: 24px; border-top-left-radius: 24px; border-bottom-left-radius: 24px; }
+    .message.bot .bubble { background: #f8fafc; color: #0f172a; border-bottom-left-radius: 8px; border-top-right-radius: 24px; border-top-left-radius: 24px; border-bottom-right-radius: 24px; }
+    .message .avatar { width: 40px; height: 40px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; font-weight: 700; color: #ffffff; font-size: 0.95rem; }
+    .message.bot .avatar { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+    .message.user .avatar { background: #312e81; }
+    .chat-controls { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 20px 24px 24px; background: #ffffff; border-top: 1px solid #e2e8f0; }
+    .chat-input, .chat-send, .topic-chip, .chat-actions button { box-sizing: border-box; }
+    .chat-input { width: 100%; min-width: 0; min-height: 52px; max-height: 150px; border: 1px solid #cbd5e1; border-radius: 18px; padding: 14px 16px; font-size: 1rem; color: #0f172a; background: #f8fafc; resize: none; box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08); }
+    .chat-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); }
+    .chat-send { min-width: 130px; min-height: 56px; border: none; border-radius: 18px; background: linear-gradient(90deg, #2563eb, #7c3aed); color: #ffffff; font-size: 1rem; font-weight: 700; cursor: pointer; padding: 0 28px; box-shadow: 0 18px 38px rgba(37, 99, 235, 0.24); transition: transform 0.2s, box-shadow 0.2s; }
+    .chat-send:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 18px 36px rgba(37, 99, 235, 0.28); }
+    .chat-send:disabled { opacity: 0.55; cursor: not-allowed; }
+    .chat-footer { padding: 16px 24px 24px; background: #f8fafc; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; }
+    .chat-note { font-size: 0.95rem; color: #475569; }
+    .chat-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .chat-actions button { border: 1px solid rgba(59, 130, 246, 0.18); border-radius: 14px; padding: 12px 18px; font-size: 0.95rem; cursor: pointer; background: #ffffff; color: #0f172a; transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s; }
+    .chat-actions button:hover { background: rgba(59, 130, 246, 0.10); transform: translateY(-1px); box-shadow: 0 12px 28px rgba(59, 130, 246, 0.12); }
+    .chat-actions button.primary { background: #2563eb; color: #ffffff; border-color: transparent; }
+    .chat-actions button.primary:hover { background: #1d4ed8; }
+    @media (max-width: 780px) {
+      .chat-shell { padding: 20px 12px 18px; }
+      .chat-header { flex-direction: column; align-items: stretch; }
+      .chat-header > div, .chat-actions { width: 100%; }
+      .chat-subtitle { max-width: 100%; }
+      .topic-chips { gap: 10px; margin: 16px 0 0; }
+      .topic-chip { flex: 1 1 calc(50% - 10px); min-width: 0; }
+      .chat-panel { min-height: auto; max-height: calc(100vh - 130px); }
+      .chat-body { padding: 18px; max-height: calc(100vh - 240px); }
+      .message .bubble { max-width: 100%; }
+      .chat-actions { justify-content: stretch; }
+      .chat-actions button { flex: 1 1 auto; }
+      .chat-controls { grid-template-columns: 1fr; gap: 10px; padding: 14px 16px 18px; }
+      .chat-input { min-width: 0; width: 100%; min-height: 48px; max-height: 120px; padding: 12px 14px; }
+      .chat-send { width: 100%; min-width: 0; min-height: 62px; font-size: 1rem; padding: 0 22px; }
+      .chat-footer { padding: 18px 18px 20px; flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-shell">
+    <div class="chat-header">
+      <div>
+        <h1 class="chat-title">Web Help Chat</h1>
+        <p class="chat-subtitle">Ask about websites, HTML/CSS/JS, hosting, SEO, web apps, or the SmartBiz interface. Replies are designed like a business chat assistant with clear guidance.</p>
+        <div class="topic-chips">
+          <button class="topic-chip" onclick="selectSuggestion('How do I create a responsive website?')">Responsive design</button>
+          <button class="topic-chip" onclick="selectSuggestion('How can I improve SEO for my business website?')">SEO help</button>
+          <button class="topic-chip" onclick="selectSuggestion('What should be in an invoice layout?')">Invoice layout</button>
+          <button class="topic-chip" onclick="selectSuggestion('How do I publish a page with CMS?')">CMS publishing</button>
+          <button class="topic-chip" onclick="selectSuggestion('How do I secure login and passwords?')">Security tips</button>
+        </div>
+      </div>
+      <div class="chat-actions">
+        <button type="button" onclick="goBack()">← Back</button>
+        <button type="button" class="primary" onclick="startDemo()">Example questions</button>
+        <button type="button" onclick="clearChat()">Clear chat</button>
+      </div>
+    </div>
+
+    <div id="chatBody" class="chat-panel">
+      <div class="chat-body" id="messages"></div>
+      <div class="chat-controls">
+        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Type your web question here..."></textarea>
+        <button id="sendBtn" class="chat-send" onclick="sendMessage()">Send</button>
+      </div>
+      <div class="chat-footer">
+        <span class="chat-note">This is a local web assistant. It answers web-related questions in plain business style.</span>
+      </div>
+    </div>
+  </div>
+  <script src="assets/js/web-chat.js"></script>
+</body>
+</html>

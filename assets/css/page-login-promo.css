@@ -1,0 +1,129 @@
+/* Shared page login promo styles for header button and injected page banner */
+
+.page-login-btn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25) !important;
+}
+
+.page-login-btn:hover {
+  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35) !important;
+}
+
+.page-login-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.25);
+  border-radius: 12px;
+}
+
+/* When injected after the page header, use margins that match header/content spacing
+   so the banner visually spans the same full width as the header actions. */
+.page-login-banner.full-width {
+  box-sizing: border-box;
+  margin: 0 25px 20px;
+  width: calc(100% - 50px);
+}
+
+@media (min-width: 769px) {
+  .page-login-banner.full-width {
+    /* Keep aligned with header which commonly uses 25px horizontal padding */
+    margin: 0 25px 20px;
+    width: calc(100% - 50px);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-login-banner.full-width {
+    margin: 0 15px 16px;
+    width: calc(100% - 30px);
+  }
+}
+
+.page-login-banner-text h3 {
+  font-size: 1.1rem;
+  color: #1a1a2e;
+  margin-bottom: 4px;
+}
+
+.page-login-banner-text p {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+}
+
+.page-login-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.page-login-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .header .header-right {
+    display: flex !important;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .header .header-right .notification-icon,
+  .header .header-right .settings-icon,
+  .header .header-right .auto-save-icon,
+  .header .header-right #userEmail {
+    display: none !important;
+  }
+
+  .header .header-right #loginIcon,
+  .header .header-right #logoutIcon {
+    display: inline-flex !important;
+  }
+
+  .header .header-right #loginIcon.page-login-btn {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .page-login-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .page-login-cta {
+    justify-content: center;
+  }
+}
+

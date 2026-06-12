@@ -1,0 +1,620 @@
+/* Proforma Invoice - Format 10 (Using Format 9 Styling) */
+
+#invoice.proforma3 {
+  background: #fff;
+  max-width: 794px; /* ~A4 at 96dpi */
+  margin: 30px auto;
+  padding: 30px;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Main black box inside white border */
+#invoice.proforma3::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  border: 2px solid #000;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#invoice.proforma3 * {
+  box-sizing: border-box;
+}
+
+.proforma3-header-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #2b2b2b;
+  padding: 4px 0 6px 0;
+}
+
+.proforma3-header-title .title {
+  text-align: center;
+  letter-spacing: 3px;
+  font-weight: 700;
+  color: #2a4bd7;
+  font-size: 14px;
+}
+
+.proforma3-header-title .right-tag {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #333;
+}
+
+.proforma3-top {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 0;
+  border-bottom: 1px solid #2b2b2b;
+}
+
+.proforma3-company {
+  padding: 10px 10px 6px 10px;
+  border-right: 1px solid #2b2b2b;
+  min-height: 120px;
+}
+
+.proforma3-company .name {
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.proforma3-company .line {
+  font-size: 10px;
+  line-height: 1.25;
+  color: #111;
+}
+
+.proforma3-info-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-left: 0;
+}
+
+.proforma3-info-cell {
+  padding: 10px;
+  border-bottom: 1px solid #2b2b2b;
+  border-right: 1px solid #2b2b2b;
+  font-size: 10px;
+  min-height: 60px;
+}
+
+.proforma3-info-cell:nth-child(2),
+.proforma3-info-cell:nth-child(4) {
+  border-right: none;
+}
+
+.proforma3-info-cell .label {
+  font-weight: 700;
+}
+
+.proforma3-customer {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  border-bottom: 1px solid #2b2b2b;
+}
+
+.proforma3-customer-left {
+  padding: 10px;
+  border-right: 1px solid #2b2b2b;
+  min-height: 135px;
+}
+
+.proforma3-customer-right {
+  position: relative;
+  min-height: 135px;
+}
+
+.proforma3-customer-left .label {
+  font-weight: 700;
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.proforma3-customer-left .value {
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.proforma3-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0.08;
+  z-index: 0;
+}
+
+.proforma3-watermark .wm {
+  font-size: 120px;
+  font-weight: 700;
+  color: #000;
+  transform: rotate(-35deg);
+  letter-spacing: 2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#invoice.proforma3 .proforma3-header-title,
+#invoice.proforma3 .proforma3-top,
+#invoice.proforma3 .proforma3-customer,
+#invoice.proforma3 .proforma3-items,
+#invoice.proforma3 .proforma3-totals-row,
+#invoice.proforma3 .proforma3-amount-words,
+#invoice.proforma3 .proforma3-taxbreak,
+#invoice.proforma3 .proforma3-signature {
+  position: relative;
+  z-index: 1;
+}
+
+.proforma3-items {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.proforma3-items th,
+.proforma3-items td {
+  border: 1px solid #2b2b2b;
+  padding: 6px 6px;
+  font-size: 10px;
+  vertical-align: top;
+}
+
+.proforma3-items thead th {
+  background: #fff;
+  font-weight: 700;
+}
+
+.proforma3-items .col-no {
+  width: 28px;
+  text-align: center;
+}
+
+.proforma3-items .col-item {
+  width: 270px;
+}
+
+.proforma3-items .col-hsn {
+  width: 70px;
+  text-align: center;
+}
+
+.proforma3-items .col-tax {
+  width: 50px;
+  text-align: center;
+}
+
+.proforma3-items .col-qty {
+  width: 60px;
+  text-align: right;
+}
+
+.proforma3-items .col-rate {
+  width: 80px;
+  text-align: right;
+}
+
+.proforma3-items .col-per {
+  width: 45px;
+  text-align: center;
+}
+
+.proforma3-items .col-amt {
+  width: 90px;
+  text-align: right;
+}
+
+.proforma3-items .item-name {
+  font-weight: 700;
+}
+
+.proforma3-items .item-desc {
+  margin-top: 2px;
+  color: #333;
+}
+
+.proforma3-totals-row {
+  display: grid;
+  grid-template-columns: 1fr 0.35fr;
+  border-left: 1px solid #2b2b2b;
+  border-right: 1px solid #2b2b2b;
+  border-bottom: 1px solid #2b2b2b;
+}
+
+.proforma3-totals-left {
+  padding: 6px 8px;
+  font-size: 10px;
+  border-right: 1px solid #2b2b2b;
+}
+
+.proforma3-totals-right {
+  padding: 6px 8px;
+  font-size: 10px;
+}
+
+.proforma3-totals-right .line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.proforma3-totals-right .grand {
+  font-weight: 700;
+  border-top: 1px solid #2b2b2b;
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.proforma3-amount-words {
+  border-left: 1px solid #2b2b2b;
+  border-right: 1px solid #2b2b2b;
+  border-bottom: 1px solid #2b2b2b;
+  padding: 6px 8px;
+  font-size: 10px;
+}
+
+.proforma3-taxbreak {
+  width: 100%;
+  border-collapse: collapse;
+  border-left: 1px solid #2b2b2b;
+  border-right: 1px solid #2b2b2b;
+  border-bottom: 1px solid #2b2b2b;
+}
+
+.proforma3-taxbreak th,
+.proforma3-taxbreak td {
+  border: 1px solid #2b2b2b;
+  padding: 5px 6px;
+  font-size: 10px;
+}
+
+.proforma3-taxbreak th:first-child {
+  text-align: center;
+}
+
+.proforma3-amount-payable {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-left: 1px solid #2b2b2b;
+  border-right: 1px solid #2b2b2b;
+  border-bottom: 1px solid #2b2b2b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.proforma3-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.44fr;
+  border-left: 1px solid #2b2b2b;
+  border-right: 1px solid #2b2b2b;
+  border-bottom: 1px solid #2b2b2b;
+  min-height: 155px;
+}
+
+.proforma3-bottom-grid .proforma3-notes-box,
+.proforma3-bottom-grid .proforma3-terms-box {
+  margin: 0;
+  width: auto;
+  border: none;
+  border-right: 1px solid #2b2b2b;
+  min-height: 155px;
+}
+
+.proforma3-terms-box {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.proforma3-terms-box .notes-title {
+  font-weight: bold;
+  font-size: 10px;
+  color: #333;
+  text-transform: uppercase;
+  padding: 10px;
+  border-bottom: 1px solid #2b2b2b;
+}
+
+.proforma3-terms-box .payment-instructions {
+  padding: 10px;
+  flex: 1;
+  min-height: 110px;
+}
+
+.proforma3-terms-box .payment-details {
+  white-space: pre-line;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.proforma3-sign-box {
+  display: flex;
+  flex-direction: column;
+  min-height: 155px;
+  padding: 10px 10px 8px;
+  position: relative;
+  background: #fff;
+}
+
+.proforma3-sign-box .sig-company {
+  text-align: right;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.proforma3-sign-box .sig-stamp-slot {
+  flex: 1 1 auto;
+  min-height: 128px;
+  margin: 8px 0 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.proforma3-sign-box .sig-signatory {
+  text-align: right;
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.proforma3-sign-box #signature-image {
+  max-width: 130px;
+  max-height: 72px;
+  display: none;
+  object-fit: contain;
+  z-index: 2;
+}
+
+.proforma3-sign-box #invoiceStampImage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: none;
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+}
+
+.proforma3-totals-left .totals-items-qty {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.proforma3-signature {
+  display: none !important;
+}
+
+/* Notes Box with Black Grid Borders - Matching Upper Boxes Full Width */
+.proforma3-notes-box {
+  margin: 0;
+  border: 1px solid #2b2b2b;
+  min-height: 135px;
+  width: 100%;
+}
+
+.proforma3-bottom-grid .proforma3-notes-box {
+  border: none;
+}
+
+.proforma3-notes-box .notes-title {
+  font-weight: bold;
+  font-size: 10px;
+  color: #333;
+  text-transform: uppercase;
+  padding: 10px;
+  border-bottom: 1px solid #2b2b2b;
+  background: #fff;
+}
+
+.proforma3-notes-box .payment-instructions {
+  padding: 10px;
+  background: #fff;
+  min-height: 105px; /* Match content area height */
+}
+
+.proforma3-notes-box .payment-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+  font-size: 10px;
+}
+
+.proforma3-notes-box .payment-details {
+  white-space: pre-line;
+  color: #333;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+/* Invoice Footer - Bottom Right Inside Box */
+.invoice-footer {
+  text-align: right;
+  padding: 10px 20px;
+  font-size: 10px;
+  color: #6c757d;
+  line-height: 1.3;
+  margin-top: 10px;
+}
+
+.invoice-footer .powered-by {
+  margin-bottom: 2px;
+}
+
+.invoice-footer .digitally-signed {
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  #invoice.proforma3 {
+    margin: 10px;
+    padding: 12px 8px;
+    max-width: 100%;
+  }
+  
+  .proforma3-header-title {
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+  }
+  
+  .proforma3-header-title .title {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  
+  .proforma3-header-title .right-tag {
+    position: static;
+    transform: none;
+    align-self: flex-end;
+  }
+  
+  .proforma3-top {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .proforma3-company, .proforma3-info-table {
+    width: 100%;
+  }
+  
+  .proforma3-customer {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .proforma3-customer-left, .proforma3-customer-right {
+    width: 100%;
+  }
+  
+  .proforma3-items {
+    font-size: 12px;
+  }
+  
+  .proforma3-items th,
+  .proforma3-items td {
+    padding: 4px 2px;
+  }
+  
+  .proforma3-totals-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .proforma3-totals-left, .proforma3-totals-right {
+    width: 100%;
+  }
+  
+  .proforma3-amount-words {
+    font-size: 12px;
+    text-align: center;
+    margin: 12px 0;
+  }
+  
+  .proforma3-taxbreak {
+    font-size: 10px;
+  }
+  
+  .proforma3-taxbreak th,
+  .proforma3-taxbreak td {
+    padding: 3px 1px;
+  }
+  
+  .proforma3-signature {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .proforma3-signature .left, .proforma3-signature .right {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .pdf-btn {
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    font-size: 16px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  #invoice.proforma3 {
+    margin: 5px;
+    padding: 8px 4px;
+  }
+  
+  .proforma3-header-title .title {
+    font-size: 14px;
+  }
+  
+  .proforma3-items {
+    font-size: 11px;
+  }
+  
+  .proforma3-items th,
+  .proforma3-items td {
+    padding: 2px 1px;
+  }
+  
+  .proforma3-taxbreak {
+    font-size: 9px;
+  }
+  
+  .proforma3-taxbreak th,
+  .proforma3-taxbreak td {
+    padding: 2px 0;
+  }
+  
+  .proforma3-amount-words {
+    font-size: 11px;
+  }
+  
+  .pdf-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    min-width: 100px;
+  }
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  #invoice.proforma3 {
+    margin: 0;
+    border: 2px solid #000;
+    max-width: none;
+  }
+}

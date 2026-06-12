@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, shrink-to-fit=no" />
+
+    <title>Delivery Challan - Format 11</title>
+
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        const viewportMeta = document.querySelector('meta[name="viewport"]');
+        if (window.innerWidth < 600) {
+          viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.2, maximum-scale=5.0, user-scalable=yes, shrink-to-fit=no');
+        }
+      });
+    </script>
+
+    <link rel="stylesheet" href="../style/style.css" />
+
+    <link rel="stylesheet" href="..\/format-css/format9.css" />
+
+    <link rel="stylesheet" href="..\/format-css/responsive-mobile.css" />
+    <link rel="stylesheet" href="..\/format-css/document-common.css" />
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../js/currency.js"></script>
+
+  </head>
+
+
+
+  <body>
+
+    <div id="invoice" class="proforma3">
+
+      <div id="proformaWatermark" class="proforma3-watermark">
+
+        <div class="wm" id="pWatermarkText">Delivery Challan</div>
+
+      </div>
+
+      <div class="proforma3-header-title">
+
+        <div class="title">DELIVERY CHALLAN</div>
+
+        <div class="right-tag">ORIGINAL FOR RECIPIENT</div>
+
+      </div>
+
+
+
+      <div class="proforma3-top">
+
+        <div class="proforma3-company">
+
+          <div class="name" id="pCompany">Company Name</div>
+
+          <div class="line">
+
+            <span class="label">GSTIN:</span> <span id="pCompanyGST"></span>
+
+          </div>
+
+          <div class="line">
+
+            <span class="label">PAN:</span> <span id="pCompanyPAN">-</span>
+
+          </div>
+
+          <div class="line" id="pCompanyAddress"></div>
+
+          <div class="line">
+
+            <span class="label">Mobile:</span>
+
+            <span id="pCompanyMobile"></span>
+
+          </div>
+
+          <div class="line" id="companyEmailLine">
+
+            <span class="label">Email:</span> <span id="pCompanyEmail"></span>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="proforma3-info-table">
+
+          <div class="proforma3-info-cell">
+
+            <div class="label">Delivery Challan #:</div>
+
+            <div id="pInvoiceNo">-</div>
+
+          </div>
+
+          <div class="proforma3-info-cell">
+
+            <div class="label">Delivery Date:</div>
+
+            <div id="pInvoiceDate">-</div>
+
+          </div>
+
+          <div class="proforma3-info-cell">
+
+            <div class="label">Place of Supply:</div>
+
+            <div id="pPlaceSupply">-</div>
+
+          </div>
+
+          <div class="proforma3-info-cell">
+
+            <div class="label">&nbsp;</div>
+
+            <div>&nbsp;</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="proforma3-customer">
+
+        <div class="proforma3-customer-left">
+
+          <div class="label">Customer Details:</div>
+
+          <div class="value" style="font-weight: 700" id="pClient">
+
+            Client Name
+
+          </div>
+
+          <div class="value">
+
+            <span class="label">GSTIN:</span> <span id="pClientGST"></span>
+
+          </div>
+
+          <div class="value">
+
+            <span class="label">PAN:</span> <span id="pClientPAN">-</span>
+
+          </div>
+
+          <div class="value"><span class="label">Billing Address:</span></div>
+
+          <div class="value" id="pClientAddress"></div>
+
+          <div class="value">
+
+            <span class="label">Ph:</span> <span id="pClientMobile"></span>
+
+          </div>
+
+        </div>
+
+        <div class="proforma3-customer-right">
+
+          &nbsp;
+
+        </div>
+
+      </div>
+
+
+
+      <table class="proforma3-items">
+
+        <thead>
+
+          <tr>
+
+            <th class="col-no">#</th>
+
+            <th class="col-item">Item</th>
+
+            <th class="col-hsn">HSN/SAC</th>
+
+            <th class="col-tax">Tax</th>
+
+            <th class="col-qty">Qty</th>
+
+            <th class="col-rate">Rate / Item</th>
+
+            <th class="col-per">Per</th>
+
+            <th class="col-amt">Amount</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="itemRows"></tbody>
+
+      </table>
+
+
+
+      <div class="proforma3-totals-row">
+
+        <div class="proforma3-totals-left">
+
+          <div class="totals-items-qty">
+            Total Items / Qty : <span id="pTotalItems">0</span> / <span id="pTotalQty">0</span>
+          </div>
+
+        </div>
+
+        <div class="proforma3-totals-right">
+
+          <div class="line">
+
+            <span>Delivery/Shipping Charges</span><span>₹<span id="pShipping">0.00</span></span>
+
+          </div>
+
+          <div class="line">
+
+            <span>Total Amount</span><span>₹<span id="pTotal">0.00</span></span>
+
+          </div>
+
+          <div class="line">
+
+            <span>Round Off</span><span>₹<span id="pRoundOff">0.00</span></span>
+
+          </div>
+
+          <div class="line grand">
+
+            <span>Grand Total</span><span>₹<span id="pTotal">0.00</span></span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="proforma3-amount-words">
+
+        Total amount (in words): <span id="pAmountWords">-</span>
+
+      </div>
+
+      <div class="proforma3-amount-payable">
+        <span>Amount Payable:</span>
+        <span class="value">₹<span id="pAmountPayable">0.00</span></span>
+      </div>
+
+      <div class="proforma3-bottom-grid">
+        <div class="proforma3-notes-box">
+          <div class="notes-title">Notes</div>
+          <div class="payment-instructions">
+            <div class="payment-details" id="pPaymentNote"></div>
+          </div>
+        </div>
+        <div class="proforma3-terms-box">
+          <div class="notes-title">Terms and Conditions</div>
+          <div class="payment-instructions">
+            <div class="payment-details" id="pTermsNote"></div>
+          </div>
+        </div>
+        <div class="proforma3-sign-box">
+          <div class="sig-company">
+            For <span id="pCompanySignature">Company Name</span>
+          </div>
+          <div class="sig-stamp-slot">
+            <img id="signature-image" src="" alt="Signature" style="max-width: 130px; max-height: 72px; display: none; object-fit: contain;" />
+            <img id="invoiceStampImage" src="" alt="Stamp" style="display: none; opacity: 0.95; pointer-events: none;" />
+          </div>
+          <div class="sig-signatory">Authorized Signatory</div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Footer inside invoice box -->
+      <div class="invoice-footer">
+        <div class="powered-by">Powered By smartbiz</div>
+        <div class="digitally-signed">This is a digitally signed document</div>
+      </div>
+    </div>
+
+
+
+    <div
+
+      class="action-buttons"
+
+      style="
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        gap: 16px;
+
+        margin: 18px 0;
+
+        flex-wrap: wrap;
+
+      "
+
+    >
+
+      <button
+
+        class="pdf-btn"
+
+        style="background: #dc3545"
+
+        onclick="cancelInvoice()"
+
+      >
+
+        Cancel Invoice
+
+      </button>
+
+      <button class="pdf-btn" onclick="showDownloadOptions()">Download / Share</button>
+
+      <button class="pdf-btn" style="background: #0d6efd" onclick="printVectorPDF()">
+
+        Print (Vector PDF)
+
+      </button>
+
+      <button class="pdf-btn" style="background: #6c757d" onclick="editInvoice()">
+
+        Edit Invoice
+
+      </button>
+
+      <button class="pdf-btn" style="background: #111827" onclick="deleteCurrentDocument()">
+
+        Delete
+
+      </button>
+
+    </div>
+
+
+
+    <!-- Download/Share Modal -->
+
+    <div
+
+      id="downloadModal"
+
+      class="modal"
+
+      style="
+
+        display: none;
+
+        position: fixed;
+
+        z-index: 1000;
+
+        left: 0;
+
+        top: 0;
+
+        width: 100%;
+
+        height: 100%;
+
+        background-color: rgba(0, 0, 0, 0.5);
+
+      "
+
+    >
+
+      <div
+
+        class="modal-dialog modal-dialog-centered"
+
+        style="max-width: 500px; margin: 5% auto"
+
+      >
+
+        <div
+
+          class="modal-content"
+
+          style="background: white; border-radius: 8px; padding: 0"
+
+        >
+
+          <div
+
+            class="modal-header"
+
+            style="
+
+              background: #007bff;
+
+              color: white;
+
+              padding: 15px 20px;
+
+              border-radius: 8px 8px 0 0;
+
+            "
+
+          >
+
+            <h5 class="modal-title" style="margin: 0">Download / Share Delivery Challan</h5>
+
+            <button
+
+              type="button"
+
+              onclick="closeDownloadModal()"
+
+              style="
+
+                background: none;
+
+                border: none;
+
+                color: white;
+
+                font-size: 24px;
+
+                cursor: pointer;
+
+                padding: 0;
+
+                width: 30px;
+
+                height: 30px;
+
+              "
+
+            >
+
+              &times;
+
+            </button>
+
+          </div>
+
+          <div class="modal-body" style="padding: 20px">
+
+            <div style="display: flex; flex-direction: column; gap: 12px">
+
+              <button
+
+                onclick="downloadPDFDirect()"
+
+                class="download-option-btn"
+
+                style="
+
+                  width: 100%;
+
+                  padding: 12px;
+
+                  background: #dc3545;
+
+                  color: white;
+
+                  border: none;
+
+                  border-radius: 6px;
+
+                  cursor: pointer;
+
+                  font-size: 16px;
+
+                  display: flex;
+
+                  align-items: center;
+
+                  justify-content: center;
+
+                  gap: 8px;
+
+                "
+
+              >
+
+                📄 Download PDF
+
+              </button>
+
+              <button
+
+                onclick="shareViaWhatsApp()"
+
+                class="download-option-btn"
+
+                style="
+
+                  width: 100%;
+
+                  padding: 12px;
+
+                  background: #25d366;
+
+                  color: white;
+
+                  border: none;
+
+                  border-radius: 6px;
+
+                  cursor: pointer;
+
+                  font-size: 16px;
+
+                  display: flex;
+
+                  align-items: center;
+
+                  justify-content: center;
+
+                  gap: 8px;
+
+                "
+
+              >
+
+                💬 Share via WhatsApp
+
+              </button>
+
+              <button
+
+                onclick="copyToClipboard()"
+
+                class="download-option-btn"
+
+                style="
+
+                  width: 100%;
+
+                  padding: 12px;
+
+                  background: #6c757d;
+
+                  color: white;
+
+                  border: none;
+
+                  border-radius: 6px;
+
+                  cursor: pointer;
+
+                  font-size: 16px;
+
+                  display: flex;
+
+                  align-items: center;
+
+                  justify-content: center;
+
+                  gap: 8px;
+
+                "
+
+              >
+
+                📋 Copy Link
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <script src="../js/stamp.js"></script>
+    <script>
+
+      // Load data from URL parameters or localStorage with error handling
+
+      let data = {};
+
+      
+
+      try {
+
+        const urlParams = new URLSearchParams(window.location.search);
+
+        const urlData = urlParams.get('data');
+
+        if (urlData) {
+
+          data = JSON.parse(decodeURIComponent(urlData));
+
+        } else {
+
+          // Fallback to localStorage
+
+          const localData = localStorage.getItem("invoiceData");
+
+          if (localData) {
+
+            data = JSON.parse(localData);
+
+          }
+
+        }
+
+      } catch (error) {
+
+        console.error('Error loading data:', error);
+
+        // Fallback to localStorage
+
+        const localData = localStorage.getItem("invoiceData");
+
+        if (localData) {
+
+          try {
+
+            data = JSON.parse(localData);
+
+          } catch (e) {
+
+            console.error('Error parsing localStorage data:', e);
+
+            data = {};
+
+          }
+
+        }
+
+      }
+
+
+
+      console.log('Loaded data:', data);
+
+
+
+      // Company details
+
+      document.getElementById('pCompany').innerText = data.companyName || '';
+
+      document.getElementById('pCompanyGST').innerText = data.companyGST || '';
+
+      document.getElementById('pCompanyAddress').innerText = data.companyAddress || '';
+
+      document.getElementById('pCompanyMobile').innerText = data.companyMobile || '';
+
+      document.getElementById('pCompanyPAN').innerText = data.companyPAN || '';
+
+
+
+      // Customer details
+
+      document.getElementById('pClient').innerText = data.clientName || '';
+
+      document.getElementById('pClientGST').innerText = data.clientGST || '';
+
+      document.getElementById('pClientAddress').innerText = data.clientAddress || '';
+
+      document.getElementById('pClientMobile').innerText = data.clientMobile || '';
+
+      document.getElementById('pClientPAN').innerText = data.clientPAN || '';
+
+
+
+      // Invoice details
+
+      document.getElementById('pInvoiceNo').innerText = data.invoiceNo || '';
+
+      document.getElementById('pInvoiceDate').innerText = data.invoiceDate || '';
+
+      document.getElementById('pPlaceSupply').innerText = data.placeSupply || '-';
+
+      // Payment notes + terms
+      const paymentNoteEl = document.getElementById("pPaymentNote");
+      const termsNoteEl = document.getElementById("pTermsNote");
+      if (paymentNoteEl && data.paymentNote) {
+        paymentNoteEl.innerHTML = multilineHtml(data.paymentNote);
+      }
+      if (termsNoteEl && data.paymentNote) {
+        termsNoteEl.innerHTML = multilineHtml(data.paymentNote);
+      }
+
+      // Update company signature name
+
+      document.getElementById('pCompanySignature').innerText = data.companyName || 'Company Name';
+
+
+
+      // Items
+
+      let tbody = document.getElementById('itemRows');
+
+      let totalAmount = 0;
+
+      const escapeHtml = (text) => (text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+
+
+      data.items?.forEach((item, i) => {
+
+        let amount = item.qty * item.rate;
+
+        totalAmount += amount;
+
+
+
+        const descHtml = item.desc ? `<br><small style="color: #666;">${escapeHtml(item.desc)}</small>` : "";
+
+        tbody.innerHTML += `
+
+      <tr>
+
+        <td>${i + 1}</td>
+
+        <td>${item.name}${descHtml}</td>
+
+        <td>${item.hsn || ''}</td>
+
+        <td>${item.tax || ''}</td>
+
+        <td>${item.qty}</td>
+
+        <td>₹${item.rate}</td>
+
+        <td>${item.per || 'Nos'}</td>
+
+        <td>₹${amount.toFixed(2)}</td>
+
+      </tr>
+
+    `;
+
+      });
+
+
+
+      // Calculate totals
+
+      const shippingTotal = data.shipping?.total ? Number(data.shipping.total) : 0;
+
+      const grandTotal = totalAmount + shippingTotal;
+
+
+
+      // Update totals
+
+      document.getElementById('pShipping').innerText = shippingTotal.toFixed(2);
+
+      document.getElementById('pTotal').innerText = grandTotal.toFixed(2);
+      const payableEl = document.getElementById('pAmountPayable');
+      if (payableEl) payableEl.innerText = grandTotal.toFixed(2);
+      const itemList = data.items || [];
+      const totalItemsEl = document.getElementById('pTotalItems');
+      const totalQtyEl = document.getElementById('pTotalQty');
+      if (totalItemsEl) totalItemsEl.innerText = String(itemList.length);
+      if (totalQtyEl) {
+        totalQtyEl.innerText = String(
+          itemList.reduce((sum, item) => sum + Number(item.qty || 0), 0)
+        );
+      }
+
+      // Update company signature name
+
+      document.getElementById('pCompanySignature').innerText = data.companyName || 'Company Name';
+
+
+
+      // Amount in words
+
+      const amountInWords = numberToWords(grandTotal);
+
+      document.getElementById('pAmountWords').innerText = amountInWords + ' Only';
+
+
+
+      // Function to convert number to words
+
+      function numberToWords(num) {
+
+        const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 
+
+                'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+
+        const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+        
+
+        if (num === 0) return 'Zero';
+
+        
+
+        if (num < 20) return a[num];
+
+        if (num < 100) return b[Math.floor(num / 10)] + ' ' + a[num % 10];
+
+        if (num < 1000) return a[Math.floor(num / 100)] + ' Hundred ' + (num % 100 !== 0 ? numberToWords(num % 100) : '');
+
+        if (num < 100000) return numberToWords(Math.floor(num / 1000)) + ' Thousand ' + (num % 1000 !== 0 ? numberToWords(num % 1000) : '');
+
+        if (num < 10000000) return numberToWords(Math.floor(num / 100000)) + ' Lakh ' + (num % 100000 !== 0 ? numberToWords(num % 100000) : '');
+
+        return numberToWords(Math.floor(num / 10000000)) + ' Crore ' + (num % 10000000 !== 0 ? numberToWords(num % 10000000) : '');
+
+      }
+
+
+
+
+
+      // Signature
+
+      if (data.signature) {
+
+        const signatureImg = document.getElementById('signature-image');
+
+        if (signatureImg) {
+
+          signatureImg.src = data.signature;
+
+          signatureImg.style.display = 'block';
+
+        }
+
+      }
+
+
+
+      window.invoicePreviewData = data;
+      if (typeof applyInvoiceWatermark === "function") {
+        applyInvoiceWatermark(data);
+      }
+      if (typeof initDocumentChrome === "function") initDocumentChrome();
+
+
+
+      // Modal and download functions
+
+      function copyToClipboard() {
+
+        navigator.clipboard.writeText(window.location.href).then(() => {
+
+          alert('Link copied to clipboard!');
+
+        });
+
+      }
+
+
+
+      function editInvoice() {
+
+        window.open('../index.html', '_self');
+
+      }
+
+
+
+      function cancelInvoice() {
+
+        window.open('../index.html', '_self');
+
+      }
+
+
+
+    </script>
+    <script src="../js/pdf.js"></script>
+    <script src="../js/watermark.js"></script>
+    <script src="../js/theme-a11y.js"></script>
+
+  </body>
+
+</html>
+

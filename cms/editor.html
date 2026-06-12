@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CMS Editor</title>
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <style>
+    body { background: #f6f8fb; color: #111827; margin: 0; font-family: Inter, system-ui, sans-serif; }
+    .editor-shell { max-width: 1140px; margin: 28px auto; padding: 0 22px 36px; }
+    .editor-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; align-items: center; margin-bottom: 18px; background: #ffffff; border-radius: 8px; padding: 24px; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06); border: 1px solid #e5e7eb; }
+    .page-header-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .editor-top h1 { margin: 0; font-size: 2rem; }
+    .editor-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .editor-actions button { border-radius: 8px; border: none; padding: 11px 16px; cursor: pointer; font-weight: 700; }
+    .editor-actions .primary { background: #2563eb; color: white; }
+    .editor-actions .secondary { background: #f8fafc; color: #0f172a; border: 1px solid #cbd5e1; }
+    .editor-actions .danger { background: #f87171; color: white; }
+    .editor-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .editor-panel { background: #fff; border-radius: 8px; padding: 22px; border: 1px solid #e5e7eb; box-shadow: 0 12px 28px rgba(15,23,42,0.06); }
+    .editor-panel h2 { margin-top: 0; }
+    .editor-section { display: grid; gap: 16px; }
+    @media (max-width: 900px) {
+      .editor-shell { padding: 0 16px 24px; }
+      .editor-top { flex-direction: column; align-items: stretch; }
+      .editor-actions { justify-content: flex-start; width: 100%; }
+      .editor-actions button { flex: 1 1 100%; }
+      .preview-box { min-height: 280px; }
+    }
+    @media (max-width: 640px) {
+      .editor-top { padding: 20px; }
+      .editor-panel { padding: 20px; }
+      .editor-actions button { width: 100%; }
+    }
+    .form-group { display: grid; gap: 8px; }
+    .form-group label { font-size: 0.95rem; color: #334155; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; padding: 13px 14px; background: #f8fafc; color: #0f172a; font-size: 0.95rem; }
+    .form-group textarea { min-height: 320px; resize: vertical; }
+    .toggle-row { display: flex; align-items: center; gap: 12px; }
+    .toggle-row input[type="checkbox"] { width: 18px; height: 18px; }
+    .preview-box { height: 360px; border-radius: 20px; border: 1px solid #cbd5e1; overflow: hidden; background: #fff; }
+    .preview-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .preview-toolbar span { color: #475569; font-size: 0.95rem; }
+    .status-bar { margin-top: 16px; color: #334155; }
+    .editor-meta { display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:#64748b; font-size:.92rem; margin-top:8px; }
+    .snippet-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+    .snippet-row button { border:1px solid #cbd5e1; background:#fff; color:#0f172a; border-radius:8px; padding:8px 10px; cursor:pointer; font-weight:650; }
+    .versions-panel { margin-top: 26px; }
+    .version-item { padding: 12px 14px; border-radius: 14px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .version-item button { border: none; border-radius: 12px; padding: 8px 12px; background: #eff6ff; color: #1d4ed8; cursor: pointer; }
+    @media (max-width: 900px) { .editor-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="editor-shell">
+    <div class="editor-top">
+      <div class="page-header-top">
+        <button class="secondary cms-back" onclick="location.href='/cms/'">← Back</button>
+        <div>
+          <h1 id="editorTitle">New Page</h1>
+          <p style="color:#475569;margin:4px 0 0;">Create or update CMS pages with description, publish state, and live preview.</p>
+          <div class="editor-meta">
+            <span id="dirtyState">Saved</span>
+            <span id="editorMetrics">0 words - 0 characters</span>
+          </div>
+        </div>
+      </div>
+      <div class="editor-actions">
+        <button class="secondary" onclick="duplicateCurrentPage()">Duplicate</button>
+        <button class="secondary" onclick="previewPage()">Preview</button>
+        <button class="primary" onclick="savePage()">Save</button>
+      </div>
+    </div>
+    <div class="editor-grid">
+      <div class="editor-panel editor-section">
+        <div class="form-group">
+          <label for="pageSlug">Page slug</label>
+          <input id="pageSlug" placeholder="about-us" />
+        </div>
+        <div class="form-group">
+          <label for="pageTitle">Page title</label>
+          <input id="pageTitle" placeholder="About Us" onblur="syncSlugFromTitle()" />
+        </div>
+        <div class="form-group">
+          <label for="pageDescription">Meta description</label>
+          <input id="pageDescription" placeholder="A short page description for SEO." />
+        </div>
+        <div class="form-group">
+          <label for="pageMetaTitle">Meta title</label>
+          <input id="pageMetaTitle" placeholder="SEO meta title (optional)" />
+        </div>
+        <div class="form-group">
+          <label for="pageKeywords">Meta keywords</label>
+          <input id="pageKeywords" placeholder="keyword1, keyword2, keyword3" />
+        </div>
+        <div class="form-group">
+          <label for="pageCanonical">Canonical URL</label>
+          <input id="pageCanonical" placeholder="https://example.com/page" />
+        </div>
+        <div class="form-group">
+          <label for="pageType">Page type</label>
+          <select id="pageType">
+            <option value="custom">Custom</option>
+            <option value="landing">Landing</option>
+            <option value="blog">Blog</option>
+            <option value="faq">FAQ</option>
+            <option value="product">Product</option>
+          </select>
+        </div>
+        <div class="toggle-row">
+          <input id="pagePublished" type="checkbox" />
+          <label for="pagePublished">Published</label>
+        </div>
+        <div class="form-group toggle-row">
+          <input id="pageScheduled" type="checkbox" />
+          <label for="pageScheduled">Schedule publishing</label>
+        </div>
+        <div class="form-group" id="scheduleControls" style="display:none; gap:12px;">
+          <label for="pageScheduleAt">Publish on</label>
+          <input id="pageScheduleAt" type="datetime-local" />
+          <label for="pageUnpublishAt">Unpublish on</label>
+          <input id="pageUnpublishAt" type="datetime-local" />
+        </div>
+        <div class="form-group">
+          <label for="pageContent">HTML content</label>
+          <div class="snippet-row">
+            <button type="button" onclick="insertSnippet('section')">Section</button>
+            <button type="button" onclick="insertSnippet('button')">Button</button>
+            <button type="button" onclick="insertSnippet('image')">Image</button>
+          </div>
+          <textarea id="pageContent" placeholder="Paste HTML content here..."></textarea>
+        </div>
+        <div class="status-bar" id="status"></div>
+      </div>
+      <div class="editor-panel">
+        <div class="preview-toolbar">
+          <div>
+            <h2 style="margin:0;font-size:1.05rem;color:#111827;">Live preview</h2>
+            <span>Preview content in a sandbox view before saving.</span>
+          </div>
+          <button class="secondary" onclick="renderLivePreview()">Refresh</button>
+        </div>
+        <div class="preview-box"><iframe id="livePreviewFrame" style="width:100%;height:100%;border:none;background:#fff"></iframe></div>
+        <div class="versions-panel" id="versions"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      if (sessionStorage.getItem('cmsAuth') !== 'authorized') {
+        location.replace('/cms.html');
+      }
+    })();
+  </script>
+  <script src="/assets/js/cms.js"></script>
+</body>
+</html>

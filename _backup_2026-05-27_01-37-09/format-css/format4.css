@@ -1,0 +1,114 @@
+/* Delivery Challan - Format 4 */
+
+body {
+  background: #f4f6f8;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 10px;
+  overflow-x: auto;
+}
+
+#invoice {
+  max-width: 794px;
+  width: 100%;
+  margin: 30px auto;
+  background: #fff;
+  padding: 30px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Watermark */
+.watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0.08;
+  z-index: 0;
+}
+
+.watermark .wm {
+  font-size: 120px;
+  font-weight: 700;
+  color: #000;
+  transform: rotate(-35deg);
+  letter-spacing: 2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Ensure content stays above watermark */
+#invoice .invoice-header,
+#invoice .bill-section,
+#invoice .invoice-table,
+#invoice .total-box,
+#invoice .signature-section {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 5px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #invoice {
+    margin: 10px auto;
+    padding: 20px;
+    max-width: 794px;
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px;
+  }
+
+  #invoice {
+    margin: 2px auto;
+    padding: 12px;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+/* A4 Page Size for Printing */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  #invoice {
+    width: 210mm;
+    height: 297mm;
+    max-width: 210mm;
+    margin: 0;
+    padding: 15mm;
+    box-shadow: none;
+    border: none;
+    page-break-after: avoid;
+    transform: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}

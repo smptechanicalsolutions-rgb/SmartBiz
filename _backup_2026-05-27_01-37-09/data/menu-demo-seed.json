@@ -1,0 +1,140 @@
+{
+  "title": "Spice Garden — Food Menu (Demo)",
+  "subtitle": "Sample restaurant catalog · safe to edit, export, or reset",
+  "isDemoMenu": true,
+  "categories": [
+    {
+      "id": "cat-demo-starters",
+      "name": "Starters",
+      "icon": "fa-utensils",
+      "items": [
+        {
+          "id": "demo-st-01",
+          "name": "Paneer Tikka",
+          "description": "Char-grilled cottage cheese, mint chutney",
+          "sku": "ST-01",
+          "price": 220
+        },
+        {
+          "id": "demo-st-02",
+          "name": "Veg Spring Rolls",
+          "description": "Crispy rolls, sweet chilli dip (6 pcs)",
+          "sku": "ST-02",
+          "price": 160
+        },
+        {
+          "id": "demo-st-03",
+          "name": "Chicken Lollipop",
+          "description": "Spicy drumettes, Schezwan sauce",
+          "sku": "ST-03",
+          "price": 280
+        }
+      ]
+    },
+    {
+      "id": "cat-demo-mains",
+      "name": "Main course",
+      "icon": "fa-utensils",
+      "items": [
+        {
+          "id": "demo-mn-01",
+          "name": "Dal Makhani",
+          "description": "Slow-cooked black lentils, cream, butter",
+          "sku": "MN-01",
+          "price": 240
+        },
+        {
+          "id": "demo-mn-02",
+          "name": "Butter Chicken",
+          "description": "Tomato-cashew gravy, naan recommended",
+          "sku": "MN-02",
+          "price": 320
+        },
+        {
+          "id": "demo-mn-03",
+          "name": "Veg Hakka Noodles",
+          "description": "Wok-tossed noodles, mixed vegetables",
+          "sku": "MN-03",
+          "price": 210
+        }
+      ]
+    },
+    {
+      "id": "cat-demo-breads",
+      "name": "Rice & breads",
+      "icon": "fa-cookie-bite",
+      "items": [
+        {
+          "id": "demo-br-01",
+          "name": "Jeera Rice",
+          "description": "Basmati rice, cumin tempering",
+          "sku": "BR-01",
+          "price": 140
+        },
+        {
+          "id": "demo-br-02",
+          "name": "Butter Naan",
+          "description": "Tandoor-baked flatbread (2 pcs)",
+          "sku": "BR-02",
+          "price": 70
+        },
+        {
+          "id": "demo-br-03",
+          "name": "Garlic Naan",
+          "description": "Tandoor naan with garlic butter",
+          "sku": "BR-03",
+          "price": 90
+        }
+      ]
+    },
+    {
+      "id": "cat-demo-beverages",
+      "name": "Beverages",
+      "icon": "fa-mug-hot",
+      "items": [
+        {
+          "id": "demo-bv-01",
+          "name": "Masala Chai",
+          "description": "Indian spiced tea (1 cup)",
+          "sku": "BV-01",
+          "price": 40
+        },
+        {
+          "id": "demo-bv-02",
+          "name": "Fresh Lime Soda",
+          "description": "Sweet or salted",
+          "sku": "BV-02",
+          "price": 60
+        },
+        {
+          "id": "demo-bv-03",
+          "name": "Cold Coffee",
+          "description": "Blended coffee, ice cream scoop",
+          "sku": "BV-03",
+          "price": 120
+        }
+      ]
+    },
+    {
+      "id": "cat-demo-desserts",
+      "name": "Desserts",
+      "icon": "fa-cookie-bite",
+      "items": [
+        {
+          "id": "demo-ds-01",
+          "name": "Gulab Jamun",
+          "description": "Warm milk dumplings, rose syrup (2 pcs)",
+          "sku": "DS-01",
+          "price": 90
+        },
+        {
+          "id": "demo-ds-02",
+          "name": "Ice Cream Scoop",
+          "description": "Vanilla / chocolate / butterscotch",
+          "sku": "DS-02",
+          "price": 80
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Invoice Preview / History</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<style>
+  body {
+    background: #f4f6f8;
+    padding: 0;
+    margin: 0;
+  }
+
+  .preview-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    background: #ffffff;
+    border-bottom: 1px solid #dadce0;
+    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.12);
+    box-sizing: border-box;
+  }
+
+  .preview-topbar-left,
+  .preview-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .preview-title {
+    min-width: 0;
+    color: #202124;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .preview-icon-btn,
+  .preview-share-btn {
+    height: 38px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #3c4043;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+
+  .preview-icon-btn {
+    width: 38px;
+    border-radius: 50%;
+    font-size: 20px;
+  }
+
+  .preview-share-btn {
+    gap: 8px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border-color: #dadce0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .preview-icon-btn:hover,
+  .preview-share-btn:hover {
+    background: #f1f3f4;
+  }
+
+  .preview-menu-wrap {
+    position: relative;
+  }
+
+  .preview-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    display: none;
+    padding: 6px 0;
+    background: #ffffff;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(60, 64, 67, 0.18);
+    overflow: hidden;
+  }
+
+  .preview-menu.is-open {
+    display: block;
+  }
+
+  .preview-menu button {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 16px;
+    border: 0;
+    background: transparent;
+    color: #202124;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .preview-menu button:hover {
+    background: #f1f3f4;
+  }
+
+  .preview-page > button[style*="position:fixed"],
+  .preview-page > div[style*="position:fixed"] {
+    display: none !important;
+  }
+
+  #history-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+
+  #history-container h2 {
+    margin-bottom: 20px;
+    font-size: 1.75rem;
+  }
+
+  .history-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .history-table thead,
+  .history-table tbody,
+  .history-table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .history-table th,
+  .history-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    word-wrap: break-word;
+  }
+
+  .history-table th {
+    background: #0a4b78;
+    color: white;
+    font-weight: 600;
+  }
+
+  .history-table td {
+    background: white;
+  }
+
+  .history-table .action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .history-table .action-buttons button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .history-table .action-buttons button:first-child {
+    background: #0a4b78;
+    color: white;
+  }
+
+  .history-table .action-buttons button:last-child {
+    background: #dc3545;
+    color: white;
+  }
+
+  #invoice-container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Google Docs Style - A4 Paper Canvas */
+  .google-docs-container {
+    background: #e8e8e8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: calc(100vh - 56px);
+    padding: 20px 10px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .paper-canvas {
+    background: white;
+    width: 210mm;
+    aspect-ratio: 210 / 297; /* A4 ratio */
+    max-width: calc(100vw - 20px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1),
+                0 10px 40px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .paper-content {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 40px;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #202124;
+  }
+
+  @media (max-width: 768px) {
+    .preview-topbar {
+      height: 52px;
+      padding: 0 10px;
+    }
+
+    .preview-title {
+      max-width: 42vw;
+      font-size: 14px;
+    }
+
+    .preview-share-btn {
+      height: 36px;
+      padding: 0 12px;
+      font-size: 13px;
+    }
+
+    .google-docs-container {
+      padding: 12px 8px;
+    }
+
+    .paper-canvas {
+      width: 100vw;
+      max-width: calc(100vw - 16px);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      border-radius: 2px;
+    }
+
+    .paper-content {
+      padding: 20px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .google-docs-container {
+      padding: 8px;
+    }
+
+    .paper-canvas {
+      width: calc(100vw - 8px);
+      max-width: calc(100vw - 8px);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .paper-content {
+      padding: 16px;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 0;
+    }
+
+    #history-container {
+      margin: 10px auto;
+      padding: 15px;
+    }
+
+    #history-container h2 {
+      font-size: 1.5rem;
+    }
+
+    .history-table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .history-table thead,
+    .history-table tbody,
+    .history-table tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 8px 6px;
+      font-size: 14px;
+    }
+
+    .history-table .action-buttons {
+      flex-direction: column;
+    }
+
+    .history-table .action-buttons button {
+      width: 100%;
+      margin-bottom: 4px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    #history-container {
+      padding: 10px;
+    }
+
+    #history-container h2 {
+      font-size: 1.25rem;
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 6px 4px;
+      font-size: 12px;
+    }
+
+    .history-table th:nth-child(2),
+    .history-table td:nth-child(2) {
+      display: none;
+    }
+  }
+</style>
+</head>
+
+<body class="preview-page">
+<header class="preview-topbar" aria-label="Preview toolbar">
+  <div class="preview-topbar-left">
+    <button id="backBtn" class="preview-icon-btn" type="button" onclick="goHome()" aria-label="Back to home">
+      &larr;
+    </button>
+    <div class="preview-title">Invoice Preview</div>
+  </div>
+  <div class="preview-topbar-right">
+    <button class="preview-share-btn" type="button" onclick="sharePreview()">Share</button>
+    <div class="preview-menu-wrap">
+      <button id="menuToggle" class="preview-icon-btn" type="button" onclick="toggleMenu(event)" aria-label="More actions" aria-expanded="false">
+        &#8942;
+      </button>
+      <div id="menuBox" class="preview-menu" role="menu" aria-label="Preview actions">
+        <button type="button" role="menuitem" onclick="editDocument()">Edit</button>
+        <button type="button" role="menuitem" onclick="cancelPreview()">Cancel</button>
+        <button type="button" role="menuitem" onclick="downloadFile()">Download</button>
+        <button type="button" role="menuitem" onclick="printFile()">Print</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Back to Home Button - Top Left Corner -->
+<button
+  id="backBtn"
+  onclick="window.location.href='home.html'"
+  style="
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+  "
+  onmouseover="this.style.background='#0056b3'"
+  onmouseout="this.style.background='#007bff'"
+>
+  ← Back to Home
+</button>
+
+<!-- Edit button (top-left, next to back) -->
+<button id="editBtn" title="Edit document" onclick="editDocument()" style="position:fixed;top:20px;left:140px;z-index:1000;background:#2d9cdb;color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);">✎ Edit</button>
+
+<!-- Three-dots menu (top-left) -->
+<div style="position:fixed;top:18px;left:220px;z-index:1000;">
+  <button id="menuToggle" onclick="toggleMenu(event)" style="background:transparent;border:none;font-size:20px;cursor:pointer;padding:6px 8px;">⋮</button>
+  <div id="menuBox" style="display:none;position:absolute;left:0;top:36px;background:#fff;border:1px solid #ddd;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.08);overflow:hidden;min-width:160px;">
+    <button onclick="sendFile()" style="display:block;width:100%;padding:10px 12px;border:none;background:transparent;text-align:left;cursor:pointer;">Send file</button>
+    <button onclick="openWith()" style="display:block;width:100%;padding:10px 12px;border:none;background:transparent;text-align:left;cursor:pointer;">Open with</button>
+    <button onclick="downloadFile()" style="display:block;width:100%;padding:10px 12px;border:none;background:transparent;text-align:left;cursor:pointer;">Download</button>
+    <button onclick="printFile()" style="display:block;width:100%;padding:10px 12px;border:none;background:transparent;text-align:left;cursor:pointer;">Print</button>
+  </div>
+</div>
+
+<div id="history-container" style="display:none">
+  <h2>Invoice History</h2>
+  <div style="overflow-x: auto;">
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Invoice No</th>
+          <th>Date</th>
+          <th>Client</th>
+          <th>Total</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="invoice-container"></div>
+
+<script src="assets/js/history.js"></script>
+<script>
+  // Support opening a specific document via ?doc=... query param
+  function handlePreviewLoad() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const doc = params.get('doc');
+
+      if (!doc) return; // nothing to do
+
+      // Try to find a matching history entry in localStorage
+      const history = JSON.parse(localStorage.getItem('invoiceHistory')) || [];
+
+      // Match by invoiceNo or clientName presence in the doc string
+      const match = history.find(entry => {
+        const combined = `${entry.clientName || ''} - ${entry.type || entry.category || ''}`.trim();
+        if (entry.invoiceNo && doc.includes(String(entry.invoiceNo))) return true;
+        if (entry.clientName && doc.includes(entry.clientName)) return true;
+        if (combined && doc.includes(combined)) return true;
+        return false;
+      });
+
+      if (match) {
+        // Reuse viewInvoice behavior: store invoiceData and navigate to format
+        const invoiceData = match.fullData || match;
+        invoiceData.__historyId = match.id;
+        localStorage.setItem('invoiceData', JSON.stringify(invoiceData));
+
+        const fmt = match.format || 'format1.html';
+        // Navigate to the format page to render the invoice preview
+        window.location.href = 'documents/formats/' + fmt;
+        return;
+      }
+
+      // If not found, show a friendly message in the invoice container
+      const container = document.getElementById('invoice-container');
+      if (container) {
+        container.innerHTML = `
+          <div style="max-width:900px;margin:40px auto;padding:30px;background:#fff;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,0.06);">
+            <h3 style="margin-bottom:12px;color:#0a4b78;">Document not found</h3>
+            <p style="margin-bottom:18px;color:#444;">The document you requested appears to be missing or deleted from history.</p>
+            <div style="display:flex;gap:12px;">
+              <button onclick="window.location.href='home.html'" style="padding:8px 14px;border-radius:6px;border:none;background:#0a4b78;color:#fff;cursor:pointer;">Back to Home</button>
+              <button onclick="window.location.href='preview.html?history=1'" style="padding:8px 14px;border-radius:6px;border:1px solid #0a4b78;background:transparent;color:#0a4b78;cursor:pointer;">Open History</button>
+            </div>
+          </div>
+        `;
+      }
+    } catch (err) {
+      console.error('Error handling preview load:', err);
+    }
+  }
+
+  // Run on initial load
+  handlePreviewLoad();
+
+  // Re-run when page is restored from bfcache (back/forward navigation)
+  window.addEventListener('pageshow', function (e) {
+    if (e && e.persisted) {
+      handlePreviewLoad();
+    }
+  });
+</script>
+<script>
+  function goHome() {
+    window.location.href = 'home.html';
+  }
+
+  function cancelPreview() {
+    goHome();
+  }
+
+  async function sharePreview() {
+    const shareData = {
+      title: document.title || 'Invoice Preview',
+      text: 'Invoice Preview',
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Preview link copied.');
+        return;
+      }
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;
+    }
+
+    window.prompt('Copy preview link:', window.location.href);
+  }
+
+  function closeMenu() {
+    const box = document.getElementById('menuBox');
+    const toggle = document.getElementById('menuToggle');
+    if (box) box.classList.remove('is-open');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  }
+
+  // Menu toggle and outside click handling
+  function toggleMenu(e) {
+    e.stopPropagation();
+    const box = document.getElementById('menuBox');
+    const toggle = document.getElementById('menuToggle');
+    const isOpen = box.classList.toggle('is-open');
+    if (toggle) toggle.setAttribute('aria-expanded', String(isOpen));
+  }
+
+  document.addEventListener('click', function(e) {
+    const box = document.getElementById('menuBox');
+    const toggle = document.getElementById('menuToggle');
+    if (!box) return;
+    if (box.classList.contains('is-open') && !box.contains(e.target) && e.target !== toggle) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  // Edit opens the main invoice editor.
+  function editDocument() {
+    window.location.href = 'index.html';
+  }
+
+  // Send file: open mail client with link to this preview page
+  function sendFile() {
+    const url = window.location.href;
+    const subject = encodeURIComponent('Document review');
+    const body = encodeURIComponent('Please review the document: ' + url);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
+
+  // Open with: create a blob of the HTML and open in a new tab (user can choose app)
+  function openWith() {
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    // revoke after a bit
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+
+  // Download: provide .html download of current view (user can save as PDF via print)
+  function downloadFile() {
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    const filename = 'document-' + (new Date()).toISOString().split('T')[0] + '.html';
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+  }
+
+  // Print the current page
+  function printFile() {
+    window.print();
+  }
+</script>
+<script src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
+<script src="assets/js/simple-login-button.js"></script>
+</body>
+</html>

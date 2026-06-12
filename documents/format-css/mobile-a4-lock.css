@@ -1,0 +1,118 @@
+/**
+ * When mobile preview is active, keep exact desktop A4 layout.
+ * Only the outer wrapper is scaled — never reflow invoice internals.
+ */
+@media (max-width: 793px) {
+  body.mobile-a4-active {
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  body.mobile-a4-active #invoice,
+  body.mobile-a4-active #invoice.proforma3,
+  body.mobile-a4-active .invoice {
+    width: 794px !important;
+    min-width: 794px !important;
+    max-width: 794px !important;
+    padding: 30px !important;
+    margin: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  body.mobile-a4-active #invoice.proforma3::before {
+    top: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    bottom: 20px !important;
+  }
+
+  body.mobile-a4-active .proforma3-header-title {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px 0 6px !important;
+  }
+
+  body.mobile-a4-active .proforma3-header-title .title {
+    font-size: 14px !important;
+    letter-spacing: 3px !important;
+  }
+
+  body.mobile-a4-active .proforma3-header-title .right-tag {
+    position: absolute !important;
+    right: 4px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    align-self: auto !important;
+  }
+
+  body.mobile-a4-active .proforma3-top {
+    display: grid !important;
+    grid-template-columns: 1.1fr 0.9fr !important;
+    gap: 0 !important;
+  }
+
+  body.mobile-a4-active .proforma3-customer {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+  }
+
+  body.mobile-a4-active .proforma3-customer-left,
+  body.mobile-a4-active .proforma3-customer-right {
+    width: auto !important;
+  }
+
+  body.mobile-a4-active .proforma3-totals-row {
+    display: grid !important;
+    grid-template-columns: 1fr 0.35fr !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+  }
+
+  body.mobile-a4-active .proforma3-totals-left,
+  body.mobile-a4-active .proforma3-totals-right {
+    width: auto !important;
+  }
+
+  body.mobile-a4-active .proforma3-items th,
+  body.mobile-a4-active .proforma3-items td {
+    padding: 6px !important;
+    font-size: 10px !important;
+  }
+
+  body.mobile-a4-active .proforma3-taxbreak th,
+  body.mobile-a4-active .proforma3-taxbreak td {
+    padding: 4px 6px !important;
+    font-size: 10px !important;
+  }
+
+  body.mobile-a4-active .proforma3-signature,
+  body.mobile-a4-active .proforma3-bottom-grid {
+    flex-direction: row !important;
+    align-items: stretch !important;
+    text-align: inherit !important;
+  }
+
+  body.mobile-a4-active .summary-section {
+    flex-direction: row !important;
+    display: flex !important;
+  }
+
+  body.mobile-a4-active .summary-left,
+  body.mobile-a4-active .summary-right {
+    width: auto !important;
+    order: unset !important;
+  }
+
+  body.mobile-a4-active .total-box {
+    width: 300px !important;
+    max-width: 300px !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+}

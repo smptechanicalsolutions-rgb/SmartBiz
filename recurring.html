@@ -1,0 +1,287 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Recurring Invoices</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    body { background:#f6f8fb; color:#1f2937; font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; margin:0; }
+    .recurring-shell { max-width:1180px; margin:28px auto; padding:0 20px 40px; }
+    .page-header { background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:24px; box-shadow:0 12px 28px rgba(15,23,42,.06); margin-bottom:18px; }
+    .page-header-row { display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between; }
+    .title-wrap { display:flex; flex-wrap:wrap; gap:14px; align-items:center; }
+    .page-title { font-size:2rem; margin:4px 0 0; letter-spacing:0; }
+    .page-copy { margin:10px 0 0; color:#4b5563; max-width:760px; line-height:1.65; }
+    .chip { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:999px; background:#eef2ff; color:#1d4ed8; font-size:.86rem; font-weight:700; }
+    .chip--inactive { background:#f3f4f6; color:#374151; }
+    .chip--due { background:#fff7ed; color:#c2410c; }
+    .hero-panel { display:grid; gap:14px; grid-template-columns:repeat(4,minmax(160px,1fr)); margin-bottom:18px; }
+    .hero-card { background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:18px; box-shadow:0 10px 24px rgba(15,23,42,.05); }
+    .hero-card h4 { margin:0 0 8px; font-size:.78rem; color:#6b7280; text-transform:uppercase; letter-spacing:.08em; }
+    .hero-card .value { font-size:1.65rem; font-weight:800; color:#111827; }
+    .panel { background:#fff; border-radius:8px; box-shadow:0 12px 28px rgba(15,23,42,.06); border:1px solid #e5e7eb; padding:22px; }
+    .panel + .panel { margin-top:18px; }
+    .panel-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .panel-header h2 { margin:0 0 4px; font-size:1.2rem; }
+    .panel-header p { margin:0; color:#6b7280; line-height:1.45; }
+    .list-toolbar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .list-toolbar input, .list-toolbar select { min-height:42px; border:1px solid #d1d5db; border-radius:8px; padding:10px 12px; background:#fff; color:#111827; }
+    .recurring-list { display:grid; gap:12px; }
+    .recurring-card { display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; padding:18px; border-radius:8px; background:#fff; border:1px solid #e5e7eb; }
+    .recurring-card .info { min-width:220px; flex:1 1 360px; }
+    .recurring-card h3 { margin:0 0 8px; font-size:1.05rem; color:#111827; }
+    .recurring-card .meta { display:flex; flex-wrap:wrap; gap:8px 14px; color:#6b7280; font-size:.92rem; line-height:1.5; }
+    .recurring-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:flex-end; }
+    .form-grid { display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+    .form-group { display:flex; flex-direction:column; gap:7px; }
+    .form-group label { font-size:.9rem; color:#374151; font-weight:650; }
+    .form-group input, .form-group select { width:100%; min-height:44px; border-radius:8px; border:1px solid #d1d5db; padding:11px 12px; background:#fafbff; color:#111827; font-size:.96rem; }
+    .form-group input:focus, .form-group select:focus, .list-toolbar input:focus, .list-toolbar select:focus { outline:2px solid #2563eb; outline-offset:2px; border-color:transparent; }
+    .form-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+    .btn-primary, .btn-secondary, .btn-danger { border-radius:8px; padding:11px 15px; font-weight:700; cursor:pointer; border:0; min-height:40px; }
+    .btn-primary { background:#2563eb; color:#fff; }
+    .btn-secondary { background:#f3f4f6; color:#1f2937; }
+    .btn-danger { background:#fee2e2; color:#991b1b; }
+    .empty-state { padding:24px; text-align:center; color:#6b7280; background:#f8fafc; border-radius:8px; border:1px dashed #d1d5db; }
+    .form-error { margin-top:12px; color:#b91c1c; min-height:22px; }
+    @media (max-width: 900px) { .hero-panel { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width: 640px) {
+      .recurring-shell { padding:0 14px 28px; }
+      .hero-panel { grid-template-columns:1fr; }
+      .panel-header, .recurring-card { flex-direction:column; }
+      .recurring-actions, .form-actions, .panel-header .btn-primary { width:100%; }
+      .recurring-actions button, .form-actions button { flex:1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="recurring-shell">
+    <header class="page-header">
+      <div class="page-header-row">
+        <div class="title-wrap">
+          <button class="btn-secondary" onclick="window.history.back()">Back</button>
+          <div>
+            <span class="chip">Automated billing</span>
+            <h1 class="page-title">Recurring Invoices</h1>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="runDueSchedules()">Run due now</button>
+      </div>
+      <p class="page-copy">Create schedules, pause or resume them, edit the next run date, and generate due recurring invoices from one workspace.</p>
+    </header>
+
+    <div class="hero-panel">
+      <div class="hero-card"><h4>Total schedules</h4><div class="value" id="totalSchedules">0</div></div>
+      <div class="hero-card"><h4>Active items</h4><div class="value" id="activeItems">0</div></div>
+      <div class="hero-card"><h4>Next due</h4><div class="value" id="nextDue">None</div></div>
+      <div class="hero-card"><h4>Due this week</h4><div class="value" id="dueWeek">0</div></div>
+    </div>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Schedule List</h2>
+          <p>Search, filter, pause, resume, edit, or delete existing recurring invoice schedules.</p>
+        </div>
+      </div>
+      <div class="list-toolbar">
+        <input id="recSearch" placeholder="Search client, title, or email..." oninput="renderRecurringList()" />
+        <select id="recStatusFilter" onchange="renderRecurringList()">
+          <option value="all">All schedules</option>
+          <option value="active">Active only</option>
+          <option value="paused">Paused only</option>
+          <option value="due">Due now</option>
+        </select>
+      </div>
+      <div id="recurringList" class="recurring-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2 id="formTitle">Create Schedule</h2>
+          <p>Use the next run date to control exactly when the first generated invoice should be created.</p>
+        </div>
+      </div>
+      <input id="rec_id" type="hidden" />
+      <div class="form-grid">
+        <div class="form-group"><label for="rec_name">Invoice title</label><input id="rec_name" placeholder="Monthly rent" /></div>
+        <div class="form-group"><label for="rec_client">Client name</label><input id="rec_client" placeholder="Client name" /></div>
+        <div class="form-group"><label for="rec_amount">Amount</label><input id="rec_amount" type="number" min="0" step="0.01" placeholder="1000" /></div>
+        <div class="form-group">
+          <label for="rec_schedule">Frequency</label>
+          <select id="rec_schedule">
+            <option value="monthly">Monthly</option>
+            <option value="weekly">Weekly</option>
+            <option value="daily">Daily</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+        <div class="form-group"><label for="rec_interval">Interval</label><input id="rec_interval" type="number" min="1" step="1" placeholder="1" /></div>
+        <div class="form-group"><label for="rec_start">Next run date</label><input id="rec_start" type="date" /></div>
+        <div class="form-group"><label for="rec_recipient">Recipient email</label><input id="rec_recipient" type="email" placeholder="Optional email address" /></div>
+        <div class="form-group"><label for="rec_reminder">Reminder days before</label><input id="rec_reminder" type="number" min="0" step="1" placeholder="0" /></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" id="recSubmitBtn" onclick="saveRecurringFromForm()">Create schedule</button>
+        <button class="btn-secondary" onclick="clearRecurringForm()">Clear</button>
+      </div>
+      <div class="form-error" id="recFormError"></div>
+    </section>
+  </div>
+
+  <script src="assets/js/recurring.js"></script>
+  <script>
+    function formatDate(value){
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? 'Not scheduled' : d.toLocaleDateString();
+    }
+
+    function updateSummary(items){
+      const activeItems = items.filter(i => i.active !== false);
+      const nextItem = activeItems.slice().sort((a,b)=>new Date(a.nextRun)-new Date(b.nextRun))[0];
+      document.getElementById('totalSchedules').innerText = items.length;
+      document.getElementById('activeItems').innerText = activeItems.length;
+      document.getElementById('nextDue').innerText = nextItem ? formatDate(nextItem.nextRun) : 'None';
+      document.getElementById('dueWeek').innerText = window.RecurringInvoices ? RecurringInvoices.upcomingWithin(7).length : 0;
+    }
+
+    function filteredItems(){
+      const now = new Date();
+      const query = (document.getElementById('recSearch')?.value || '').toLowerCase().trim();
+      const status = document.getElementById('recStatusFilter')?.value || 'all';
+      return RecurringInvoices.list().filter(item => {
+        const due = item.active !== false && new Date(item.nextRun) <= now;
+        const text = `${item.name || ''} ${item.clientName || ''} ${item.recipient || ''}`.toLowerCase();
+        if (query && !text.includes(query)) return false;
+        if (status === 'active' && item.active === false) return false;
+        if (status === 'paused' && item.active !== false) return false;
+        if (status === 'due' && !due) return false;
+        return true;
+      }).sort((a,b)=>new Date(a.nextRun)-new Date(b.nextRun));
+    }
+
+    function renderRecurringList(){
+      const listEl = document.getElementById('recurringList');
+      if (!listEl || !window.RecurringInvoices) return;
+      const allItems = RecurringInvoices.list();
+      const items = filteredItems();
+      const now = new Date();
+      updateSummary(allItems);
+      if (!items.length){
+        listEl.innerHTML = '<div class="empty-state">No schedules match this view. Create one below or change the filters.</div>';
+        return;
+      }
+      listEl.innerHTML = items.map(item => {
+        const active = item.active !== false;
+        const due = active && new Date(item.nextRun) <= now;
+        return `
+          <div class="recurring-card">
+            <div class="info">
+              <h3>${item.name || 'Untitled schedule'}</h3>
+              <div class="meta">
+                <span>Client: ${item.clientName || 'Not set'}</span>
+                <span>Next: ${formatDate(item.nextRun)}</span>
+                <span>${String(item.schedule || 'monthly').replace(/^./, c => c.toUpperCase())} every ${item.interval || 1}</span>
+                <span>Amount: ${Number(item.amount || 0).toLocaleString()}</span>
+                <span>${item.recipient ? 'Email: ' + item.recipient : 'No email recipient'}</span>
+              </div>
+            </div>
+            <div class="recurring-actions">
+              <span class="${active ? 'chip' : 'chip chip--inactive'}">${active ? 'Active' : 'Paused'}</span>
+              ${due ? '<span class="chip chip--due">Due now</span>' : ''}
+              <button class="btn-secondary" onclick="editRecurring(${item.id})">Edit</button>
+              <button class="btn-secondary" onclick="toggleRecurring(${item.id})">${active ? 'Pause' : 'Resume'}</button>
+              <button class="btn-danger" onclick="deleteRecurring(${item.id})">Delete</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function clearRecurringForm(){
+      ['rec_id','rec_name','rec_client','rec_amount','rec_interval','rec_start','rec_recipient','rec_reminder'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('rec_schedule').value = 'monthly';
+      document.getElementById('recSubmitBtn').innerText = 'Create schedule';
+      document.getElementById('formTitle').innerText = 'Create Schedule';
+      document.getElementById('recFormError').innerText = '';
+    }
+
+    function readRecurringForm(){
+      const name = document.getElementById('rec_name').value.trim();
+      const clientName = document.getElementById('rec_client').value.trim();
+      const amount = Number(document.getElementById('rec_amount').value);
+      const schedule = document.getElementById('rec_schedule').value;
+      const interval = Number(document.getElementById('rec_interval').value || 1);
+      const dateValue = document.getElementById('rec_start').value;
+      const recipient = document.getElementById('rec_recipient').value.trim();
+      const reminderDays = Number(document.getElementById('rec_reminder').value || 0);
+      if (!name) throw new Error('Invoice title is required.');
+      if (!clientName) throw new Error('Client name is required.');
+      if (!Number.isFinite(amount) || amount < 0) throw new Error('Enter a valid amount.');
+      if (!Number.isInteger(interval) || interval < 1) throw new Error('Interval must be at least 1.');
+      if (!Number.isInteger(reminderDays) || reminderDays < 0) throw new Error('Reminder days cannot be negative.');
+      if (recipient && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) throw new Error('Recipient email is not valid.');
+      const nextRun = dateValue ? new Date(dateValue).toISOString() : new Date().toISOString();
+      return { name, clientName, amount, schedule, interval, startDate: nextRun, nextRun, recipient, reminderDays };
+    }
+
+    function saveRecurringFromForm(){
+      const errorEl = document.getElementById('recFormError');
+      try {
+        const id = document.getElementById('rec_id').value;
+        const payload = readRecurringForm();
+        if (id) RecurringInvoices.update(id, payload);
+        else RecurringInvoices.create(payload);
+        clearRecurringForm();
+        renderRecurringList();
+        alert(id ? 'Recurring schedule updated.' : 'Recurring schedule created.');
+      } catch (error) {
+        errorEl.innerText = error.message;
+      }
+    }
+
+    function editRecurring(id){
+      const item = RecurringInvoices.list().find(i => String(i.id) === String(id));
+      if (!item) return;
+      document.getElementById('rec_id').value = item.id;
+      document.getElementById('rec_name').value = item.name || '';
+      document.getElementById('rec_client').value = item.clientName || '';
+      document.getElementById('rec_amount').value = item.amount || 0;
+      document.getElementById('rec_schedule').value = item.schedule || 'monthly';
+      document.getElementById('rec_interval').value = item.interval || 1;
+      document.getElementById('rec_start').value = (item.nextRun || item.startDate || '').slice(0,10);
+      document.getElementById('rec_recipient').value = item.recipient || '';
+      document.getElementById('rec_reminder').value = item.reminderDays || 0;
+      document.getElementById('recSubmitBtn').innerText = 'Update schedule';
+      document.getElementById('formTitle').innerText = 'Edit Schedule';
+      document.getElementById('recFormError').innerText = '';
+      document.getElementById('rec_name').focus();
+    }
+
+    function toggleRecurring(id){
+      const item = RecurringInvoices.list().find(i => String(i.id) === String(id));
+      if (!item) return;
+      RecurringInvoices.update(id, { active: item.active === false });
+      renderRecurringList();
+    }
+
+    function runDueSchedules(){
+      const changed = RecurringInvoices.checkAndRun();
+      renderRecurringList();
+      alert(changed.length ? `Generated ${changed.length} recurring invoice(s).` : 'No schedules are due right now.');
+    }
+
+    function deleteRecurring(id){
+      if(!confirm('Delete this recurring schedule?')) return;
+      RecurringInvoices.remove(id);
+      renderRecurringList();
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      renderRecurringList();
+      window.addEventListener('storage', function(e){ if (e.key==='recurringInvoices') renderRecurringList(); });
+    });
+  </script>
+</body>
+</html>
