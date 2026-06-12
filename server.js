@@ -155,9 +155,10 @@ function ensureCanonicalTestHistory() {
     const seed = JSON.parse(fs.readFileSync(TEST_HISTORY_SEED, 'utf8'));
     if (!Array.isArray(seed) || seed.length === 0) return;
     const current = readHistory();
-    if (!isCanonicalTestHistory(current)) {
+    // Only seed canonical test history when history is empty. Do not overwrite existing user data.
+    if (!Array.isArray(current) || current.length === 0) {
       writeHistory(seed);
-      console.log('Document history reset to canonical test documents (' + CANONICAL_TEST_NOS.join(', ') + ').');
+      console.log('Document history initialized with canonical test documents.');
     }
   } catch (e) {
     console.warn('Could not ensure test history:', e.message);
