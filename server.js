@@ -384,6 +384,16 @@ app.get('/api/me', authenticateToken, (req, res) => {
   res.json({ user: req.user });
 });
 
+// Diagnostic: return server-side history file for debugging (no auth - development helper)
+app.get('/api/history/list', (req, res) => {
+  try {
+    const history = readHistory();
+    res.json({ success: true, count: Array.isArray(history) ? history.length : 0, history });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message || String(e) });
+  }
+});
+
 // Request OTP
 app.post('/api/request-otp', (req, res) => {
   const mobile = (req.body.mobile||'').toString();

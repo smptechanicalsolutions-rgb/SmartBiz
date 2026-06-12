@@ -271,6 +271,11 @@ function saveInvoiceToHistory(invoiceData) {
 
     // Save to file via API (primary storage)
     saveHistoryToFile(historyEntry).then(() => {
+      try {
+        if (typeof notificationService !== 'undefined') {
+          notificationService.notifyInvoiceCreated(historyEntry.invoiceNo || historyEntry.id);
+        }
+      } catch (e) {}
       // Also update localStorage as backup
       let history = JSON.parse(localStorage.getItem("invoiceHistory")) || [];
       
@@ -293,6 +298,11 @@ function saveInvoiceToHistory(invoiceData) {
       localStorage.setItem("invoiceHistory", JSON.stringify(history));
       console.log(`${docType} saved to history file`);
     }).catch(error => {
+      try {
+        if (typeof notificationService !== 'undefined') {
+          notificationService.show('Saved locally (server unavailable)', 'warning', 4000);
+        }
+      } catch (e) {}
       let history = JSON.parse(localStorage.getItem("invoiceHistory")) || [];
 
       const existingIndex = history.findIndex(
@@ -315,6 +325,38 @@ function saveInvoiceToHistory(invoiceData) {
     });
   } catch (error) {
     console.error("Error saving to history:", error);
+  }
+}
+
+// Debug helper: run save checks (localStorage + server history)
+async function runSaveChecks() {
+  try {
+    console.group('Save checks');
+    const local = JSON.parse(localStorage.getItem('invoiceHistory') || '[]');
+    console.log('Local invoiceHistory length:', Array.isArray(local) ? local.length : 0, local);
+    try {
+      const res = await fetch('/api/history/list');
+      if (res.ok) {
+        const data = await res.json();
+        console.log('Server history count:', data.count, data.history || []);
+        if (typeof notificationService !== 'undefined') {
+          notificationService.show(`Server history: ${data.count} documents`, 'info', 4000);
+        }
+      } else {
+        console.warn('Server history request failed', res.status);
+        if (typeof notificationService !== 'undefined') {
+          notificationService.show('Server history request failed', 'warning', 4000);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not fetch server history:', e);
+      if (typeof notificationService !== 'undefined') {
+        notificationService.show('Could not fetch server history', 'error', 4000);
+      }
+    }
+    console.groupEnd();
+  } catch (e) {
+    console.error('runSaveChecks error', e);
   }
 }
 
