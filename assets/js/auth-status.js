@@ -220,6 +220,12 @@ function logout() {
       console.warn('Logout API call failed (server may not be running):', err);
     })
     .finally(() => {
+      // If Firebase auth is available, sign out first to avoid onAuthStateChanged recreating a session
+      try {
+        if (window.firebaseAuth && typeof window.firebaseAuth.signOut === 'function') {
+          window.firebaseAuth.signOut().catch(()=>{});
+        }
+      } catch (e) {}
       localStorage.removeItem('smarbiz_session');
       localStorage.removeItem('auth_current');
       window.location.href = getLoginPageUrl();

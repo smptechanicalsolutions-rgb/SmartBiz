@@ -2817,16 +2817,24 @@
                 notificationIcon.addEventListener('click', showNotifications);
             }
             
-            // Check for backup reminder
-            if (typeof backupService !== 'undefined') {
-                const reminder = backupService.setBackupReminder(7);
-                if (reminder.shouldBackup && typeof notificationService !== 'undefined') {
-                    notificationService.show(
-                        '?? ' + reminder.message,
-                        'warning',
-                        0 // persistent
-                    );
+            // Check for backup reminder only if user is logged in
+            try {
+                const isUserLoggedIn = (window.authService && typeof authService.isLoggedIn === 'function' && authService.isLoggedIn())
+                    || (window.authGuard && typeof authGuard.isLoggedIn === 'function' && authGuard.isLoggedIn())
+                    || !!localStorage.getItem('smarbiz_session');
+
+                if (isUserLoggedIn && typeof backupService !== 'undefined') {
+                    const reminder = backupService.setBackupReminder(7);
+                    if (reminder.shouldBackup && typeof notificationService !== 'undefined') {
+                        notificationService.show(
+                            '⚠️ ' + reminder.message,
+                            'warning',
+                            0 // persistent
+                        );
+                    }
                 }
+            } catch (e) {
+                // Fail silently if auth/backup services are not available
             }
         });
         
