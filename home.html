@@ -2883,6 +2883,25 @@
         function goToNotifications() {
             window.location.href = 'settings.html#notifications';
         }
+        
+        // Debug tools: visible buttons to run checks and sync local to server
+        (function injectDebugButtons(){
+            const style = document.createElement('style');
+            style.textContent = `
+                #debug-tools { position: fixed; right: 18px; bottom: 18px; z-index: 99999; display:flex; gap:8px; }
+                .dbg-btn { background:#1f2937; color:white; border:none; padding:8px 10px; border-radius:8px; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.12); }
+                .dbg-btn.secondary { background:#6b7280; }
+            `;
+            document.head.appendChild(style);
+
+            const container = document.createElement('div');
+            container.id = 'debug-tools';
+            container.innerHTML = `
+                <button class="dbg-btn" onclick="(typeof runSaveChecks === 'function' ? runSaveChecks() : alert('runSaveChecks not available'))">Run Save Checks</button>
+                <button class="dbg-btn secondary" onclick="(typeof syncLocalToServer === 'function' ? syncLocalToServer() : alert('syncLocalToServer not available'))">Sync Local → Server</button>
+            `;
+            document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(container); });
+        })();
     </script>
 </body>
 </html>

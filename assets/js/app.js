@@ -360,6 +360,41 @@ async function runSaveChecks() {
   }
 }
 
+// Sync local invoiceHistory to server using /api/history/merge
+async function syncLocalToServer() {
+  try {
+    const invoices = JSON.parse(localStorage.getItem('invoiceHistory') || '[]');
+    if (!Array.isArray(invoices) || invoices.length === 0) {
+      if (typeof notificationService !== 'undefined') notificationService.show('No local invoices to sync', 'info', 3000);
+      return;
+    }
+
+    if (typeof notificationService !== 'undefined') notificationService.show('Syncing local invoices to server...', 'info', 2000);
+
+    const res = await fetch('/api/history/merge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invoices })
+    });
+
+    const data = await res.json();
+    if (res.ok && data && data.success) {
+      if (typeof notificationService !== 'undefined') notificationService.show(`Sync complete: added ${data.added}, updated ${data.updated}`, 'success', 5000);
+      console.log('Sync result', data);
+      // Refresh checks
+      if (typeof runSaveChecks === 'function') runSaveChecks();
+    } else {
+      console.warn('Sync failed', data);
+      if (typeof notificationService !== 'undefined') notificationService.show('Sync failed', 'error', 5000);
+    }
+  } catch (e) {
+    console.error('syncLocalToServer error', e);
+    if (typeof notificationService !== 'undefined') notificationService.show('Sync failed: ' + (e.message || ''), 'error', 5000);
+  }
+}
+
+window.syncLocalToServer = syncLocalToServer;
+
 // Save history entry to file via API
 async function saveHistoryToFile(historyEntry) {
   try {

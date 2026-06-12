@@ -394,6 +394,53 @@ app.get('/api/history/list', (req, res) => {
   }
 });
 
+// Development helper: merge client-provided invoices into server history
+app.post('/api/history/merge', express.json(), (req, res) => {
+  try {
+    const payload = req.body && (Array.isArray(req.body) ? req.body : req.body.invoices) ? (Array.isArray(req.body) ? req.body : req.body.invoices) : null;
+    if (!Array.isArray(payload)) return res.status(400).json({ success: false, error: 'Invalid payload: expected { invoices: [...] } or an array' });
+
+    const incoming = payload;
+    const existing = readHistory() || [];
+    const map = new Map(existing.map(d => [String(d.id), d]));
+
+    let added = 0, updated = 0, skipped = 0;
+
+    incoming.forEach(item => {
+      if (!item) { skipped++; return; }
+      const id = item.id != null ? String(item.id) : (item.__historyId != null ? String(item.__historyId) : null);
+      if (!id) {
+        // assign a new unique id
+        const newId = Date.now().toString() + Math.floor(Math.random() * 1000).toString();
+        item.id = newId;
+        item.createdAt = item.createdAt || new Date().toISOString();
+        map.set(String(item.id), item);
+        added++;
+        return;
+      }
+
+      if (map.has(id)) {
+        const existingItem = map.get(id) || {};
+        const merged = Object.assign({}, existingItem, item);
+        merged.createdAt = existingItem.createdAt || item.createdAt || new Date().toISOString();
+        map.set(id, merged);
+        updated++;
+      } else {
+        item.createdAt = item.createdAt || new Date().toISOString();
+        map.set(id, item);
+        added++;
+      }
+    });
+
+    const merged = Array.from(map.values()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    writeHistory(merged);
+    res.json({ success: true, added, updated, skipped, count: merged.length });
+  } catch (e) {
+    console.error('history/merge error', e);
+    res.status(500).json({ success: false, error: e.message || String(e) });
+  }
+});
+
 // Request OTP
 app.post('/api/request-otp', (req, res) => {
   const mobile = (req.body.mobile||'').toString();
