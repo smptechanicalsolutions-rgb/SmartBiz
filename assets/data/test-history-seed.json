@@ -1,6 +1,7 @@
 [
   {
     "id": 100001,
+    "userId": "demo-user",
     "invoiceNo": "TEST-INV-001",
     "invoiceDate": "2026-05-24",
     "dueDate": "2026-06-23",
@@ -53,6 +54,7 @@
   },
   {
     "id": 100002,
+    "userId": "demo-user",
     "invoiceNo": "TEST-ALL-001",
     "invoiceDate": "2026-05-24",
     "dueDate": "2026-06-24",
@@ -105,6 +107,7 @@
   },
   {
     "id": 100003,
+    "userId": "demo-user",
     "invoiceNo": "TEST-DC-001",
     "invoiceDate": "2026-05-24",
     "dueDate": "",
@@ -157,6 +160,7 @@
   },
   {
     "id": 100004,
+    "userId": "demo-user",
     "invoiceNo": "TEST-PRO-001",
     "invoiceDate": "2026-05-24",
     "dueDate": "2026-06-10",

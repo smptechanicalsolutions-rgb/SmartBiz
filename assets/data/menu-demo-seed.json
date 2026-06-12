@@ -1,6 +1,7 @@
 {
   "title": "Spice Garden — Food Menu (Demo)",
   "subtitle": "Sample restaurant catalog · safe to edit, export, or reset",
+  "userId": "demo-user",
   "isDemoMenu": true,
   "categories": [
     {
